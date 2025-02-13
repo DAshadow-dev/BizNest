@@ -9,10 +9,9 @@ import DetailsScreen from '@screens/DetailsScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Routes from '@utils/Routes';
 import { RootParamList } from '@utils/RootParamList';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-
-
-const Stack = createNativeStackNavigator<RootParamList>();
+import { createStackNavigator } from '@react-navigation/stack';
+  
+const Stack = createStackNavigator<RootParamList>();
 
 function MyStack() {
   return (

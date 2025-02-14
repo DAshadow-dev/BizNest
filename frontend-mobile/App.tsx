@@ -10,6 +10,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Routes from '@utils/Routes';
 import { RootParamList } from '@utils/RootParamList';
 import { createStackNavigator } from '@react-navigation/stack';
+import AdminDashboardScreen from '@screens/admin/AdminDashboardScreen';
+import AccountListScreen from '@screens/admin/AccountListScreen';
+import PendingAccountScreen from '@screens/admin/PendingAccountScreen';
+import AccountDetailScreen from '@screens/admin/AccountDetailScreen';
   
 const Stack = createStackNavigator<RootParamList>();
 
@@ -22,6 +26,10 @@ function MyStack() {
       initialRouteName={Routes.HomeScreen}>
         <Stack.Screen name={Routes.HomeScreen} component={HomeScreen} />
         <Stack.Screen name={Routes.DetailsScreen} component={DetailsScreen} />
+        <Stack.Screen name={Routes.AdminDashboardScreen} component={AdminDashboardScreen} />
+        <Stack.Screen name={Routes.AccountListScreen} component={AccountListScreen}/>
+        <Stack.Screen name={Routes.AccountDetailScreen} component={AccountDetailScreen}/>
+        <Stack.Screen name={Routes.PendingAccountsScreen} component={PendingAccountScreen} />
     </Stack.Navigator>
   );
 }

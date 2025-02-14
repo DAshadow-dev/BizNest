@@ -6,11 +6,14 @@ import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
 import HomeScreen from '@screens/HomeScreen';
 import DetailsScreen from '@screens/DetailsScreen';
+import InvoiceListScreen from '@screens/InvoiceListScreen';  
+import InvoiceScreen from '@screens/InvoiceScreen';  
+import CreateInvoiceScreen from '@screens/CreateInvoiceScreen';  
+import PaymentScreen from '@screens/PaymentScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Routes from '@utils/Routes';
 import { RootParamList } from '@utils/RootParamList';
 import { createStackNavigator } from '@react-navigation/stack';
-  
 const Stack = createStackNavigator<RootParamList>();
 
 function MyStack() {
@@ -22,6 +25,10 @@ function MyStack() {
       initialRouteName={Routes.HomeScreen}>
         <Stack.Screen name={Routes.HomeScreen} component={HomeScreen} />
         <Stack.Screen name={Routes.DetailsScreen} component={DetailsScreen} />
+        <Stack.Screen name={Routes.InvoiceListScreen} component={InvoiceListScreen} />
+        <Stack.Screen name={Routes.InvoiceScreen} component={InvoiceScreen} />
+        <Stack.Screen name={Routes.CreateInvoiceScreen} component={CreateInvoiceScreen} />
+        <Stack.Screen name={Routes.PaymentScreen} component={PaymentScreen} />
     </Stack.Navigator>
   );
 }

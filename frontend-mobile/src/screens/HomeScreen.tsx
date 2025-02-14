@@ -10,6 +10,8 @@ const HomeScreen = () => {
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text>Home Screen</Text>
       <Button title="Go to Details" onPress={() => navigation.navigate(Routes.DetailsScreen, {message: 'hello'})} />
+      <Text>InvoiceListScreen</Text>
+      <Button title="Go to InvoiceListScreen" onPress={() => navigation.navigate(Routes.InvoiceListScreen, {message: 'hello'})} />
     </View>
   );
 }

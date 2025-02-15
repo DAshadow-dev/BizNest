@@ -10,6 +10,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Routes from '@utils/Routes';
 import { RootParamList } from '@utils/RootParamList';
 import { createStackNavigator } from '@react-navigation/stack';
+import ProductListScreen from '@screens/ProductListScreen';
+import CreateProductScreen from '@screens/CreateProductScreen';
+import ProductDetailScreen from '@screens/productDetailScreen';
+import EditProductScreen from '@screens/EditProductScreen';
   
 const Stack = createStackNavigator<RootParamList>();
 
@@ -19,9 +23,15 @@ function MyStack() {
       screenOptions={{
         headerShown: false,
       }}
-      initialRouteName={Routes.HomeScreen}>
+      initialRouteName={Routes.ProductListScreen}>
         <Stack.Screen name={Routes.HomeScreen} component={HomeScreen} />
         <Stack.Screen name={Routes.DetailsScreen} component={DetailsScreen} />
+        <Stack.Screen name={Routes.ProductListScreen} component={ProductListScreen} />
+        <Stack.Screen name={Routes.CreateProductScreen} component={CreateProductScreen} />
+        <Stack.Screen name={Routes.ProductDetailScreen} component={ProductDetailScreen} />
+        <Stack.Screen name={Routes.EditProductScreen} component={EditProductScreen} />
+
+
     </Stack.Navigator>
   );
 }

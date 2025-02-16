@@ -28,6 +28,14 @@ const HomeScreen = () => {
         title="Go to StaffListScreen"
         onPress={() => navigation.navigate(Routes.StaffListScreen)}
       />
+      <Button
+        title="Go to CustomerListScreen"
+        onPress={() => navigation.navigate(Routes.CUSTOMER_LIST)}
+      />
+      <Button
+        title="Go to BusinessDashboard"
+        onPress={() => navigation.navigate(Routes.BUSINESS_DASHBOARD)}
+      />
     </View>
   );
 };

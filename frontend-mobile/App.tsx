@@ -12,10 +12,16 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Routes from '@utils/Routes';
 import { RootParamList } from '@utils/RootParamList';
 import { createStackNavigator } from '@react-navigation/stack';
+//product
 import ProductListScreen from '@screens/products/ProductListScreen';
 import CreateProductScreen from '@screens/products/CreateProductScreen';
 import ProductDetailScreen from '@screens/products/productDetailScreen';
 import EditProductScreen from '@screens/products/EditProductScreen';
+//staff
+import CreateStaffScreen from '@screens/staff/CreateStaffScreen';
+import EditStaffScreen from '@screens/staff/EditStaffScreen';
+import StaffListScreen from '@screens/staff/StaffListScreen';
+import StaffDetailScreen from '@screens/staff/StaffDetailScreen';
 import AdminDashboardScreen from '@screens/admin/AdminDashboardScreen';
 import AccountListScreen from '@screens/admin/AccountListScreen';
 import PendingAccountScreen from '@screens/admin/PendingAccountScreen';
@@ -43,6 +49,11 @@ function MyStack() {
         <Stack.Screen name={Routes.CreateProductScreen} component={CreateProductScreen} />
         <Stack.Screen name={Routes.ProductDetailScreen} component={ProductDetailScreen} />
         <Stack.Screen name={Routes.EditProductScreen} component={EditProductScreen} />
+        {/* staff */}
+        <Stack.Screen name={Routes.CreateStaffScreen} component={CreateStaffScreen} />
+        <Stack.Screen name={Routes.EditStaffScreen} component={EditStaffScreen} />
+        <Stack.Screen name={Routes.StaffDetailScreen} component={StaffDetailScreen} />
+        <Stack.Screen name={Routes.StaffListScreen} component={StaffListScreen} />
     </Stack.Navigator>
   );
 }

@@ -5,6 +5,9 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
 import HomeScreen from '@screens/HomeScreen';
+import InvoiceListScreen from '@screens/invoices/InvoiceListScreen';  
+import InvoiceScreen from '@screens/invoices/InvoiceScreen';  
+import PaymentScreen from '@screens/invoices/PaymentScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Routes from '@utils/Routes';
 import { RootParamList } from '@utils/RootParamList';
@@ -13,7 +16,7 @@ import AdminDashboardScreen from '@screens/admin/AdminDashboardScreen';
 import AccountListScreen from '@screens/admin/AccountListScreen';
 import PendingAccountScreen from '@screens/admin/PendingAccountScreen';
 import AccountDetailScreen from '@screens/admin/AccountDetailScreen';
-  
+import CreateInvoiceScreen from '@screens/invoices/CreateInvoiceScreen';
 const Stack = createStackNavigator<RootParamList>();
 
 function MyStack() {
@@ -28,6 +31,10 @@ function MyStack() {
         <Stack.Screen name={Routes.AccountListScreen} component={AccountListScreen}/>
         <Stack.Screen name={Routes.AccountDetailScreen} component={AccountDetailScreen}/>
         <Stack.Screen name={Routes.PendingAccountsScreen} component={PendingAccountScreen} />
+        <Stack.Screen name={Routes.InvoiceListScreen} component={InvoiceListScreen} />
+        <Stack.Screen name={Routes.InvoiceScreen} component={InvoiceScreen} />
+        <Stack.Screen name={Routes.CreateInvoiceScreen} component={CreateInvoiceScreen} />
+        <Stack.Screen name={Routes.PaymentScreen} component={PaymentScreen} />
     </Stack.Navigator>
   );
 }

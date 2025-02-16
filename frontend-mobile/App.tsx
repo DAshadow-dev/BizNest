@@ -1,6 +1,5 @@
-import { Fonts } from '@utils/CommonStyles';
 import React from 'react';
-import { StatusBar, StyleSheet, Text, View } from 'react-native';
+import { StatusBar, Text, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
@@ -27,7 +26,18 @@ import AccountListScreen from '@screens/admin/AccountListScreen';
 import PendingAccountScreen from '@screens/admin/PendingAccountScreen';
 import AccountDetailScreen from '@screens/admin/AccountDetailScreen';
 import CreateInvoiceScreen from '@screens/invoices/CreateInvoiceScreen';
+import ProfileScreen from '@screens/profile/ProfileScreen';
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import PasswordScreen from '@screens/profile/PasswordScreen';
+import { FontAwesome } from "@expo/vector-icons";
+import CustomerListScreen from '@screens/customer/CustomerListScreen';
+import CreateCustomerScreen from '@screens/customer/CreateCustomerScreen';
+import CustomerDetailScreen from '@screens/customer/CustomerDetailScreen';
+import BusinessDashBoardScreen from '@screens/dashboard/BusinessDashBoardScreen';
+
 const Stack = createStackNavigator<RootParamList>();
+const Tab = createBottomTabNavigator();
+
 
 function MyStack() {
   return (
@@ -54,10 +64,49 @@ function MyStack() {
         <Stack.Screen name={Routes.EditStaffScreen} component={EditStaffScreen} />
         <Stack.Screen name={Routes.StaffDetailScreen} component={StaffDetailScreen} />
         <Stack.Screen name={Routes.StaffListScreen} component={StaffListScreen} />
+
+        <Stack.Screen name={Routes.PROFILE} component={MyProfile} />
+        <Stack.Screen name={Routes.CUSTOMER_LIST} component={CustomerListScreen} />
+        <Stack.Screen name={Routes.CREATE_CUSTOMER} component={CreateCustomerScreen} />
+        <Stack.Screen name={Routes.CUSTOMER_DETAIL} component={CustomerDetailScreen} />
+        <Stack.Screen name={Routes.BUSINESS_DASHBOARD} component={BusinessDashBoardScreen} />
     </Stack.Navigator>
   );
 }
 
+function MyProfile() {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: "#fff", // Màu nền của tab bar
+          borderTopWidth: 1,
+          borderTopColor: "#ddd",
+          height: 60,
+          paddingBottom: 10,
+        },
+        tabBarIcon: ({ color, size }) => {
+          if (route.name === Routes.PROFILE_SCREEN) {
+            return <FontAwesome name="user" size={size} color={color} />;          
+          } else if (route.name === Routes.PASSWORD_SCREEN) {
+            return <FontAwesome name="lock" size={size} color={color} />;          
+          }        },
+        tabBarLabel: ({ focused, color }) => (
+          <Text style={{ color, fontSize: 14, fontWeight: focused ? "bold" : "normal" }}>
+            {route.name === Routes.PROFILE_SCREEN ? "Profile" : "Password"}
+          </Text>
+        ),
+        tabBarActiveTintColor: "#000000", // Màu khi active
+        tabBarInactiveTintColor: "#888", // Màu khi không active
+      })}
+      
+      initialRouteName={Routes.PROFILE_SCREEN}>
+      <Tab.Screen name={Routes.PROFILE_SCREEN} component={ProfileScreen} />
+      <Tab.Screen name={Routes.PASSWORD_SCREEN} component={PasswordScreen} />
+    </Tab.Navigator>
+  );
+}
 export default function App() {
 
   const [fontsLoaded] = useFonts({

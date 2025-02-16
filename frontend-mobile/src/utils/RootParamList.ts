@@ -47,4 +47,11 @@ export type RootParamList = {
     StaffDetailScreen: { staff: { fullname: string; email: string; phone: string; role: string; } };
     CreateStaffScreen: undefined;
     EditStaffScreen: { staff: { fullname: string; email: string; phone: string; role: string; } };
+  PROFILE_SCREEN: undefined,
+  PASSWORD_SCREEN: undefined,
+  PROFILE: undefined,
+  CUSTOMER_LIST: undefined,
+  CREATE_CUSTOMER: {idUpdate: number};
+  CUSTOMER_DETAIL: undefined;
+  BUSINESS_DASHBOARD: undefined,
 };

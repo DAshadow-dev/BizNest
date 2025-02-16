@@ -9,7 +9,6 @@ const HomeScreen = () => {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text>Home Screen</Text>
-      <Button title="Go to Details" onPress={() => navigation.navigate(Routes.DetailsScreen, {message: 'hello'})} />
       <Button title="Admin Dashboard" onPress={() => navigation.navigate(Routes.AdminDashboardScreen)}/>
     </View>
   );

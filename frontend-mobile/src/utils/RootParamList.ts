@@ -1,6 +1,5 @@
 export type RootParamList = {
   HomeScreen: undefined,
-  DetailsScreen: {message: string},
   AdminDashboardScreen : undefined,
   AccountListScreen : undefined,
   PendingAccountsScreen : undefined,

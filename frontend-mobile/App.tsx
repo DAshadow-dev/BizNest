@@ -5,7 +5,6 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
 import HomeScreen from '@screens/HomeScreen';
-import DetailsScreen from '@screens/DetailsScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Routes from '@utils/Routes';
 import { RootParamList } from '@utils/RootParamList';
@@ -25,7 +24,6 @@ function MyStack() {
       }}
       initialRouteName={Routes.HomeScreen}>
         <Stack.Screen name={Routes.HomeScreen} component={HomeScreen} />
-        <Stack.Screen name={Routes.DetailsScreen} component={DetailsScreen} />
         <Stack.Screen name={Routes.AdminDashboardScreen} component={AdminDashboardScreen} />
         <Stack.Screen name={Routes.AccountListScreen} component={AccountListScreen}/>
         <Stack.Screen name={Routes.AccountDetailScreen} component={AccountDetailScreen}/>

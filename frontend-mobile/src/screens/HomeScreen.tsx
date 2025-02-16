@@ -42,20 +42,46 @@
 // export default HomeScreen;
 
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Button } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Button,
+} from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LineChart } from "react-native-chart-kit";
 import * as Routes from "@utils/Routes";
-import { navigate, useNavigationRoot } from "@components/navigate/RootNavigation";
+import {
+  navigate,
+  useNavigationRoot,
+} from "@components/navigate/RootNavigation";
+import Foorer from "@components/Footer";
 
 const HomePage = () => {
   const navigation = useNavigationRoot();
   const categories = [
-    { id: "1", name: "Product", icon: "storefront", route: Routes.ProductListScreen },
+    {
+      id: "1",
+      name: "Product",
+      icon: "storefront",
+      route: Routes.ProductListScreen,
+    },
     { id: "2", name: "Staff", icon: "receipt", route: Routes.StaffListScreen },
     { id: "3", name: "Customer", icon: "people", route: Routes.CUSTOMER_LIST },
-    { id: "4", name: "Business dashboard", icon: "bar-chart", route: Routes.BUSINESS_DASHBOARD },
-    { id: "5", name: "Invoice", icon: "account-balance-wallet", route: Routes.InvoiceListScreen },
+    {
+      id: "4",
+      name: "Business dashboard",
+      icon: "bar-chart",
+      route: Routes.BUSINESS_DASHBOARD,
+    },
+    {
+      id: "5",
+      name: "Invoice",
+      icon: "account-balance-wallet",
+      route: Routes.InvoiceListScreen,
+    },
   ];
 
   return (
@@ -88,7 +114,11 @@ const HomePage = () => {
 
         <View style={styles.categoryContainer}>
           {categories.map((item) => (
-            <TouchableOpacity key={item.id} style={styles.categoryItem} onPress={() => navigation.navigate(item.route)}>
+            <TouchableOpacity
+              key={item.id}
+              style={styles.categoryItem}
+              onPress={() => navigation.navigate(item.route)}
+            >
               <MaterialIcons name={item.icon} size={32} color="#007AFF" />
               <Text style={styles.categoryText}>{item.name}</Text>
             </TouchableOpacity>
@@ -96,24 +126,7 @@ const HomePage = () => {
         </View>
       </ScrollView>
 
-      <TouchableOpacity style={styles.chatButton} onPress={() => navigation.navigate("CHAT_SCREEN")}>
-        <Ionicons name="chatbubble" size={28} color="white" />
-      </TouchableOpacity>
-
-      <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate(Routes.AdminDashboardScreen)}>
-          <Ionicons name="home" size={28} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Ionicons name="cart" size={28} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Ionicons name="stats-chart" size={28} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Ionicons name="person" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
+      <Foorer />
     </View>
   );
 };
@@ -148,11 +161,6 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 3,
   },
-  chartTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
   categoryContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -175,35 +183,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 5,
     fontWeight: "bold",
-  },
-  chatButton: {
-    position: "absolute",
-    bottom: 80,
-    right: 20,
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 50,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  bottomNav: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    backgroundColor: "#007AFF",
-    paddingVertical: 10,
-    height: 60,
-    alignItems: "center",
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
   },
 });

@@ -39,7 +39,10 @@ const PaymentScreen = () => {
   };
 
   return (
+    
     <View style={styles.container}>
+      <Button title="Back" onPress={() => navigation.goBack()} />
+
       <Text style={styles.title}>Payment</Text>
       <View style={styles.paymentMethodsContainer}>
         {paymentMethods.map((method) => (

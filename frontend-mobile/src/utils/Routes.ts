@@ -5,6 +5,7 @@ const PendingAccountsScreen= 'PendingAccountsScreen';
 const AccountDetailScreen = 'AccountDetailScreen';
 const InvoiceListScreen= 'InvoiceListScreen';
 const InvoiceScreen= 'InvoiceScreen';
+const CreateInvoiceProductScreen= 'CreateInvoiceProductScreen';
 const CreateInvoiceScreen= 'CreateInvoiceScreen';
 const PaymentScreen = 'PaymentScreen';
 //product screen
@@ -41,6 +42,7 @@ export {
   AccountDetailScreen,
   InvoiceListScreen,
   InvoiceScreen,
+  CreateInvoiceProductScreen,
   CreateInvoiceScreen,
   PaymentScreen,
   ProductListScreen,

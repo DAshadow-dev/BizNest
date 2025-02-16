@@ -6,6 +6,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import HomeScreen from '@screens/HomeScreen';
 import InvoiceListScreen from '@screens/invoices/InvoiceListScreen';  
 import InvoiceScreen from '@screens/invoices/InvoiceScreen';  
+import CreateInvoiceProductScreen from '@screens/invoices/CreateInvoiceProductScreen';
 import PaymentScreen from '@screens/invoices/PaymentScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Routes from '@utils/Routes';
@@ -67,6 +68,7 @@ function MyStack() {
         <Stack.Screen name={Routes.InvoiceListScreen} component={InvoiceListScreen} />
         <Stack.Screen name={Routes.InvoiceScreen} component={InvoiceScreen} />
         <Stack.Screen name={Routes.CreateInvoiceScreen} component={CreateInvoiceScreen} />
+        <Stack.Screen name={Routes.CreateInvoiceProductScreen} component={CreateInvoiceProductScreen} />
         <Stack.Screen name={Routes.PaymentScreen} component={PaymentScreen} />
         <Stack.Screen name={Routes.ProductListScreen} component={ProductListScreen} />
         <Stack.Screen name={Routes.CreateProductScreen} component={CreateProductScreen} />

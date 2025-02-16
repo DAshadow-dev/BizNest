@@ -2,6 +2,7 @@ import { useNavigationRoot } from "@components/navigate/RootNavigation";
 import React from "react";
 import * as Routes from "@utils/Routes";
 import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
+import Footer from "@components/Footer";
 
 const InvoiceScreen = (props: {
   route: {
@@ -21,7 +22,7 @@ const InvoiceScreen = (props: {
   const navigation = useNavigationRoot();
 
   return (
-    <View style={styles.container}>
+    <View>
       <Text style={styles.title}>Invoice Details</Text>
       <View style={styles.detailBox}>
         {/* <Text style={styles.label}>Invoice ID: {invoiceId}</Text>
@@ -46,7 +47,7 @@ const InvoiceScreen = (props: {
       >
         <Text style={styles.buttonText}>Pay this invoice</Text>
       </TouchableOpacity>
-      <Button title="Go back" onPress={() => navigation.goBack()} />
+      <Footer />
     </View>
   );
 };

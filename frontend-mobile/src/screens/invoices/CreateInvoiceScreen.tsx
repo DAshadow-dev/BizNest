@@ -1,4 +1,5 @@
 import { useNavigationRoot } from "@components/navigate/RootNavigation";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import React, { useState } from "react";
 import {
   View,
@@ -8,20 +9,10 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import Footer from "@components/Footer";
 
-const CreateInvoiceScreen = (route: {
-  params?: {
-    invoiceId?: string;
-    amount?: string;
-    date?: string;
-    customer?: string;
-    address?: string;
-    createdBy?: string;
-    createdDate?: string;
-  };
-}) => {
-  const navigation = useNavigationRoot();
-
+const CreateInvoiceScreen = ({ navigation }) => {
   const [invoiceId, setInvoiceId] = useState("");
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState("");
@@ -29,28 +20,69 @@ const CreateInvoiceScreen = (route: {
   const [address, setAddress] = useState("");
   const [createdBy, setCreatedBy] = useState("");
   const [createdDate, setCreatedDate] = useState("");
+  const [currency, setCurrency] = useState("");
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+  const getDateNow = () => {
+    const date = new Date();
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (selectedDate) => {
+    const formattedDate = selectedDate.toLocaleDateString();
+    setDate(formattedDate);
+    hideDatePicker();
+  };
+
+  const handleContinue = () => {
+    navigation.navigate("CreareInvoiceProductScreen", {
+      invoiceId,
+      amount,
+      date,
+      customer,
+      address,
+      createdBy,
+      createdDate,
+      currency,
+    });
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create Invoice</Text>
-      <View style={styles.inputBox}>
+    <View height="100%">
+      <Text style={styles.title} paddingHorizontal="15">Create Invoice</Text>
+      <View style={styles.inputBox} paddingHorizontal="15">
+        <Text style={styles.titleInvoice}>Invoice ID: VN-1000</Text>
+        <Text style={styles.titleInvoice}>Invoice Date: {getDateNow()}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Amount"
-          value={amount}
-          onChangeText={setAmount}
+          placeholder="Company"
+          onChangeText={setCustomer}
         />
+        <TextInput style={styles.input} placeholder="Tax code" />
+        <TextInput style={styles.input} placeholder="Email" />
         <TextInput
           style={styles.input}
-          placeholder="Date"
+          placeholder="Due Date"
           value={date}
+          onFocus={showDatePicker}
           onChangeText={setDate}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Customer"
-          value={customer}
-          onChangeText={setCustomer}
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={handleConfirm}
+          onCancel={hideDatePicker}
         />
         <TextInput
           style={styles.input}
@@ -58,31 +90,11 @@ const CreateInvoiceScreen = (route: {
           value={address}
           onChangeText={setAddress}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="End Date"
-          value={createdDate}
-          onChangeText={setCreatedDate}
-        />
       </View>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          console.log({
-            invoiceId,
-            amount,
-            date,
-            customer,
-            address,
-            createdBy,
-            createdDate,
-          })
-        }
-      >
-        <Text style={styles.buttonText}>Create new invoice</Text>
+      <TouchableOpacity style={styles.button} onPress={handleContinue}>
+        <Text style={styles.buttonText}>Continue</Text>
       </TouchableOpacity>
-      <Button title="Go back" onPress={() => navigation.goBack()} />
+      <Footer />
     </View>
   );
 };
@@ -90,14 +102,11 @@ const CreateInvoiceScreen = (route: {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 15,
     backgroundColor: "#f8f9fa",
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
+  title: { fontSize: 22, fontWeight: "bold", marginBottom: 10 },
+  titleInvoice: { fontSize: 16, marginBottom: 10 },
   inputBox: {
     padding: 20,
     backgroundColor: "#ffffff",
@@ -127,25 +136,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     alignItems: "center",
   },
-  buttonText: {
-    color: "#FFF",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  buttonSecondary: {
-    backgroundColor: "#E3F2FD",
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    marginVertical: 10,
-    minWidth: 180,
-    alignItems: "center",
-  },
-  buttonTextSecondary: {
-    color: "#4A90E2",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
+  buttonText: { color: "#FFF", fontSize: 16, fontWeight: "bold" },
 });
 
 export default CreateInvoiceScreen;

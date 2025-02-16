@@ -16,6 +16,15 @@ export type RootParamList = {
       createdBy?: string;
       createdDate?: string;
   },
+  CreateInvoiceProductScreen : {
+    invoiceId: string;
+      amount: string;
+      date: string;
+      customer: string;
+      address: string;
+      createdBy: string;
+      createdDate: string;
+  },
   InvoiceScreen:{
     invoiceId: string;
       amount: string;

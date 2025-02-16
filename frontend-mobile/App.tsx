@@ -34,6 +34,13 @@ import CustomerListScreen from '@screens/customer/CustomerListScreen';
 import CreateCustomerScreen from '@screens/customer/CreateCustomerScreen';
 import CustomerDetailScreen from '@screens/customer/CustomerDetailScreen';
 import BusinessDashBoardScreen from '@screens/dashboard/BusinessDashBoardScreen';
+import OnboardingScreen from '@screens/guest/OnboardingScreen';
+import LoginScreen from '@screens/guest/LoginScreen';
+import RegisterScreen from '@screens/guest/RegisterScreen';
+import BusinessCategoryScreen from '@screens/guest/BusinessCategoryScreen';
+// import HomeScreen from '@screens/guest/HomeScreen';
+import Chatscreen from '@screens/guest/Chatscreen';
+ 
 
 const Stack = createStackNavigator<RootParamList>();
 const Tab = createBottomTabNavigator();
@@ -45,8 +52,14 @@ function MyStack() {
       screenOptions={{
         headerShown: false,
       }}
-      initialRouteName={Routes.HomeScreen}>
+      initialRouteName={Routes.ONBOARDING_SCREEN}>
+        <Stack.Screen name={Routes.ONBOARDING_SCREEN} component={OnboardingScreen} />
+        <Stack.Screen name={Routes.LOGIN_SCREEN} component={LoginScreen} />
+        <Stack.Screen name={Routes.REGISTER_SCREEN} component={RegisterScreen} />
+        <Stack.Screen name={Routes.BUSINESSCATEGORY_SCREEN} component={BusinessCategoryScreen} />
         <Stack.Screen name={Routes.HomeScreen} component={HomeScreen} />
+        {/* <Stack.Screen name={Routes.HOME_SCREEN} component={HomeScreen} /> */}
+        <Stack.Screen name={Routes.CHAT_SCREEN} component={Chatscreen} />
         <Stack.Screen name={Routes.AdminDashboardScreen} component={AdminDashboardScreen} />
         <Stack.Screen name={Routes.AccountListScreen} component={AccountListScreen}/>
         <Stack.Screen name={Routes.AccountDetailScreen} component={AccountDetailScreen}/>

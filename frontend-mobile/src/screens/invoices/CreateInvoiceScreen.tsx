@@ -1,22 +1,25 @@
 import { useNavigationRoot } from "@components/navigate/RootNavigation";
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 
-type InvoiceScreenProps = {
-  route: {
-    params?: {
-      invoiceId?: string;
-      amount?: string;
-      date?: string;
-      customer?: string;
-      address?: string;
-      createdBy?: string;
-      createdDate?: string;
-    };
+const CreateInvoiceScreen = (route: {
+  params?: {
+    invoiceId?: string;
+    amount?: string;
+    date?: string;
+    customer?: string;
+    address?: string;
+    createdBy?: string;
+    createdDate?: string;
   };
-};
-
-const CreateInvoiceScreen: React.FC<InvoiceScreenProps> = () => {
+}) => {
   const navigation = useNavigationRoot();
 
   const [invoiceId, setInvoiceId] = useState("");

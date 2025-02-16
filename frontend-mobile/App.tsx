@@ -5,10 +5,9 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
 import HomeScreen from '@screens/HomeScreen';
-import InvoiceListScreen from '@screens/InvoiceListScreen';  
-import InvoiceScreen from '@screens/InvoiceScreen';  
-import CreateInvoiceScreen from '@screens/CreateInvoiceScreen';  
-import PaymentScreen from '@screens/PaymentScreen';
+import InvoiceListScreen from '@screens/invoices/InvoiceListScreen';  
+import InvoiceScreen from '@screens/invoices/InvoiceScreen';  
+import PaymentScreen from '@screens/invoices/PaymentScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Routes from '@utils/Routes';
 import { RootParamList } from '@utils/RootParamList';
@@ -17,6 +16,7 @@ import AdminDashboardScreen from '@screens/admin/AdminDashboardScreen';
 import AccountListScreen from '@screens/admin/AccountListScreen';
 import PendingAccountScreen from '@screens/admin/PendingAccountScreen';
 import AccountDetailScreen from '@screens/admin/AccountDetailScreen';
+import CreateInvoiceScreen from '@screens/invoices/CreateInvoiceScreen';
 const Stack = createStackNavigator<RootParamList>();
 
 function MyStack() {

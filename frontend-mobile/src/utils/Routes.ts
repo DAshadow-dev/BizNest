@@ -7,6 +7,10 @@ const InvoiceListScreen= 'InvoiceListScreen';
 const InvoiceScreen= 'InvoiceScreen';
 const CreateInvoiceScreen= 'CreateInvoiceScreen';
 const PaymentScreen = 'PaymentScreen';
+const ProductListScreen= 'ProductListScreen';
+const ProductDetailScreen= 'ProductDetailScreen';
+const CreateProductScreen= 'CreateProductScreen';
+const EditProductScreen= 'EditProductScreen';
 
 export {
   HomeScreen,
@@ -17,5 +21,9 @@ export {
   InvoiceListScreen,
   InvoiceScreen,
   CreateInvoiceScreen,
-  PaymentScreen
+  PaymentScreen,
+  ProductListScreen,
+  ProductDetailScreen,
+  CreateProductScreen,
+  EditProductScreen,
 }

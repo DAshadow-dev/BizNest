@@ -11,6 +11,7 @@ const HomeScreen = () => {
       <Text>Home Screen</Text>
       <Button title="Admin Dashboard" onPress={() => navigation.navigate(Routes.AdminDashboardScreen)}/>
       <Button title="Go to InvoiceListScreen" onPress={() => navigation.navigate(Routes.InvoiceListScreen)} />
+      <Button title="Go to ProductListScreen" onPress={() => navigation.navigate(Routes.ProductListScreen)} /> 
     </View>
   );
 }

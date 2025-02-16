@@ -12,6 +12,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Routes from '@utils/Routes';
 import { RootParamList } from '@utils/RootParamList';
 import { createStackNavigator } from '@react-navigation/stack';
+import ProductListScreen from '@screens/products/ProductListScreen';
+import CreateProductScreen from '@screens/products/CreateProductScreen';
+import ProductDetailScreen from '@screens/products/productDetailScreen';
+import EditProductScreen from '@screens/products/EditProductScreen';
 import AdminDashboardScreen from '@screens/admin/AdminDashboardScreen';
 import AccountListScreen from '@screens/admin/AccountListScreen';
 import PendingAccountScreen from '@screens/admin/PendingAccountScreen';
@@ -35,6 +39,10 @@ function MyStack() {
         <Stack.Screen name={Routes.InvoiceScreen} component={InvoiceScreen} />
         <Stack.Screen name={Routes.CreateInvoiceScreen} component={CreateInvoiceScreen} />
         <Stack.Screen name={Routes.PaymentScreen} component={PaymentScreen} />
+        <Stack.Screen name={Routes.ProductListScreen} component={ProductListScreen} />
+        <Stack.Screen name={Routes.CreateProductScreen} component={CreateProductScreen} />
+        <Stack.Screen name={Routes.ProductDetailScreen} component={ProductDetailScreen} />
+        <Stack.Screen name={Routes.EditProductScreen} component={EditProductScreen} />
     </Stack.Navigator>
   );
 }

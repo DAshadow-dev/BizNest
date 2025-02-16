@@ -54,4 +54,10 @@ export type RootParamList = {
   CREATE_CUSTOMER: {idUpdate: number};
   CUSTOMER_DETAIL: undefined;
   BUSINESS_DASHBOARD: undefined,
+  lOGIN_SCREEN: undefined,
+  ONBOARDING_SCREEN : undefined,
+  REGISTER_SCREEN :undefined,
+  BUSINESSCATEGORY_SCREEN: undefined,
+  // HOME_SCREEN: undefined,
+  CHAT_SCREEN :undefined,
 };

@@ -73,6 +73,7 @@ function MyStack() {
         <Stack.Screen name={Routes.ProductDetailScreen} component={ProductDetailScreen} />
         <Stack.Screen name={Routes.EditProductScreen} component={EditProductScreen} />
         {/* staff */}
+        <Stack.Screen name={Routes.PROFILE_SCREEN} component={ProfileScreen} />
         <Stack.Screen name={Routes.CreateStaffScreen} component={CreateStaffScreen} />
         <Stack.Screen name={Routes.EditStaffScreen} component={EditStaffScreen} />
         <Stack.Screen name={Routes.StaffDetailScreen} component={StaffDetailScreen} />

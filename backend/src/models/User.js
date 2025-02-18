@@ -34,6 +34,10 @@ const UserSchema = new mongoose.Schema({
         unique : true,
         match : /^\+?\d{1,3}?[-.\s]?\(?\d{1,4}?[-.\s]?\)?[-.\s]?\d{1,12}$/
     },
+    image : {
+        type : String,
+        default : '',
+    },
     status : {
         type : String,
         enum : ['active', 'inactive'],

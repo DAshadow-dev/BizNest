@@ -4,7 +4,6 @@ const UserSchema = new mongoose.Schema({
     username : {
         type : String,
         required : [true, "Please enter a username"],
-        unique : true,
         minlength : [5, "Please enter at least 5 characters"],
         maxlength : [30, "Please enter no more than 30 characters"],
         match : [/^[a-zA-Z0-9]+$/, "Username can only contain alphanumeric characters"]
@@ -13,8 +12,12 @@ const UserSchema = new mongoose.Schema({
         type : String,
         required : [true, "Please enter a password"],
         minlength : [8, "Please enter at least 8 characters"],
-        maxlength : [50, "Please enter no more than 50 characters"],
+        maxlength : [100, "Please enter no more than 100 characters"],
         match : [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"],
+    },
+    verified: {
+        type : Boolean,
+        default : false
     },
     role : {
         type : String,

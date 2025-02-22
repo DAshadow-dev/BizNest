@@ -13,7 +13,7 @@ connectToDB();
 //from router
 app.use(express.json())
 
-app.use('/api/usres', require('./src/routes/userRoute'))
+app.use('/api/users', require('./src/routes/userRoute'))
 
 //from errorHandle
 app.use(errorHandler);

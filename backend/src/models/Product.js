@@ -37,6 +37,11 @@ const ProductSchema = new mongoose.Schema({
     required: [true, "Product description is required"],
     maxlength: 500,
   },
+  image : {
+    type: String,
+    required: [true, "Product image is required"],
+    default: "",
+  },
   brand: {
     type: String,
     required: [true, "Product brand is required"],

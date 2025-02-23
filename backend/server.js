@@ -1,24 +1,30 @@
-const express= require('express');
-const dotenv= require('dotenv').config();
-const app= express();
-const errorHandler= require('./src/middlewares/errorHandler');
-const connectToDB = require('./src/config/dbConnection');
+const express = require("express");
+const dotenv = require("dotenv").config();
+const cors = require("cors");
+const app = express();
+const errorHandler = require("./src/middlewares/errorHandler");
+const connectToDB = require("./src/config/dbConnection");
+const authRoute = require("./src/routes/auth/authRoute");
+const userRoute = require('./src/routes/userRoute');
 
-const port= process.env.PORT || 5000;
-
+const port = process.env.PORT || 5000;
 
 //connect to DB
 connectToDB();
 
 //from router
-app.use(express.json())
+app.use(express.json());
 
-app.use('/api/users', require('./src/routes/userRoute'))
+//from cors
+app.use(cors());
 
 //from errorHandle
 app.use(errorHandler);
 
-app.listen(port, () =>{
-    console.log('Server running on port: ', port);
-})
+//auth router
+app.use("/api/auth", authRoute);
+app.use('/api/user', userRoute)
 
+app.listen(port, () => {
+  console.log("Server running on port: ", port);
+});

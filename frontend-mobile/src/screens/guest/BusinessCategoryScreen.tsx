@@ -5,9 +5,9 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Picker,
   Modal,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { navigate, useNavigationRoot } from "@components/navigate/RootNavigation";
 import * as Routes from "@utils/Routes";

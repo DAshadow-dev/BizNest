@@ -112,7 +112,7 @@ const HomePage = () => {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate(Routes.PROFILE_SCREEN);
+            navigation.navigate(Routes.PROFILE);
           }}
         >
           <Ionicons name="person" size={28} color="white" />

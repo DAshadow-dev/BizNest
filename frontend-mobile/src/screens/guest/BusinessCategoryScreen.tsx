@@ -5,12 +5,12 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Picker,
   Modal,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { navigate, useNavigationRoot } from "@components/navigate/RootNavigation";
 import * as Routes from "@utils/Routes";
+import { Picker } from "@react-native-picker/picker";
 const BusinessCategoryScreen = () => {
     const navigation = useNavigationRoot();
   const [businessCategory, setBusinessCategory] = useState("");

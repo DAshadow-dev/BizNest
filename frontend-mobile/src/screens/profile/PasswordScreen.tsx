@@ -5,19 +5,33 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {FormProvider, useForm} from 'react-hook-form';
 import FormInput from "@components/input/FormInput";
 import {required} from '@utils/Validator';
+import {useDispatch} from 'react-redux';
+import UserActions from "@redux/user/actions";
 
 const PasswordScreen= ()=> {
+
+    const dispatch = useDispatch();
 
     const methods = useForm({
         defaultValues: {
           oldPassword: '',
           newPassword: '',
-          newAgainPassword: '',
+          againNewPassword: '',
         },
     });
     const onSubmit = (data: any) => {
-        const {fullname, phonenumber, email} = data;
-        console.log(fullname,' + ', phonenumber, ' + ', email)
+        dispatch({type: UserActions.CHANGE_PASSWORD, payload: {
+            data, 
+            onSuccess: (data: any) => {
+                console.log("Data: ", data)
+            },
+            onError: (error: any) => {
+                console.log("Error: ", error)
+            },
+            onFailed: (MsgNo: string) => {
+                console.log("Failed: ", MsgNo)
+            }
+        }})
     };
     return(
         <View style={{flex: 1}}>
@@ -62,7 +76,7 @@ const PasswordScreen= ()=> {
                     <View style={styles.formInput}>
                         <Text style={styles.textLabel}>Again New Password</Text>
                         <FormInput
-                            fieldName="newAgainPassword"
+                            fieldName="againNewPassword"
                             placeHolder={"Enter agaim your new password"}
                             secureTextEntry={true}
                             validate={[required]}

@@ -17,6 +17,8 @@ module.exports = function (api) {
             '@libs': './src/libs',
             '@requestComponent': './src/screens/request/component',
             '@assets': './assets',
+            '@type': './src/types',
+            '@adapter': './src/adapter',
           },
         },
       ],

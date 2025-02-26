@@ -1,23 +1,96 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Routes from "@utils/Routes";
+import { storeToken } from "@utils/handleToken";
+import axios from "axios";
+import { API_URL } from "src/config/api";
 
-import {
-  navigate,
-  useNavigationRoot,
-} from "@components/navigate/RootNavigation";
+import { useNavigationRoot } from "@components/navigate/RootNavigation";
 
-
-const LoginScreen = () => {
-    const navigation = useNavigationRoot();
+const LoginScreen: React.FC = () => {
+  const navigation = useNavigationRoot();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const handleLogin = () => {
-    console.log("Đăng nhập thành công!");
-    navigation.navigate(Routes.HomeScreen); // Điều hướng đúng cách
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleLogin = async () => {
+    let valid = true;
+
+    if (!email || !validateEmail(email)) {
+      setEmailError("Please enter a valid email address.");
+      valid = false;
+    } else {
+      setEmailError("");
+    }
+
+    if (!password) {
+      setPasswordError("Please enter a password.");
+      valid = false;
+    } else if (password.length < 8) {
+      setPasswordError("Password must be at least 8 characters long.");
+      valid = false;
+    } else {
+      setPasswordError("");
+    }
+
+    if (!valid) return;
+
+    try {
+      const res = await axios.post(`${API_URL}/auth/login`, {
+        email,
+        password,
+      });
+      if (res) {
+        storeToken(res.data.token);
+        navigation.navigate(Routes.HomeScreen);
+      } else {
+        alert("Login failed");
+      }
+    } catch (error: any) {
+      if (error.response) {
+        console.error("Server responded with status:", error.response.status);
+        console.error("Data:", error.response.data);
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+      } else {
+        console.error("Error:", error.message);
+      }
+      alert("Network error");
+    }
+  };
+
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
+    if (!validateEmail(text)) {
+      setEmailError("Please enter a valid email address.");
+    } else {
+      setEmailError("");
+    }
+  };
+
+  const handlePasswordChange = (text: string) => {
+    setPassword(text);
+    if (text.length < 8) {
+      setPasswordError("Password must be at least 8 characters long.");
+    } else {
+      setPasswordError("");
+    }
   };
 
   return (
@@ -38,10 +111,11 @@ const LoginScreen = () => {
           placeholder="Email ID"
           placeholderTextColor={"gray"}
           value={email}
-          onChangeText={setEmail}
+          onChangeText={handleEmailChange}
           keyboardType="email-address"
         />
       </View>
+      {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
 
       {/* Password Input */}
       <View style={styles.inputContainer}>
@@ -56,7 +130,7 @@ const LoginScreen = () => {
           placeholder="Password"
           placeholderTextColor={"gray"}
           value={password}
-          onChangeText={setPassword}
+          onChangeText={handlePasswordChange}
           secureTextEntry={!showPassword}
         />
         <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
@@ -67,12 +141,14 @@ const LoginScreen = () => {
           />
         </TouchableOpacity>
       </View>
+      {passwordError ? (
+        <Text style={styles.errorText}>{passwordError}</Text>
+      ) : null}
 
       {/* Forgot Password */}
-      {/* <TouchableOpacity>
+      <TouchableOpacity>
         <Text style={styles.forgotPassword}>Forgot Password?</Text>
-      </TouchableOpacity> */}
-      <Text style={styles.forgotPassword}>Forgot Password?</Text>
+      </TouchableOpacity>
 
       {/* Login Button */}
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
@@ -102,7 +178,7 @@ const LoginScreen = () => {
   );
 };
 
-const styles = {
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -128,7 +204,7 @@ const styles = {
     backgroundColor: "#f5f5f5",
     borderRadius: 10,
     paddingHorizontal: 10,
-    marginBottom: 15,
+    marginBottom: 5,
   },
   input: {
     flex: 1,
@@ -138,13 +214,18 @@ const styles = {
   icon: {
     marginRight: 10,
   },
+  errorText: {
+    color: "red",
+    fontSize: 12,
+    alignSelf: "flex-start",
+    marginBottom: 15,
+  },
   forgotPassword: {
-    textAlign: "right", // Đẩy về bên phải
+    textAlign: "right", // Aligns to the right
     color: "#007bff",
     marginBottom: 15,
-    width: "100%", // Đảm bảo nó căn sát bên phải
+    width: "100%", // Ensures it aligns to the right
   },
-
   loginButton: {
     backgroundColor: "#007bff",
     width: "100%",
@@ -180,6 +261,6 @@ const styles = {
     fontSize: 14,
     color: "gray",
   },
-};
+});
 
 export default LoginScreen;

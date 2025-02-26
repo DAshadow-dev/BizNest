@@ -16,9 +16,9 @@ export interface UserReducer {
 }
 
 export interface ChangePassword {
-  OldPassword: string;
-  NewPassword: string;
-  NewAgainPassword: string,
+  oldPassword: string;
+  newPassword: string;
+  againNewPassword: string,
 }
 
 export interface UpdateInformation {

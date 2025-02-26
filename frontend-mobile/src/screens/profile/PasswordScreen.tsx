@@ -7,6 +7,8 @@ import FormInput from "@components/input/FormInput";
 import {required} from '@utils/Validator';
 import {useDispatch} from 'react-redux';
 import UserActions from "@redux/user/actions";
+import { useAppSelector } from "@redux/store";
+import { RootState } from "@redux/root-reducer";
 
 const PasswordScreen= ()=> {
 
@@ -33,6 +35,9 @@ const PasswordScreen= ()=> {
             }
         }})
     };
+
+    const Auth = useAppSelector((state: RootState) => state.User.Auth);
+    console.log(Auth)
     return(
         <View style={{flex: 1}}>
             <View style={{height: verticalScale(60), width: scale(393), backgroundColor: '#3750B2', flexDirection: 'row', alignItems: "flex-end"}}>

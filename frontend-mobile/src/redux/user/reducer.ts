@@ -1,31 +1,29 @@
-import type {UpdateInformation, User, UserReducer} from '@type/user.types';
+import type {ChangePassword, UpdateInformation, User, UserReducer} from '@type/user.types';
 
 import UserActions from './actions';
-import { act } from 'react';
 
 const initState: UserReducer = {
   Auth: {
-    id: 0
+    id: 0,
   },
 };
 
 const Reducer = (
   state = initState,
-  action: { type: string; payload: { Auth: User, newPassword: string, UpdateInformation: UpdateInformation}},
+  action: { type: string; payload: { c: User, data: ChangePassword, UpdateInformation: UpdateInformation}},
 ) => {
   switch (action.type) {
     case UserActions.CHANGE_PASSWORD_SUCCESS:
       return {
         ...state,
-        password: action.payload.newPassword
+        Auth: {
+          ...state.Auth,
+          password: action.payload.data.newPassword, 
+        },
       };
     case UserActions.UPDATE_INFORMATION_SUCCESS:
       return {
-        ...state,
-        username: action.payload.UpdateInformation.UserName,
-        phone: action.payload.UpdateInformation.Phone,
-        email: action.payload.UpdateInformation.Email,
-        image: action.payload.UpdateInformation.Image,
+        ...state,   
       };
     default:
       return state;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar, Text, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
@@ -140,8 +140,8 @@ export default function App() {
     return null;
   }
   SplashScreen.hideAsync();
-
-
+  
+  
   return (
     <Provider store={store}>
       <View style={{flex: 1}}>

@@ -39,7 +39,7 @@ export default {
       ...options,
       headers: {
         ...headers,
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhlbGx3b3JkQGVtYWlsLmNvbSIsImlhdCI6MTc0MDQ5NjgwNywiZXhwIjoxNzQwNTAwNDA3LCJpc3MiOiJpc3N1ZXIifQ.SMZGf8HX891YHFadvjHdedXWTiiQ4jMCIguWX3JKb6c`, // Thêm thủ công ở đây
+        Authorization: `Bearer `, // Thêm thủ công ở đây
       },
       method: 'POST',
     });
@@ -52,7 +52,7 @@ export default {
       ...options,
       headers: {
         ...headers,
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhlbGx3b3JkQGVtYWlsLmNvbSIsImlhdCI6MTc0MDQ5NjgwNywiZXhwIjoxNzQwNTAwNDA3LCJpc3MiOiJpc3N1ZXIifQ.SMZGf8HX891YHFadvjHdedXWTiiQ4jMCIguWX3JKb6c`, // Thêm thủ công ở đây
+        Authorization: `Bearer `, // Thêm thủ công ở đây
       },
       method: 'PUT',
     });
@@ -65,7 +65,7 @@ export default {
       ...options,
       headers: {
         ...headers,
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhlbGx3b3JkQGVtYWlsLmNvbSIsImlhdCI6MTc0MDQ5NjgwNywiZXhwIjoxNzQwNTAwNDA3LCJpc3MiOiJpc3N1ZXIifQ.SMZGf8HX891YHFadvjHdedXWTiiQ4jMCIguWX3JKb6c`, // Thêm thủ công ở đây
+        Authorization: `Bearer `, // Thêm thủ công ở đây
       },
       method: 'PUT',
     });
@@ -78,7 +78,7 @@ export default {
       ...options,
       headers: {
         ...headers,
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhlbGx3b3JkQGVtYWlsLmNvbSIsImlhdCI6MTc0MDQ5NjgwNywiZXhwIjoxNzQwNTAwNDA3LCJpc3MiOiJpc3N1ZXIifQ.SMZGf8HX891YHFadvjHdedXWTiiQ4jMCIguWX3JKb6c`, // Thêm thủ công ở đây
+        Authorization: `Bearer `, // Thêm thủ công ở đây
       },
       method: 'DELETE',
     });

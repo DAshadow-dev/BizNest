@@ -5,13 +5,19 @@ import Factories from './factories';
 export function* changePassword() {
   yield takeEvery(UserActions.CHANGE_PASSWORD, function* (action: any): any {
     const {data, onSuccess, onFailed, onError} = action.payload;
-    console.log(data)
     try {
       const response: CommonResponse<CodeResponse> = yield call(() =>
         Factories.changePassword(data),
       );
       if (response?.status === 200) {
+        console.log(data)
         onSuccess && onSuccess(response.data.Data);
+        yield put({
+          type: UserActions.CHANGE_PASSWORD_SUCCESS,
+          payload: {
+            data
+          },
+        });
       }else{
         onFailed && onFailed(response.data.MsgNo);
       }

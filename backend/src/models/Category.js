@@ -7,7 +7,7 @@ const CategorySchema = new mongoose.Schema({
         unique: true
     },
     description: String,
-    products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }]
+    // products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }] -> tránh trùng lặp dữ liệu
 })
 
 module.exports = mongoose.model('Category', CategorySchema);

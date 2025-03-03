@@ -1,13 +1,48 @@
-const BASE_PREFIX = 'http://10.0.2.2:5001/api';
+import ApiConstants from 'src/adapter/ApiConstants';
+import api from '@libs/api';
+import type { ChangePassword, UpdateInformation } from '@type/user.types';
 
-const ApiConstants = {
-  // User
-  CHANGE_PASSWORD: `${BASE_PREFIX}/user/changePassword`,
-  UPDATE_INFORMATION: `${BASE_PREFIX}/user/updateInformation`,
+// Define a type for the invoice data
+type InvoiceData = {
+  amount: number;
+  date: string;
+  customer: string;
+  address: string;
+  createdBy: string;
+  createdDate: string;
 };
 
-export default ApiConstants;
+const Factories = {
+  // User Actions
+  changePassword: (data: ChangePassword) => {
+    return api.post(ApiConstants.CHANGE_PASSWORD, { data });
+  },
 
-export {
-  BASE_PREFIX,
+  updateInformation: (data: UpdateInformation) => {
+    return api.post(ApiConstants.UPDATE_INFORMATION, { data });
+  },
+
+  // Invoice Actions
+  createInvoice: (data: InvoiceData) => {
+    return api.post(ApiConstants.CREATE_INVOICE, { data });
+  },
+
+  // You can add more invoice-related methods here
+  updateInvoice: (invoiceId: string, data: Partial<InvoiceData>) => {
+    return api.put(`${ApiConstants.UPDATE_INVOICE}/${invoiceId}`, { data });
+  },
+
+  getInvoice: (invoiceId: string) => {
+    return api.get(`${ApiConstants.GET_INVOICE}/${invoiceId}`);
+  },
+
+  deleteInvoice: (invoiceId: string) => {
+    return api.delete(`${ApiConstants.DELETE_INVOICE}/${invoiceId}`);
+  },
+
+  getInvoicesByCustomer: (customerId: string) => {
+    return api.get(`${ApiConstants.GET_INVOICE_BY_CUSTOMER}/${customerId}`);
+  },
 };
+
+export default Factories;

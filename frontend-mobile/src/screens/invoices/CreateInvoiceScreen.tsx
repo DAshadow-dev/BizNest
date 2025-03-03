@@ -7,28 +7,52 @@ import {
   Button,
   StyleSheet,
   TouchableOpacity,
+  Alert,
+  Keyboard,
 } from "react-native";
+import Factories from "@redux/invoice/factories";
 
-const CreateInvoiceScreen = (route: {
-  params?: {
-    invoiceId?: string;
-    amount?: string;
-    date?: string;
-    customer?: string;
-    address?: string;
-    createdBy?: string;
-    createdDate?: string;
-  };
-}) => {
+const CreateInvoiceScreen = () => {
   const navigation = useNavigationRoot();
 
-  const [invoiceId, setInvoiceId] = useState("");
   const [amount, setAmount] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Default to today
   const [customer, setCustomer] = useState("");
   const [address, setAddress] = useState("");
-  const [createdBy, setCreatedBy] = useState("");
-  const [createdDate, setCreatedDate] = useState("");
+  const [createdBy, setCreatedBy] = useState("User123"); // Replace with actual user
+  const [loading, setLoading] = useState(false);
+
+  const handleCreateInvoice = async () => {
+    if (!amount || !date || !customer || !address) {
+      Alert.alert("Missing Fields", "Please fill in all required fields.");
+      return;
+    }
+
+    Keyboard.dismiss();
+    setLoading(true);
+
+    try {
+      const newInvoice = await Factories.createInvoice({
+        amount,
+        date,
+        customer,
+        address,
+        createdBy,
+      });
+
+      Alert.alert("Success", "Invoice created successfully.");
+      setAmount("");
+      setDate(new Date().toISOString().split("T")[0]); // Reset to today
+      setCustomer("");
+      setAddress("");
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert("Error", error.message || "Failed to create invoice.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -38,11 +62,12 @@ const CreateInvoiceScreen = (route: {
           style={styles.input}
           placeholder="Amount"
           value={amount}
+          keyboardType="numeric"
           onChangeText={setAmount}
         />
         <TextInput
           style={styles.input}
-          placeholder="Date"
+          placeholder="Date (YYYY-MM-DD)"
           value={date}
           onChangeText={setDate}
         />
@@ -58,31 +83,17 @@ const CreateInvoiceScreen = (route: {
           value={address}
           onChangeText={setAddress}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="End Date"
-          value={createdDate}
-          onChangeText={setCreatedDate}
-        />
       </View>
-
       <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          console.log({
-            invoiceId,
-            amount,
-            date,
-            customer,
-            address,
-            createdBy,
-            createdDate,
-          })
-        }
+        style={[styles.button, loading && styles.buttonDisabled]}
+        onPress={handleCreateInvoice}
+        disabled={loading}
       >
-        <Text style={styles.buttonText}>Create new invoice</Text>
+        <Text style={styles.buttonText}>
+          {loading ? "Creating..." : "Create Invoice"}
+        </Text>
       </TouchableOpacity>
-      <Button title="Go back" onPress={() => navigation.goBack()} />
+      <Button title="Go Back" onPress={() => navigation.goBack()} />
     </View>
   );
 };
@@ -132,19 +143,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  buttonSecondary: {
-    backgroundColor: "#E3F2FD",
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    marginVertical: 10,
-    minWidth: 180,
-    alignItems: "center",
-  },
-  buttonTextSecondary: {
-    color: "#4A90E2",
-    fontSize: 16,
-    fontWeight: "bold",
+  buttonDisabled: {
+    backgroundColor: "#AAB8C2",
   },
 });
 

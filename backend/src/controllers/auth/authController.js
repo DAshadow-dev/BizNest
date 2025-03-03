@@ -2,7 +2,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../../models/User");
 const generateToken = require("../../utils/generateToken");
-const sendVerificationEmail = require("../../config/mailer");
+const {
+  sendVerificationEmail,
+  sendResetPasswordEmail,
+} = require("../../config/mailer");
 
 exports.register = async (req, res) => {
   const { username, password, email, phone } = req.body;
@@ -22,15 +25,17 @@ exports.register = async (req, res) => {
 };
 
 exports.verifyEmail = async (req, res) => {
-  const { token } = req.query;
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
-    return res.status(400).json({ message: "Token is required" });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Authorization token is required" });
   }
 
+  const token = authHeader.split(" ")[1];
   try {
     const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
     console.log("Decoded Token:", decodedToken);
+
     const user = await User.findOneAndUpdate(
       { email: decodedToken.email },
       { $set: { verified: true } },
@@ -38,15 +43,15 @@ exports.verifyEmail = async (req, res) => {
     );
 
     if (!user) {
-      return res.status(400).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    res
-      .status(200)
-      .json({ message: "Email verified successfully. You can now login." });
+    res.status(200).json({
+      message: "Email verified successfully. You can now login.",
+    });
   } catch (error) {
     console.error("Error verifying email:", error);
-    res.status(400).json({ message: "Invalid token or email." });
+    res.status(400).json({ message: "Invalid or expired token." });
   }
 };
 
@@ -66,4 +71,45 @@ exports.login = async (req, res) => {
   res.json({ token });
 };
 
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
 
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  const token = generateToken(email);
+  await sendResetPasswordEmail(email, token);
+
+  res.status(200).json({
+    message: "Password reset email sent. Please check your inbox.",
+  });
+};
+
+exports.resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    const user = await User.findOneAndUpdate(
+      { email: decodedToken.email },
+      { $set: { password: hashedPassword } },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message:
+        "Password reset successfully. You can now login with your new password.",
+    });
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    res.status(400).json({ message: "Invalid or expired token." });
+  }
+};

@@ -8,8 +8,11 @@ export interface User {
   image?: string,
   status?: string,
   createAt?: Date,
-  lastLogin?: Date
+  lastLogin?: Date,
+  isAuthenticated?: boolean,
 }
+
+
 
 export interface UserReducer {
   Auth: User;

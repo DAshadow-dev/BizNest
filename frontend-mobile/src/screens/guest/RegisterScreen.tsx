@@ -6,22 +6,43 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Import icon từ Expo
 import * as Routes from "@utils/Routes";
-import {
-    navigate,
-    useNavigationRoot,
-  } from "@components/navigate/RootNavigation";
-const RegisterScreen = () => {
-    const navigation = useNavigationRoot();
+import { useDispatch } from "react-redux";
+import { useNavigationRoot } from "@components/navigate/RootNavigation";
+import AuthActions from "@redux/auth/actions";
+
+
+const RegisterScreen: React.FC = () => {
+  const navigation = useNavigationRoot();
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [mobile, setMobile] = useState("");
 
   const handleRegister = () => {
-    console.log("Đăng ký thành công!");
-    navigation.navigate(Routes.HomeScreen);  // Chuyển đến trang Home sau khi đăng ký
+    if (!email || !fullName || !mobile) {
+      Alert.alert("Enter all fields to register");
+      return;
+    }
+
+    dispatch({
+      type: AuthActions.REGISTER,
+      payload: {
+        data: { email, fullName, mobile }, 
+        onSuccess: (user: any) => {
+          navigation.navigate(Routes.BUSINESSCATEGORY_SCREEN);
+        },
+        onFailed: (message: string) => {
+          Alert.alert("Register failed", message);
+        },
+        onError: (error: any) => {
+          Alert.alert("Error", "There are any errors happening during the registration process");
+        },
+      },
+    });
   };
 
   return (
@@ -42,7 +63,7 @@ const RegisterScreen = () => {
       <TextInput
         style={styles.input}
         placeholder="Full name"
-        placeholderTextColor={"gray"}
+        placeholderTextColor="gray"
         value={fullName}
         onChangeText={setFullName}
       />
@@ -50,7 +71,7 @@ const RegisterScreen = () => {
       <TextInput
         style={styles.input}
         placeholder="Email"
-        placeholderTextColor={"gray"}
+        placeholderTextColor="gray"
         keyboardType="email-address"
         value={email}
         onChangeText={setEmail}
@@ -59,7 +80,7 @@ const RegisterScreen = () => {
       <TextInput
         style={styles.input}
         placeholder="Mobile"
-        placeholderTextColor={"gray"}
+        placeholderTextColor="gray"
         keyboardType="phone-pad"
         value={mobile}
         onChangeText={setMobile}
@@ -71,16 +92,16 @@ const RegisterScreen = () => {
         <Text style={styles.link}>Privacy Policy</Text>
       </Text>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("BUSINESSCATEGORY_SCREEN")}
-      >
+      <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Continue</Text>
       </TouchableOpacity>
 
       <Text style={styles.footerText}>
         Joined us before?{" "}
-        <Text style={styles.link} onPress={() => navigation.navigate("LOGIN_SCREEN")}>
+        <Text
+          style={styles.link}
+          onPress={() => navigation.navigate("LOGIN_SCREEN")}
+        >
           Login
         </Text>
       </Text>
@@ -100,7 +121,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    top: 50, // Điều chỉnh vị trí theo thiết bị
+    top: 50,
     left: 20,
     zIndex: 10,
   },

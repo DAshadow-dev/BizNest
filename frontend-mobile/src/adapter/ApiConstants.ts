@@ -1,48 +1,31 @@
-import ApiConstants from 'src/adapter/ApiConstants';
-import api from '@libs/api';
-import type { ChangePassword, UpdateInformation } from '@type/user.types';
+// const BASE_PREFIX = 'http://10.0.2.2:5001/api';
+import Constants from 'expo-constants';
 
-// Define a type for the invoice data
-type InvoiceData = {
-  amount: number;
-  date: string;
-  customer: string;
-  address: string;
-  createdBy: string;
-  createdDate: string;
+interface ExpoConfig {
+  hostUri?: string;
+}
+
+const expoConfig: ExpoConfig = Constants.expoConfig || {};
+const debuggerHost: string = expoConfig.hostUri?.split(':').shift() || 'localhost';
+
+const BASE_PREFIX = `http://${debuggerHost}:5000/api`
+
+const ApiConstants = {
+  //Authentication & Authorization
+  LOGIN : `${BASE_PREFIX}/auth/login`,
+  REGISTER: `${BASE_PREFIX}/auth/register`,
+  VERIFY_EMAIL : `${BASE_PREFIX}/auth/verify-email`,
+  // User
+  CHANGE_PASSWORD: `${BASE_PREFIX}/user/changePassword`,
+  UPDATE_INFORMATION: `${BASE_PREFIX}/user/updateInformation`,
 };
 
-const Factories = {
-  // User Actions
-  changePassword: (data: ChangePassword) => {
-    return api.post(ApiConstants.CHANGE_PASSWORD, { data });
-  },
+export default ApiConstants;
 
-  updateInformation: (data: UpdateInformation) => {
-    return api.post(ApiConstants.UPDATE_INFORMATION, { data });
-  },
-
-  // Invoice Actions
-  createInvoice: (data: InvoiceData) => {
-    return api.post(ApiConstants.CREATE_INVOICE, { data });
-  },
-
-  // You can add more invoice-related methods here
-  updateInvoice: (invoiceId: string, data: Partial<InvoiceData>) => {
-    return api.put(`${ApiConstants.UPDATE_INVOICE}/${invoiceId}`, { data });
-  },
-
-  getInvoice: (invoiceId: string) => {
-    return api.get(`${ApiConstants.GET_INVOICE}/${invoiceId}`);
-  },
-
-  deleteInvoice: (invoiceId: string) => {
-    return api.delete(`${ApiConstants.DELETE_INVOICE}/${invoiceId}`);
-  },
-
-  getInvoicesByCustomer: (customerId: string) => {
-    return api.get(`${ApiConstants.GET_INVOICE_BY_CUSTOMER}/${customerId}`);
-  },
+export {
+  BASE_PREFIX,
 };
 
-export default Factories;
+export const API_URL: string = `http://${debuggerHost}:5000/api`;
+
+console.log('🌐 API_URL:', API_URL);

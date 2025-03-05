@@ -8,40 +8,34 @@ import {
   Image,
   Alert,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // Import icon từ Expo
+import { Ionicons } from "@expo/vector-icons"; 
 import * as Routes from "@utils/Routes";
-import { useDispatch } from "react-redux";
 import { useNavigationRoot } from "@components/navigate/RootNavigation";
-import AuthActions from "@redux/auth/actions";
-
 
 const RegisterScreen: React.FC = () => {
   const navigation = useNavigationRoot();
-  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [mobile, setMobile] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleRegister = () => {
-    if (!email || !fullName || !mobile) {
+    if (!email || !fullName || !mobile || !password || !confirmPassword) {
       Alert.alert("Enter all fields to register");
       return;
     }
 
-    dispatch({
-      type: AuthActions.REGISTER,
-      payload: {
-        data: { email, fullName, mobile }, 
-        onSuccess: (user: any) => {
-          navigation.navigate(Routes.BUSINESSCATEGORY_SCREEN);
-        },
-        onFailed: (message: string) => {
-          Alert.alert("Register failed", message);
-        },
-        onError: (error: any) => {
-          Alert.alert("Error", "There are any errors happening during the registration process");
-        },
-      },
+    if (password !== confirmPassword) {
+      Alert.alert("Passwords do not match!");
+      return;
+    }
+
+    navigation.navigate(Routes.BUSINESSCATEGORY_SCREEN, {
+      email : email,
+      fullName: fullName,
+      mobile : mobile,
+      password: password,
     });
   };
 
@@ -56,7 +50,10 @@ const RegisterScreen: React.FC = () => {
       </TouchableOpacity>
 
       {/* Hình ảnh minh họa */}
-      <Image source={require("@assets/image/Register.png")} style={styles.image} />
+      <Image
+        source={require("@assets/image/Register.png")}
+        style={styles.image}
+      />
 
       <Text style={styles.title}>Sign up</Text>
 
@@ -84,6 +81,26 @@ const RegisterScreen: React.FC = () => {
         keyboardType="phone-pad"
         value={mobile}
         onChangeText={setMobile}
+      />
+
+      {/* Password Input */}
+      <TextInput
+        style={styles.input}
+        placeholder="Create Password"
+        placeholderTextColor="gray"
+        secureTextEntry={true}
+        value={password}
+        onChangeText={setPassword}
+      />
+
+      {/* Confirm Password Input */}
+      <TextInput
+        style={styles.input}
+        placeholder="Confirm Password"
+        placeholderTextColor="gray"
+        secureTextEntry={true}
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
       />
 
       <Text style={styles.policyText}>

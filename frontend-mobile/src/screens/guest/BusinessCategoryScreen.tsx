@@ -6,36 +6,67 @@ import {
   TouchableOpacity,
   StyleSheet,
   Modal,
+  Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { navigate, useNavigationRoot } from "@components/navigate/RootNavigation";
+import {
+  navigate,
+  useNavigationRoot,
+} from "@components/navigate/RootNavigation";
 import * as Routes from "@utils/Routes";
-const BusinessCategoryScreen = () => {
-    const navigation = useNavigationRoot();
+import { useDispatch } from "react-redux";
+import AuthActions from "@redux/auth/actions";
+const BusinessCategoryScreen = (props: {
+  route: { params: { email: string; fullName: string; mobile: string,password: string } };
+}) => {
+  const { email, fullName, mobile,password } = props.route.params;
+  const navigation = useNavigationRoot();
+  const dispatch = useDispatch();
   const [businessCategory, setBusinessCategory] = useState("");
   const [storeName, setStoreName] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [storeAddress, setStoreAddress] = useState("");
+  const [storePhone, setStorePhone] = useState(mobile);
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
 
   const handleNext = () => {
-    if (!businessCategory || !storeName || !password || !confirmPassword) {
+    if (!businessCategory || !storeName) {
       alert("Please fill in all fields!");
       return;
     }
-    if (password !== confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
-
-    // Show success modal
-    setIsSuccessModalVisible(true);
+    dispatch({
+      type: AuthActions.REGISTER,
+      payload: {
+        data: {
+          email,
+          userName : fullName,
+          phone: mobile,
+          password: password,
+          businessCategory,
+          storeName,
+          storeAddress,
+          storePhone,
+        },
+        onSuccess: (user: any) => {
+          // Show success modal
+          setIsSuccessModalVisible(true);
+        },
+        onFailed: (message: string) => {
+          Alert.alert("Register failed", message);
+        },
+        onError: (error: any) => {
+          Alert.alert(
+            "Error",
+            "There are any errors happening during the registration process"
+          );
+        },
+      },
+    });
   };
 
   const handleGoToLogin = () => {
     setIsSuccessModalVisible(false);
-    navigation.navigate(Routes.LOGIN_SCREEN);  // Navigate to login screen
+    navigation.navigate(Routes.LOGIN_SCREEN); // Navigate to login screen
   };
 
   return (
@@ -44,7 +75,12 @@ const BusinessCategoryScreen = () => {
 
       {/* Business Category Selection */}
       <View style={styles.inputContainer}>
-        <MaterialIcons name="business" size={20} color="gray" style={styles.icon} />
+        <MaterialIcons
+          name="business"
+          size={20}
+          color="gray"
+          style={styles.icon}
+        />
         <Picker
           selectedValue={businessCategory}
           style={styles.picker}
@@ -60,7 +96,12 @@ const BusinessCategoryScreen = () => {
 
       {/* Store Name Input */}
       <View style={styles.inputContainer}>
-        <Ionicons name="storefront-outline" size={20} color="gray" style={styles.icon} />
+        <Ionicons
+          name="storefront-outline"
+          size={20}
+          color="gray"
+          style={styles.icon}
+        />
         <TextInput
           style={styles.input}
           placeholder="Store Name"
@@ -70,29 +111,38 @@ const BusinessCategoryScreen = () => {
         />
       </View>
 
-      {/* Password Input */}
+      {/* Store Address Input */}
       <View style={styles.inputContainer}>
-        <Ionicons name="lock-closed-outline" size={20} color="gray" style={styles.icon} />
+        <Ionicons
+          name="map-outline"
+          size={20}
+          color="gray"
+          style={styles.icon}
+        />
         <TextInput
           style={styles.input}
-          placeholder="Create Password"
+          placeholder="Store Address"
           placeholderTextColor="gray"
-          secureTextEntry={true}
-          value={password}
-          onChangeText={setPassword}
+          value={storeAddress}
+          onChangeText={setStoreAddress}
         />
       </View>
 
-      {/* Confirm Password Input */}
+      {/* Store Phone Input */}
       <View style={styles.inputContainer}>
-        <Ionicons name="lock-closed-outline" size={20} color="gray" style={styles.icon} />
+        <MaterialIcons
+          name="phone"
+          size={20}
+          color="gray"
+          style={styles.icon}
+        />
         <TextInput
           style={styles.input}
-          placeholder="Confirm Password"
+          placeholder="Store Phone Number"
           placeholderTextColor="gray"
-          secureTextEntry={true}
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
+          keyboardType="phone-pad"
+          value={storePhone}
+          onChangeText={setStorePhone}
         />
       </View>
 
@@ -111,7 +161,9 @@ const BusinessCategoryScreen = () => {
           <View style={styles.modalContent}>
             <Ionicons name="checkmark-circle-outline" size={60} color="green" />
             <Text style={styles.modalTitle}>Registration Successful!</Text>
-            <Text style={styles.modalText}>Your account has been created successfully.</Text>
+            <Text style={styles.modalText}>
+              Your account has been created successfully.
+            </Text>
 
             {/* Go to Login Button */}
             <TouchableOpacity style={styles.button} onPress={handleGoToLogin}>

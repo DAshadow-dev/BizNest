@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../../models/User");
+const Store = require("../../models/Store");
 const generateToken = require("../../utils/generateToken");
 const {
   sendVerificationEmail,
@@ -8,18 +9,39 @@ const {
 } = require("../../config/mailer");
 
 exports.register = async (req, res) => {
-  const { username, password, email, phone } = req.body;
-  //hash Password
+  const {
+    username,
+    password,
+    email,
+    phone,
+    storeName,
+    storeAddress,
+    storePhone,
+  } = req.body;
+
+  // Hash Password
   const hashedPassword = await bcrypt.hash(password, 10);
-  //Save user
+
+  // Save user
   const user = new User({ username, password: hashedPassword, email, phone });
   await user.save();
+
+  // Save store with owner attribute
+  const store = new Store({
+    owner: user._id,
+    name: storeName,
+    address: storeAddress,
+    phone: storePhone,
+  });
+  await store.save();
+
   // Generate Token and verify email
   const token = generateToken(email);
   await sendVerificationEmail(email, token);
 
   res.status(201).json({
-    message: "User registered successfully. Please verify your email.",
+    message:
+      "User and store registered successfully. Please verify your email.",
     token: token,
   });
 };

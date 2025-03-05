@@ -57,7 +57,12 @@ export type RootParamList = {
   LOGIN_SCREEN: undefined,
   ONBOARDING_SCREEN : undefined,
   REGISTER_SCREEN :undefined,
-  BUSINESSCATEGORY_SCREEN: undefined,
+  BUSINESSCATEGORY_SCREEN: {
+    email: string,
+    fullName: string,
+    mobile: string,
+    password : string,
+  },
   // HOME_SCREEN: undefined,
   CHAT_SCREEN :undefined,
 };

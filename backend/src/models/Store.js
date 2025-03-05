@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const StoreSchema = new mongoose.Schema({
-    ownerId: {
+    owner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
@@ -19,7 +19,7 @@ const StoreSchema = new mongoose.Schema({
         type : String,
         required : [true, "Please enter a phone number"],
         unique : true,
-        match : /^\+?\d{1,3}?[-.\s]?\(?\d{1,4}?[-.\s]?\)?[-.\s]?\d{1,12}$/
+        // match : /^\+?\d{1,3}?[-.\s]?\(?\d{1,4}?[-.\s]?\)?[-.\s]?\d{1,12}$/
     },
     createdAt : {
         type : Date,

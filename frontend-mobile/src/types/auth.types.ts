@@ -4,12 +4,15 @@ export interface Login {
 }
 
 export interface Register {
-  email: string;
   username: string;
   password: string;
+  email: string;
   phone: string;
+  businessCategory: string;
+  storeName: string;
+  storeAddress: string;
+  storePhone: string;
 }
-
 export interface VerifyEmail {
   token: string;
 }

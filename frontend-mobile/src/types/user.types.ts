@@ -22,9 +22,9 @@ export interface ChangePassword {
 }
 
 export interface UpdateInformation {
-  Email: string;
-  Phone: string;
-  UserName: string;
-  Image: string;
+  email: string;
+  phone: string;
+  username: string;
+  image: string;
 }
 

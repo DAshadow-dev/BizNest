@@ -6,21 +6,20 @@ import {
   TouchableOpacity,
   StyleSheet,
   Modal,
+  ActivityIndicator,
   Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import {
-  navigate,
-  useNavigationRoot,
-} from "@components/navigate/RootNavigation";
+import { useNavigationRoot } from "@components/navigate/RootNavigation";
 import * as Routes from "@utils/Routes";
 import { useDispatch } from "react-redux";
 import AuthActions from "@redux/auth/actions";
+
 const BusinessCategoryScreen = (props: {
-  route: { params: { email: string; fullName: string; mobile: string,password: string } };
+  route: { params: { email: string; fullName: string; mobile: string, password: string } };
 }) => {
-  const { email, fullName, mobile,password } = props.route.params;
+  const { email, fullName, mobile, password } = props.route.params;
   const navigation = useNavigationRoot();
   const dispatch = useDispatch();
   const [businessCategory, setBusinessCategory] = useState("");
@@ -28,18 +27,22 @@ const BusinessCategoryScreen = (props: {
   const [storeAddress, setStoreAddress] = useState("");
   const [storePhone, setStorePhone] = useState(mobile);
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleNext = () => {
     if (!businessCategory || !storeName) {
       alert("Please fill in all fields!");
       return;
     }
+
+    setIsLoading(true); // Bắt đầu hiển thị loading spinner
+
     dispatch({
       type: AuthActions.REGISTER,
       payload: {
         data: {
           email,
-          userName : fullName,
+          username: fullName,
           phone: mobile,
           password: password,
           businessCategory,
@@ -48,17 +51,16 @@ const BusinessCategoryScreen = (props: {
           storePhone,
         },
         onSuccess: (user: any) => {
-          // Show success modal
+          setIsLoading(false); // Dừng hiển thị loading spinner
           setIsSuccessModalVisible(true);
         },
         onFailed: (message: string) => {
+          setIsLoading(false); // Dừng hiển thị loading spinner
           Alert.alert("Register failed", message);
         },
         onError: (error: any) => {
-          Alert.alert(
-            "Error",
-            "There are any errors happening during the registration process"
-          );
+          setIsLoading(false); // Dừng hiển thị loading spinner
+          Alert.alert("Error", "There are any errors happening during the registration process");
         },
       },
     });
@@ -66,7 +68,7 @@ const BusinessCategoryScreen = (props: {
 
   const handleGoToLogin = () => {
     setIsSuccessModalVisible(false);
-    navigation.navigate(Routes.LOGIN_SCREEN); // Navigate to login screen
+    navigation.navigate(Routes.LOGIN_SCREEN); // Chuyển hướng đến màn hình đăng nhập
   };
 
   return (
@@ -75,12 +77,7 @@ const BusinessCategoryScreen = (props: {
 
       {/* Business Category Selection */}
       <View style={styles.inputContainer}>
-        <MaterialIcons
-          name="business"
-          size={20}
-          color="gray"
-          style={styles.icon}
-        />
+        <MaterialIcons name="business" size={20} color="gray" style={styles.icon} />
         <Picker
           selectedValue={businessCategory}
           style={styles.picker}
@@ -96,12 +93,7 @@ const BusinessCategoryScreen = (props: {
 
       {/* Store Name Input */}
       <View style={styles.inputContainer}>
-        <Ionicons
-          name="storefront-outline"
-          size={20}
-          color="gray"
-          style={styles.icon}
-        />
+        <Ionicons name="storefront-outline" size={20} color="gray" style={styles.icon} />
         <TextInput
           style={styles.input}
           placeholder="Store Name"
@@ -113,12 +105,7 @@ const BusinessCategoryScreen = (props: {
 
       {/* Store Address Input */}
       <View style={styles.inputContainer}>
-        <Ionicons
-          name="map-outline"
-          size={20}
-          color="gray"
-          style={styles.icon}
-        />
+        <Ionicons name="map-outline" size={20} color="gray" style={styles.icon} />
         <TextInput
           style={styles.input}
           placeholder="Store Address"
@@ -130,12 +117,7 @@ const BusinessCategoryScreen = (props: {
 
       {/* Store Phone Input */}
       <View style={styles.inputContainer}>
-        <MaterialIcons
-          name="phone"
-          size={20}
-          color="gray"
-          style={styles.icon}
-        />
+        <MaterialIcons name="phone" size={20} color="gray" style={styles.icon} />
         <TextInput
           style={styles.input}
           placeholder="Store Phone Number"
@@ -151,18 +133,24 @@ const BusinessCategoryScreen = (props: {
         <Text style={styles.buttonText}>Continue</Text>
       </TouchableOpacity>
 
+      {/* Loading Spinner */}
+      {isLoading && (
+        <Modal transparent={true} visible={isLoading} animationType="fade">
+          <View style={styles.modalContainer}>
+            <ActivityIndicator size="large" color="#007AFF" />
+            <Text style={styles.loadingText}>Registering, please wait...</Text>
+          </View>
+        </Modal>
+      )}
+
       {/* Success Modal */}
-      <Modal
-        transparent={true}
-        visible={isSuccessModalVisible}
-        animationType="fade"
-      >
+      <Modal transparent={true} visible={isSuccessModalVisible} animationType="fade">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Ionicons name="checkmark-circle-outline" size={60} color="green" />
             <Text style={styles.modalTitle}>Registration Successful!</Text>
             <Text style={styles.modalText}>
-              Your account has been created successfully.
+              Your account has been created successfully. Please verify to activate your account.
             </Text>
 
             {/* Go to Login Button */}
@@ -231,6 +219,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  loadingText: {
+    fontSize: 16,
+    color: "#fff",
+    marginTop: 10,
   },
   modalContent: {
     width: "80%",

@@ -9,7 +9,7 @@ function* handleAuthSaga(action : any,factoryFunction : Function, successAction 
     const response : CommonResponse<CodeResponse> = yield call(() => factoryFunction(data))
       if (response?.status === 200){
         onSuccess && onSuccess(response.data.Data);
-        yield put({type: successAction, payload: {user : response.data.Data}})
+        yield put({type: successAction, payload: {res : response.data.Data}})
     }
     else {
       onFailure && onFailure(response.data.MsgNo);

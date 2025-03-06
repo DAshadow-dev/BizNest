@@ -9,7 +9,8 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendVerificationEmail = async (email, token) => {
-  const url = "http://localhost:5000/api/auth/verify-email?token=" + token;
+  const url = `http://localhost:5000/api/auth/verify-email?token=${token}`; // URL chứa token trong query string
+
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to: email,
@@ -20,9 +21,9 @@ const sendVerificationEmail = async (email, token) => {
             <a href="${url}">${url}</a>`,
   });
 };
-
 const sendResetPasswordEmail = async (email, token) => {
-  const url = "http://localhost:5000/api/auth/reset-password?token=" + token;
+  const url = "http://localhost:5000/api/auth/reset-password"; // URL không chứa token
+
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to: email,
@@ -30,7 +31,9 @@ const sendResetPasswordEmail = async (email, token) => {
     html: `
             <h1>Reset your password</h1>
             <p>Please click on the following link to reset your password:</p>
-            <a href="${url}">${url}</a>`,
+            <p><a href="${url}">${url}</a></p>
+            <p>Your reset password token is: <strong>${token}</strong></p>
+            <p>Please include this token in the Authorization header as: Bearer ${token}</p>`,
   });
 };
 

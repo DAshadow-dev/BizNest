@@ -39,7 +39,7 @@ exports.register = async (req, res) => {
   const token = generateToken(email);
   await sendVerificationEmail(email, token);
 
-  res.status(201).json({
+  res.status(200).json({
     message:
       "User and store registered successfully. Please verify your email.",
     token: token,
@@ -47,13 +47,12 @@ exports.register = async (req, res) => {
 };
 
 exports.verifyEmail = async (req, res) => {
-  const authHeader = req.headers.authorization;
+  const token = req.query.token; // Lấy token từ query string
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (!token) {
     return res.status(401).json({ message: "Authorization token is required" });
   }
 
-  const token = authHeader.split(" ")[1];
   try {
     const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
     console.log("Decoded Token:", decodedToken);
@@ -76,7 +75,6 @@ exports.verifyEmail = async (req, res) => {
     res.status(400).json({ message: "Invalid or expired token." });
   }
 };
-
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });

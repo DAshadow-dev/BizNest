@@ -29,3 +29,4 @@ export {
 export const API_URL: string = `http://${debuggerHost}:5000/api`;
 
 console.log('🌐 API_URL:', API_URL);
+

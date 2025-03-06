@@ -21,7 +21,8 @@ app.use(cors());
 
 //auth router
 app.use("/api/auth", authRoute);
-app.use('/api/user', userRoute)
+app.use('/api/user', userRoute);
+
 
 //from errorHandle
 app.use(errorHandler);

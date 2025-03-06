@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar, Text, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
@@ -40,7 +40,9 @@ import RegisterScreen from '@screens/guest/RegisterScreen';
 import BusinessCategoryScreen from '@screens/guest/BusinessCategoryScreen';
 // import HomeScreen from '@screens/guest/HomeScreen';
 import Chatscreen from '@screens/guest/Chatscreen';
- 
+import {Provider} from 'react-redux';
+import { store } from '@redux/store';
+
 
 const Stack = createStackNavigator<RootParamList>();
 const Tab = createBottomTabNavigator();
@@ -52,7 +54,7 @@ function MyStack() {
       screenOptions={{
         headerShown: false,
       }}
-      initialRouteName={Routes.ONBOARDING_SCREEN}>
+      initialRouteName={Routes.PROFILE}>
         <Stack.Screen name={Routes.ONBOARDING_SCREEN} component={OnboardingScreen} />
         <Stack.Screen name={Routes.LOGIN_SCREEN} component={LoginScreen} />
         <Stack.Screen name={Routes.REGISTER_SCREEN} component={RegisterScreen} />
@@ -138,16 +140,18 @@ export default function App() {
     return null;
   }
   SplashScreen.hideAsync();
-
-
+  
+  
   return (
-    <View style={{flex: 1}}>
-      <SafeAreaProvider>
-        <StatusBar barStyle="light-content" />
-        <NavigationContainer>
-          <MyStack/>
-        </NavigationContainer>
-      </SafeAreaProvider>
-    </View>
+    <Provider store={store}>
+      <View style={{flex: 1}}>
+        <SafeAreaProvider>
+          <StatusBar barStyle="light-content" />
+          <NavigationContainer>
+            <MyStack/>
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </View>
+    </Provider>
   );
 }

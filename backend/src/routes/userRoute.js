@@ -1,10 +1,11 @@
 const express= require('express');
 const router=  express.Router();
 
-const userController= require('../controllers/userController');
-const  {getUsers} = userController;
+const userController= require('../controllers/user/userController');
+const validateToken = require('../middlewares/validateTokenHandler');
+const  {changePasswordByUser, updateInformationByUser} = userController;
 
-router.route('/').get(getUsers);
-
+router.post('/changePassword', validateToken, changePasswordByUser)
+router.post('/updateInformation', validateToken, updateInformationByUser)
 
 module.exports= router;

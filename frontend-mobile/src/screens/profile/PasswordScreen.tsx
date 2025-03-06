@@ -5,20 +5,41 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {FormProvider, useForm} from 'react-hook-form';
 import FormInput from "@components/input/FormInput";
 import {required} from '@utils/Validator';
+import {useDispatch} from 'react-redux';
+import UserActions from "@redux/user/actions";
+import { useAppSelector } from "@redux/store";
+import { RootState } from "@redux/root-reducer";
 
 const PasswordScreen= ()=> {
+
+    const dispatch = useDispatch();
 
     const methods = useForm({
         defaultValues: {
           oldPassword: '',
           newPassword: '',
-          newAgainPassword: '',
+          againNewPassword: '',
         },
     });
     const onSubmit = (data: any) => {
-        const {fullname, phonenumber, email} = data;
-        console.log(fullname,' + ', phonenumber, ' + ', email)
+        dispatch({type: UserActions.CHANGE_PASSWORD, 
+            payload: {
+                data, 
+                onSuccess: (data: any) => {
+                    console.log("Data: ", data)
+                },
+                onError: (error: any) => {
+                    console.log("Error: ", error)
+                },
+                onFailed: (MsgNo: string) => {
+                    console.log("Failed: ", MsgNo)
+                }
+            }
+        })
     };
+
+    const Auth = useAppSelector((state: RootState) => state.User.Auth);
+    console.log(Auth)
     return(
         <View style={{flex: 1}}>
             <View style={{height: verticalScale(60), width: scale(393), backgroundColor: '#3750B2', flexDirection: 'row', alignItems: "flex-end"}}>
@@ -62,7 +83,7 @@ const PasswordScreen= ()=> {
                     <View style={styles.formInput}>
                         <Text style={styles.textLabel}>Again New Password</Text>
                         <FormInput
-                            fieldName="newAgainPassword"
+                            fieldName="againNewPassword"
                             placeHolder={"Enter agaim your new password"}
                             secureTextEntry={true}
                             validate={[required]}

@@ -4,7 +4,7 @@ import type {ChangePassword, UpdateInformation} from '@type/user.types';
 
 const Factories = {
   changePassword: (data: ChangePassword) => {
-    return api.post(
+    return api.put(
       ApiConstants.CHANGE_PASSWORD,
       {
         data,
@@ -13,7 +13,7 @@ const Factories = {
   },
 
   updateInformation: (data: UpdateInformation) => {
-    api.post(
+    return api.put(
         ApiConstants.UPDATE_INFORMATION,{
             data
         }

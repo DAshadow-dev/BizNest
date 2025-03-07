@@ -6,6 +6,8 @@ const errorHandler = require("./src/middlewares/errorHandler");
 const connectToDB = require("./src/config/dbConnection");
 const authRoute = require("./src/routes/auth/authRoute");
 const userRoute = require('./src/routes/userRoute');
+const adminRoute = require('./src/routes/admin/adminRouter');
+
 
 const port = process.env.PORT || 5000;
 
@@ -22,6 +24,7 @@ app.use(cors());
 //auth router
 app.use("/api/auth", authRoute);
 app.use('/api/user', userRoute);
+app.use('/api/admin', adminRoute);
 
 
 //from errorHandle

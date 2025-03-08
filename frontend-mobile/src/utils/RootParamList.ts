@@ -52,7 +52,7 @@ export type RootParamList = {
   PROFILE: undefined,
   CUSTOMER_LIST: undefined,
   CREATE_CUSTOMER: {idUpdate: number};
-  CUSTOMER_DETAIL: undefined;
+  CUSTOMER_DETAIL: {id: number};
   BUSINESS_DASHBOARD: undefined,
   lOGIN_SCREEN: undefined,
   ONBOARDING_SCREEN : undefined,

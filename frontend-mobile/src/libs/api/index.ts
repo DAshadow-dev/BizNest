@@ -16,21 +16,18 @@ const api: AxiosInstance = axios.create(axiosRequestConfig);
 
 export default {
   async get(endPoint: string, options?: AxiosRequestConfig) {
-    let query = '';
-    if (options?.params) {
-      query = qs.stringify(options.params, {
-        addQueryPrefix: true,
-        skipNulls: true,
-      });
-      delete options.params;
-    }
-
+    const headers = options && options.headers ? {...options.headers} : {};
     return api.request({
-      url: `${endPoint}${query}`,
+      url: endPoint,
       ...options,
+      headers: {
+        ...headers,
+        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEyMyIsImlhdCI6MTc0MTM1NzE4OCwiZXhwIjoxNzQxMzYwNzg4LCJpc3MiOiJpc3N1ZXIifQ.tFIQYMwAph0nxv8PLpC-UPY7znV7e1HGMBeOPVS0WCI`, // Thêm thủ công ở đây
+      },
       method: 'GET',
     });
   },
+  
   async post(endPoint: string, options?: AxiosRequestConfig) {
     const headers = options && options.headers ? {...options.headers} : {};
 
@@ -39,7 +36,7 @@ export default {
       ...options,
       headers: {
         ...headers,
-        Authorization: `Bearer `, // Thêm thủ công ở đây
+        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEyMyIsImlhdCI6MTc0MTM1NzE4OCwiZXhwIjoxNzQxMzYwNzg4LCJpc3MiOiJpc3N1ZXIifQ.tFIQYMwAph0nxv8PLpC-UPY7znV7e1HGMBeOPVS0WCI`, // Thêm thủ công ở đây
       },
       method: 'POST',
     });
@@ -52,11 +49,11 @@ export default {
       ...options,
       headers: {
         ...headers,
-        Authorization: `Bearer `, // Thêm thủ công ở đây
+        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEyMyIsImlhdCI6MTc0MTM1NzE4OCwiZXhwIjoxNzQxMzYwNzg4LCJpc3MiOiJpc3N1ZXIifQ.tFIQYMwAph0nxv8PLpC-UPY7znV7e1HGMBeOPVS0WCI`, // Thêm thủ công ở đây
       },
       method: 'PUT',
     });
-  },
+  },  
   async patch(endPoint: string, options?: AxiosRequestConfig) {
     const headers = options && options.headers ? {...options.headers} : {};
 
@@ -65,7 +62,7 @@ export default {
       ...options,
       headers: {
         ...headers,
-        Authorization: `Bearer `, // Thêm thủ công ở đây
+        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEyMyIsImlhdCI6MTc0MTQwMDc0MSwiZXhwIjoxNzQxNDA0MzQxLCJpc3MiOiJpc3N1ZXIifQ.OXfY8qGRivHnLmjyhb60VaCzqA9aDoKmv9gk4DZ3Qws`, // Thêm thủ công ở đây
       },
       method: 'PUT',
     });
@@ -78,7 +75,7 @@ export default {
       ...options,
       headers: {
         ...headers,
-        Authorization: `Bearer `, // Thêm thủ công ở đây
+        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEyMyIsImlhdCI6MTc0MTQwMDc0MSwiZXhwIjoxNzQxNDA0MzQxLCJpc3MiOiJpc3N1ZXIifQ.OXfY8qGRivHnLmjyhb60VaCzqA9aDoKmv9gk4DZ3Qws`, // Thêm thủ công ở đây
       },
       method: 'DELETE',
     });

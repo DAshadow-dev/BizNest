@@ -5,7 +5,7 @@ const userController= require('../controllers/user/userController');
 const validateToken = require('../middlewares/validateTokenHandler');
 const  {changePasswordByUser, updateInformationByUser} = userController;
 
-router.put('/changePassword', validateToken, changePasswordByUser)
-router.put('/updateInformation', validateToken, updateInformationByUser)
+router.post('/changePassword', validateToken, changePasswordByUser);
+router.post('/updateInformation', validateToken, updateInformationByUser);
 
 module.exports= router;

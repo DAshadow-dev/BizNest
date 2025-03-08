@@ -8,6 +8,8 @@ const authRoute = require("./src/routes/auth/authRoute");
 const { Server } = require("socket.io");
 const chatRoute = require("./src/routes/chatRoute");
 const userRoute = require('./src/routes/userRoute');
+const adminRoute = require('./src/routes/admin/adminRouter');
+
 
 const port = process.env.PORT || 5000;
 
@@ -28,6 +30,8 @@ app.use(errorHandler);
 
 //auth router
 app.use("/api/auth", authRoute);
+app.use('/api/user', userRoute);
+app.use('/api/admin', adminRoute);
 //chat router
 app.use("api/chat", chatRoute);
 //connect socket.io
@@ -43,8 +47,6 @@ io.on("connection", (socket) => {
   });
 });
 app.use('/api/user', userRoute)
-
-
 
 app.listen(port, () => {
   console.log("Server running on port: ", port);

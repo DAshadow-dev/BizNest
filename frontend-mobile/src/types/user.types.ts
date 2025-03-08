@@ -8,8 +8,11 @@ export interface User {
   image?: string,
   status?: string,
   createAt?: Date,
-  lastLogin?: Date
+  lastLogin?: Date,
+  isAuthenticated?: boolean,
 }
+
+
 
 export interface UserReducer {
   Auth: User;
@@ -22,9 +25,9 @@ export interface ChangePassword {
 }
 
 export interface UpdateInformation {
-  Email: string;
-  Phone: string;
-  UserName: string;
-  Image: string;
+  email: string;
+  phone: string;
+  username: string;
+  image: string;
 }
 

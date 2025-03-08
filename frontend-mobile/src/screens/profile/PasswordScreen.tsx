@@ -9,9 +9,12 @@ import {useDispatch} from 'react-redux';
 import UserActions from "@redux/user/actions";
 import { useAppSelector } from "@redux/store";
 import { RootState } from "@redux/root-reducer";
+import { useNavigationRoot } from "@components/navigate/RootNavigation";
+import * as Routes from "@utils/Routes";
+import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 
 const PasswordScreen= ()=> {
-
+    const navigation = useNavigationRoot();
     const dispatch = useDispatch();
 
     const methods = useForm({
@@ -25,25 +28,45 @@ const PasswordScreen= ()=> {
         dispatch({type: UserActions.CHANGE_PASSWORD, payload: {
             data, 
             onSuccess: (data: any) => {
-                console.log("Data: ", data)
+                methods.reset();
+                Toast.show({
+                    type: "success",
+                    text1: "Success!",
+                    text2: "Changed your password successfully",
+                    position: "top",
+                    visibilityTime: 2000
+                });
             },
             onError: (error: any) => {
-                console.log("Error: ", error)
+                Toast.show({
+                    type: "error",
+                    text1: "Fail!",
+                    text2: error,
+                    position: "top",
+                    visibilityTime: 2000
+                });
             },
             onFailed: (MsgNo: string) => {
-                console.log("Failed: ", MsgNo)
+                Toast.show({
+                    type: "error",
+                    text1: "Fail!",
+                    text2: MsgNo,
+                    position: "top",
+                    visibilityTime: 2000
+                });            
             }
         }})
     };
 
     const Auth = useAppSelector((state: RootState) => state.User.Auth);
-    console.log(Auth)
     return(
         <View style={{flex: 1}}>
-            <View style={{height: verticalScale(60), width: scale(393), backgroundColor: '#3750B2', flexDirection: 'row', alignItems: "flex-end"}}>
+            <View style={{height: verticalScale(60), width: scale(393), backgroundColor: '#1e88e5', flexDirection: 'row', alignItems: "flex-end"}}>
                 <View style={{width: scale(50), height: verticalScale(50), justifyContent: "center", alignItems: "center"}}>
                     <TouchableOpacity
-                        onPress={()=>{}}
+                        onPress={()=>{
+                            navigation.navigate(Routes.HomeScreen)
+                        }}
                     >
                         <IconBack/>
                     </TouchableOpacity>
@@ -101,13 +124,14 @@ const PasswordScreen= ()=> {
                         <TouchableOpacity
                             onPress={methods.handleSubmit(onSubmit)}
                         >
-                            <View style={{width: scale(162.5), height: verticalScale(44), backgroundColor: "#3750B2", borderRadius: 8, justifyContent: "center", alignItems: "center"}}>
+                            <View style={{width: scale(162.5), height: verticalScale(44), backgroundColor: "#1e88e5", borderRadius: 8, justifyContent: "center", alignItems: "center"}}>
                                 <Text style={{fontSize: moderateScale(16), color: CommonColors.white, ...Fonts.defaultMedium}}>Save</Text>
                             </View>
                         </TouchableOpacity>
                     </View>
                 </View>
             </FormProvider>
+            <Toast config={toastConfig}/>
         </View>
     );
 }
@@ -131,4 +155,39 @@ const styles= StyleSheet.create({
     },
 });
 
+// 🎨 Tuỳ chỉnh giao diện Toast
+const toastConfig = {
+    success: (props: any) => (
+        <BaseToast
+            {...props}
+            style={{ borderLeftColor: "green", backgroundColor: "white", marginTop: scale(15)}}
+            contentContainerStyle={{ paddingHorizontal: verticalScale(15) }}
+            text1Style={{
+                fontSize: moderateScale(16),
+                fontWeight: "bold",
+                color: "green",
+            }}
+            text2Style={{
+                fontSize: moderateScale(14),
+                color: "#333",
+            }}
+        />
+    ),
+    error: (props: any) => (
+        <ErrorToast
+            {...props}
+            style={{ borderLeftColor: "red", backgroundColor: "white", marginTop: scale(15)}}
+            contentContainerStyle={{ paddingHorizontal: verticalScale(15)}}
+            text1Style={{
+                fontSize: moderateScale(16),
+                fontWeight: "bold",
+                color: "red",
+            }}
+            text2Style={{
+                fontSize: moderateScale(14),
+                color: "#333",
+            }}
+        />
+    ),
+};
 export default PasswordScreen;

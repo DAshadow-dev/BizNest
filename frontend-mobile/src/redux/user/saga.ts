@@ -9,8 +9,8 @@ export function* changePassword() {
       const response: CommonResponse<CodeResponse> = yield call(() =>
         Factories.changePassword(data),
       );
+
       if (response?.status === 200) {
-        console.log(data)
         onSuccess && onSuccess(response.data.Data);
         yield put({
           type: UserActions.CHANGE_PASSWORD_SUCCESS,
@@ -28,10 +28,26 @@ export function* changePassword() {
 }
 
 export function* updateInformation() {
-  yield takeEvery(UserActions.UPDATE_INFORMATION, function* (): any {
+  yield takeEvery(UserActions.UPDATE_INFORMATION, function* (action: any): any {
+    const {data, onSuccess, onFailed, onError} = action.payload;
     try {
+      const response: CommonResponse<CodeResponse> = yield call(() =>
+        Factories.updateInformation(data),
+      );
+      if (response?.status === 200) {
+        onSuccess && onSuccess(response.data.Data);
+        yield put({
+          type: UserActions.UPDATE_INFORMATION_SUCCESS,
+          payload: {
+            data
+          },
+        });
+      }else{
+        onFailed && onFailed(response.data.MsgNo);
+      }
     } catch (error) {
-    }
+      onError && onError(error);
+    }    
   });
 }
 

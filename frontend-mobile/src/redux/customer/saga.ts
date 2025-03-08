@@ -76,10 +76,37 @@ import Factories from './factories';
         });
       }
 
+      function* updateCustomer() {
+        yield takeEvery(CustomerActions.UPDATE_CUSTOMER, function* (action: any): any {
+          const {Data, onSuccess, onFailed, onError} = action.payload;
+          const {id, data}= Data
+          try {
+            const response: CommonResponse<CodeResponse> = yield call(() =>
+              Factories.update_customer(id, data),
+            );
+            if (response?.status === 200) {
+              onSuccess && onSuccess(response.data.Data);
+              yield put({
+                type: CustomerActions.UPDATE_CUSTOMER_SUCCESS,
+                payload: {
+                  data: response.data.Data,
+                  id: id
+                },
+              });
+            }else{
+              onFailed && onFailed(response.data.MsgNo);
+            }
+          } catch (error) {
+            onError && onError(error);
+          }    
+        });
+      }
+
 export default function* customerSaga() {
   yield all([
     fork(fetchListCustomer),
     fork(createCustomer),
     fork(deletCustomer),
+    fork(updateCustomer),
   ]);
 }

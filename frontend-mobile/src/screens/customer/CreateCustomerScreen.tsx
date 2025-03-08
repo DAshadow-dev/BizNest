@@ -11,10 +11,10 @@ import { Customer } from "@type/user.types";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "@redux/store";
 import { RootState } from "@redux/root-reducer";
-import { format } from "date-fns";
 import CustomerActions from "@redux/customer/actions";
 import { useDispatch } from "react-redux";
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
+import { format, parse } from "date-fns";
 
 const CreateCustomerScreen= (props: {route: {params: {idUpdate: number}}})=> {
     const {idUpdate}= props.route.params
@@ -27,9 +27,10 @@ const CreateCustomerScreen= (props: {route: {params: {idUpdate: number}}})=> {
             fullname: customer ? customer.fullname : '',
             email: customer ? customer.email : '',
             phone: customer ? customer.phone : '',
-            gender: customer ? customer.gender : false,
-            date_of_birth: customer ? customer.date_of_birth : '1/1/1999',
-        },
+            gender: customer ? (customer.gender ? "true" : "false") : "false",
+            date_of_birth: customer?.date_of_birth 
+            ? format(new Date(customer.date_of_birth), "dd/MM/yyyy") 
+            : "01/01/1999",        },
     });
     const navigation= useNavigationRoot();
 
@@ -41,46 +42,72 @@ const CreateCustomerScreen= (props: {route: {params: {idUpdate: number}}})=> {
                 fullname: findCustomer.fullname,
                 email: findCustomer.email,
                 phone: findCustomer.phone,
-                gender: findCustomer.gender,
-                date_of_birth: findCustomer.date_of_birth || '1/1/1999',
-            });
+                gender: findCustomer.gender ? "true" : "false",
+                date_of_birth: findCustomer?.date_of_birth 
+                ? format(new Date(findCustomer.date_of_birth), "dd/MM/yyyy") 
+                : "01/01/1999",}
+            );
         }
         setLoading(false)
     },[customers, idUpdate]);
     
     const dispatch= useDispatch();
     const onSubmit = (data: any) => {
-        dispatch({type: CustomerActions.CREATE_CUSTOMER, payload: {
-          data, 
-          onSuccess: () => {
-            methods.reset();
-            Toast.show({
-                type: "success",
-                text1: "Success!",
-                text2: "Create customer successfully",
-                position: "top",
-                visibilityTime: 2000
-            });
-          },
-          onError: (error: any) => {
-            Toast.show({
-                type: "error",
-                text1: "Error!",
-                text2: error,
-                position: "top",
-                visibilityTime: 2000
-            });
-          },
-          onFailed: (MsgNo: string) => {
-            Toast.show({
-                type: "error",
-                text1: "Fail!",
-                text2: "Create customer unsuccessfully",
-                position: "top",
-                visibilityTime: 2000
-            });    
-          }
-        }})
+        if(idUpdate === -1){
+            dispatch({type: CustomerActions.CREATE_CUSTOMER, payload: {
+                data, 
+                onSuccess: () => {
+                  methods.reset();
+                  navigation.navigate(Routes.CUSTOMER_LIST, { showToast: true, message: "Create customer successfully"});
+                },
+                onError: (error: any) => {
+                  Toast.show({
+                      type: "error",
+                      text1: "Error!",
+                      text2: "Required or invalid data",
+                      position: "top",
+                      visibilityTime: 2000
+                  });
+                },
+                onFailed: (MsgNo: string) => {
+                  Toast.show({
+                      type: "error",
+                      text1: "Fail!",
+                      text2: "Create customer unsuccessfully",
+                      position: "top",
+                      visibilityTime: 2000
+                  });    
+                }
+              }}
+            )
+        }else{
+            dispatch({type: CustomerActions.UPDATE_CUSTOMER, payload: {
+                Data: {id: idUpdate, data: data}, 
+                onSuccess: () => {
+                  methods.reset();
+                  navigation.navigate(Routes.CUSTOMER_DETAIL, {id: idUpdate});
+                },
+                onError: (error: any) => {
+                  Toast.show({
+                      type: "error",
+                      text1: "Error!",
+                      text2: "Required or invalid data",
+                      position: "top",
+                      visibilityTime: 2000
+                  });
+                },
+                onFailed: (MsgNo: string) => {
+                  Toast.show({
+                      type: "error",
+                      text1: "Fail!",
+                      text2: "Create customer unsuccessfully",
+                      position: "top",
+                      visibilityTime: 2000
+                  });    
+                }
+              }}
+            )
+        }
       };
     return(
         
@@ -93,9 +120,9 @@ const CreateCustomerScreen= (props: {route: {params: {idUpdate: number}}})=> {
                             <TouchableOpacity
                                 onPress={()=>{
                                     if(idUpdate== -1){
-                                        navigation.navigate(Routes.CUSTOMER_LIST)
+                                        navigation.goBack();
                                     }else{
-                                        navigation.navigate(Routes.CUSTOMER_DETAIL,{id: idUpdate})
+                                        navigation.goBack();
                                     }
                                 }}
                             >

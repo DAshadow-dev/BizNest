@@ -14,14 +14,31 @@ import { useDispatch } from "react-redux";
 import CustomerActions from "@redux/customer/actions";
 import { useAppSelector } from "@redux/store";
 import { RootState } from "@redux/root-reducer";
+import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
+import { moderateScale, scale, verticalScale } from "@libs/reactResizeMatter/scalingUtils";
 
-const CustomerListScreen = () => {
+const CustomerListScreen = (props: any) => {
   const navigation = useNavigationRoot();
   const dispatch = useDispatch();
   const [search, setSearch] = useState<string>('');
   const [filteredCustomers, setFilteredCustomers] = useState<any[]>([]);
 
   const customers = useAppSelector((state: RootState) => state.Customer.ListCustomer);
+
+  useEffect(() => {
+    if (props.route.params?.showToast) {
+      Toast.show({
+        type: "success",
+        text1: "Success!",
+        text2: props.route.params?.message,
+        position: "top",
+        visibilityTime: 2000,
+      });
+
+      // Xóa param sau khi hiển thị toast để tránh hiển thị lại khi re-render
+      navigation.setParams({ showToast: undefined });
+    }
+  }, [props.route.params]);
 
   useEffect(() => {
     dispatch({
@@ -104,6 +121,8 @@ const CustomerListScreen = () => {
           <Text style={styles.buttonText}>New</Text>
         </TouchableOpacity>
       </View>
+      <Toast config={toastConfig}/>
+      
     </View>
   );
 };
@@ -166,7 +185,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   customerText: {
-    fontSize: 18,
+    fontSize: 16,
     color: "#333",
   },
   floatingButton: {
@@ -192,4 +211,41 @@ const styles = StyleSheet.create({
   },
 });
 
+
+// 🎨 Tuỳ chỉnh giao diện Toast
+const toastConfig = {
+  success: (props: any) => (
+      <BaseToast
+          {...props}
+          style={{ borderLeftColor: "green", backgroundColor: "white", marginTop: scale(0)}}
+          contentContainerStyle={{ paddingHorizontal: verticalScale(15) }}
+          text1Style={{
+              fontSize: moderateScale(16),
+              fontWeight: "bold",
+              color: "green",
+          }}
+          text2Style={{
+              fontSize: moderateScale(14),
+              color: "#333",
+          }}
+      />
+  ),
+  error: (props: any) => (
+      <ErrorToast
+          {...props}
+          style={{ borderLeftColor: "red", backgroundColor: "white", marginTop: scale(0)}}
+          contentContainerStyle={{ paddingHorizontal: verticalScale(15)}}
+          text1Style={{
+              fontSize: moderateScale(16),
+              fontWeight: "bold",
+              color: "red",
+          }}
+          text2Style={{
+              fontSize: moderateScale(14),
+              color: "#333",
+          }}
+      />
+  ),
+};
+ 
 export default CustomerListScreen;

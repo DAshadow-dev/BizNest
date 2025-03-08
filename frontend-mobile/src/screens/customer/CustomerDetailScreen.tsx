@@ -11,7 +11,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigationRoot } from "@components/navigate/RootNavigation";
 import * as Routes from "@utils/Routes";
-import { scale, verticalScale } from "@libs/reactResizeMatter/scalingUtils";
+import { moderateScale, scale, verticalScale } from "@libs/reactResizeMatter/scalingUtils";
 import { useAppSelector } from "@redux/store";
 import { RootState } from "@redux/root-reducer";
 import { Customer } from "@type/user.types";
@@ -42,8 +42,7 @@ const CustomerDetailScreen = (props: any) => {
         payload: {
           data: {id: id},
           onSuccess:(data: any) => {
-            console.log("Delete success")
-            navigation.navigate(Routes.CUSTOMER_LIST)
+            navigation.navigate(Routes.CUSTOMER_LIST, { showToast: true, message: "Delete customer successfully" });
           },
           onError: (error: any) => {
             console.log(error);
@@ -77,7 +76,7 @@ const CustomerDetailScreen = (props: any) => {
                   <View style={{marginRight: verticalScale(10)}}/>
                   <TouchableOpacity
                     onPress={() => {
-                      navigation.navigate(Routes.CREATE_CUSTOMER, {idUpdate: 1});
+                      navigation.navigate(Routes.CREATE_CUSTOMER, {idUpdate: id});
                     }}
                   >
                     <Ionicons name="pencil" size={24} color="white" />
@@ -169,7 +168,7 @@ const CustomerDetailScreen = (props: any) => {
                   />
             </ScrollView>
           </View>
-      }
+      }      
     </View>
   );
 };
@@ -235,5 +234,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
+
 
 export default CustomerDetailScreen;

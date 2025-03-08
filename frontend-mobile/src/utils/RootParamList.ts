@@ -50,7 +50,7 @@ export type RootParamList = {
   PROFILE_SCREEN: undefined,
   PASSWORD_SCREEN: undefined,
   PROFILE: undefined,
-  CUSTOMER_LIST: undefined,
+  CUSTOMER_LIST: {showToast?: boolean, message?: string},
   CREATE_CUSTOMER: {idUpdate: number};
   CUSTOMER_DETAIL: {id: number};
   BUSINESS_DASHBOARD: undefined,

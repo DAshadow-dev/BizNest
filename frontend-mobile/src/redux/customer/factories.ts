@@ -24,7 +24,14 @@ const Factories = {
 
   delete_customer: (id: number) => {
     return api.delete(
-      `${ApiConstants.DELE_CUSTOMER}/${id}`,
+      `${ApiConstants.DELETE_CUSTOMER}/${id}`,
+    ) 
+  },
+
+  update_customer: (id: number, data: any) => {
+    return api.put(
+      `${ApiConstants.DELETE_CUSTOMER}/${id}`,
+      {data}
     ) 
   },
 }

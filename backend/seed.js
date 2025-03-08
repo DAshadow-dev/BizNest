@@ -1,19 +1,19 @@
 const mongoose = require('mongoose');
-const connectDB = require('./src/config/dbConnection');
+const dbConnecion = require('./src/config/dbConnection');
 const bcrypt = require("bcryptjs");
 const User = require('./src/models/User');
 const Customer = require('./src/models/Customer');
 const Store = require('./src/models/Store');
 
 const seedData = async () => {
-    await connectDB();
+    await dbConnecion();
 
     //create Data User
     await User.create({
         username: "123",
-        password: await bcrypt.hash('123', 10),
+        password: await bcrypt.hash('12345678', 10),
         verified: true,
-        email: "123",
+        email: "cus1@gmail.com",
         phone: "123",
         gender: true,
         date_of_birth: new Date("2000-01-01"),
@@ -56,7 +56,7 @@ const seedData = async () => {
     //create store
 
     await Store.create({
-        ownerId: 1,
+        owner: 1,
         name: "Fashion Men Shop",
         address: "650 Le Duan, Thanh Khe, Da Nang",
         phone: "0934726073",

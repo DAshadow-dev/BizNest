@@ -14,9 +14,37 @@ const initState: UserReducer = {
 
 const Reducer = (
   state = initState,
-  action: { type: string; payload: { c: User, data: any}},
+  action: { type: string; payload: { user: User, data: any}},
 ) => {
   switch (action.type) {
+    case UserActions.LOGIN_SUCCESS:
+    case UserActions.REGISTER_SUCCESS:
+      return {
+        ...state,
+        Auth: {
+          ...action.payload?.user,
+          isAuthenticated: true
+        },
+      };
+      
+    case UserActions.LOGIN_FAILURE:
+    case UserActions.REGISTER_FAILURE:
+      return {
+        ...state,
+        Auth: {
+          ...state.Auth,
+          isAuthenticated: false,
+        },
+      };
+
+    case UserActions.VERIFY_EMAIL_SUCCESS:
+      return {
+        ...state,
+        Auth: {
+          ...state.Auth,
+          verified: true,
+        },
+      };
     case UserActions.CHANGE_PASSWORD_SUCCESS:
       return {
         ...state,

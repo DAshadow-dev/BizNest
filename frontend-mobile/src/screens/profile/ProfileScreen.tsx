@@ -90,6 +90,15 @@ const ProfileScreen: React.FC = () => {
       setImage(result.assets[0].uri);
     }
   };
+
+  const handleButtonCancel= () => {
+    methods.reset({
+      username: Auth.username,
+      email: Auth.email,
+      phone: Auth.phone,
+    });
+    setImage(Auth.image)
+  }
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
@@ -173,7 +182,7 @@ const ProfileScreen: React.FC = () => {
         </View>
         <View style={{width: scale(353), height: verticalScale(50),margin: scale(20), flexDirection: 'row', justifyContent: "space-between", marginTop: verticalScale(20)}}>
           <TouchableOpacity
-              onPress={() => {}}
+              onPress={handleButtonCancel}
           >
               <View style={{width: scale(162.5), height: verticalScale(44), backgroundColor: "white", borderColor: 'red', borderWidth: 1, borderRadius: 8, justifyContent: "center", alignItems: "center"}}>
                   <Text style={{fontSize: moderateScale(16), color: CommonColors.redColor, ...Fonts.defaultMedium}}>Cancel</Text>

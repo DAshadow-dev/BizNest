@@ -31,6 +31,11 @@ app.use(errorHandler);
 app.use("/api/auth", authRoute);
 //chat router
 app.use("api/chat", chatRoute);
+//user router
+app.use('/api/user', userRoute)
+//customer router
+app.use('/api/customer', customerRoute)
+
 //connect socket.io
 io.on("connection", (socket) => {
   console.log("User connected : " + socket.id);
@@ -43,8 +48,6 @@ io.on("connection", (socket) => {
     console.log("User disconnected : " + socket.id);
   });
 });
-app.use('/api/user', userRoute)
-app.use('/api/customer', customerRoute)
 
 
 

@@ -88,7 +88,10 @@ exports.login = async (req, res) => {
   }
 
   const token = generateToken(email);
-  res.json({ token });
+  res.json({Data:{
+    token: token,
+    user: user
+  } });
 };
 
 exports.forgotPassword = async (req, res) => {

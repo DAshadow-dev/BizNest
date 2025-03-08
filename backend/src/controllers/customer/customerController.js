@@ -55,6 +55,19 @@ const deleteCustomerById= asyncHandler( async (req, res) => {
 })
 
 const updateCustomerById= asyncHandler( async (req, res) => {
+    try {
+        const customer = await Customer.findById(req.params.id)
+        customer.fullname= req.body.fullname;
+        customer.email= req.body.email;
+        customer.phone= req.body.phone;
+        customer.gender= req.body.gender;
+        customer.date_of_birth= req.body.date_of_birth;
+        customer.save();
+        res.status(200).json({Data: customer});
+    } catch (err) {
+        res.status(400)
+        throw new Error(err.message)
+    }
 })
 
 

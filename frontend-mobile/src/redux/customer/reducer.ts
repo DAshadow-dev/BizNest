@@ -9,7 +9,7 @@ const initState: CustomerReducer = {
 
 const Reducer = (
   state = initState,
-  action: { type: string; payload: { c: User, data: any}},
+  action: { type: string; payload: { c: User, data: any, id: number}},
 ) => {
   switch (action.type) {
     case CustomerActions.FETCH_LIST_CUSTOMER_SUCCESS:
@@ -21,6 +21,15 @@ const Reducer = (
       return {
         ...state,
         ListCustomer: [...state.ListCustomer, action.payload.data]
+      };
+    case CustomerActions.UPDATE_CUSTOMER_SUCCESS:
+      return {
+        ...state,
+        ListCustomer: state.ListCustomer.map(customer =>
+          customer._id === action.payload.id
+            ? { ...customer, ...action.payload.data } 
+            : customer 
+        )
       };
     default:
       return state;

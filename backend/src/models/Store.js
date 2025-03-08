@@ -2,16 +2,11 @@ const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const StoreSchema = new mongoose.Schema({
-<<<<<<< HEAD
     _id: {
         type: Number
     },
-    ownerId: {
-        type: mongoose.Schema.Types.Number,
-=======
     owner: {
-        type: mongoose.Schema.Types.ObjectId,
->>>>>>> 37fda09f2b94111ff33993360245314eb5b96d50
+        type: mongoose.Schema.Types.Number,
         ref: 'User',
         required: true
     },

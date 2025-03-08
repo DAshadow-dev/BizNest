@@ -1,12 +1,12 @@
 import UserReducer from '@redux/user/reducer';
-import InvoiceReducer from '@redux/invoice/reducer';
+// import InvoiceReducer from '@redux/invoice/reducer';
 import CustomerReducer from '@redux/customer/reducer';
 
 import { combineReducers } from 'redux';
 
 const rootReducer = combineReducers({
   User: UserReducer,
-  Invoice: InvoiceReducer,
+  // Invoice: InvoiceReducer,
   Customer: CustomerReducer,
 });
 

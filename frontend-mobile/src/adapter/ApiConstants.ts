@@ -21,7 +21,8 @@ const ApiConstants = {
   //Customer
   LIST_CUSTOMER: `${BASE_PREFIX}/customer`,
   CREATE_CUSTOMER: `${BASE_PREFIX}/customer`,
-  DELE_CUSTOMER: `${BASE_PREFIX}/customer`,
+  DELETE_CUSTOMER: `${BASE_PREFIX}/customer`,
+  UPDATE_CUSTOMER: `${BASE_PREFIX}/customer`,
 };
 
 export default ApiConstants;

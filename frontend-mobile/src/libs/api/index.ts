@@ -30,14 +30,19 @@ api.interceptors.request.use(
 );
 export default {
   async get(endPoint: string, options?: AxiosRequestConfig) {
-    const headers = options && options.headers ? {...options.headers} : {};
+    const token = await getToken();
+    let query = '';
+    if (options?.params) {
+      query = qs.stringify(options.params, {
+        addQueryPrefix: true,
+        skipNulls: true,
+      });
+      delete options.params;
+    }
+
     return api.request({
-      url: endPoint,
+      url: `${endPoint}${query}`,
       ...options,
-      headers: {
-        ...headers,
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEyMyIsImlhdCI6MTc0MTM1NzE4OCwiZXhwIjoxNzQxMzYwNzg4LCJpc3MiOiJpc3N1ZXIifQ.tFIQYMwAph0nxv8PLpC-UPY7znV7e1HGMBeOPVS0WCI`, // Thêm thủ công ở đây
-      },
       method: 'GET',
     });
   },

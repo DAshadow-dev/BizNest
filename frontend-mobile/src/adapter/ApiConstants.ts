@@ -18,6 +18,9 @@ const ApiConstants = {
   // User
   CHANGE_PASSWORD: `${BASE_PREFIX}/user/changePassword`,
   UPDATE_INFORMATION: `${BASE_PREFIX}/user/updateInformation`,
+  //Admin
+  LIST_BUSSINESS_ONWER: `${BASE_PREFIX}/admin/businessOwners`,
+  TOGGLE_ACCOUNT_STATUS: `${BASE_PREFIX}/admin/toggleStatus`,
   //Customer
   LIST_CUSTOMER: `${BASE_PREFIX}/customer`,
   CREATE_CUSTOMER: `${BASE_PREFIX}/customer`,

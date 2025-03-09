@@ -45,11 +45,15 @@ const UserSchema = new mongoose.Schema({
         type : String,
         default : '',
     },
-    status : {
-        type : String,
-        enum : ['active', 'inactive'],
-        default : 'active'
-    },
+    status: {
+        type: String,
+        enum: ["active", "inactive", "pending"],
+        default: "pending",
+      },
+      pendingApproval: {
+        type: Boolean,
+        default: true,
+      },
     storeId : {
         type : mongoose.Schema.Types.Number,
         ref : 'Store'

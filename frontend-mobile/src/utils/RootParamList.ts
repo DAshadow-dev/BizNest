@@ -3,9 +3,9 @@ export type RootParamList = {
   AdminDashboardScreen : undefined,
   AccountListScreen : undefined,
   PendingAccountsScreen : undefined,
-  AccountDetailScreen : {  id: string;
-    name: string;
-    status: 'Active' | 'Blocked'},
+  AccountDetailScreen : {  
+    id: string
+  },
   InvoiceListScreen : undefined,
   CreateInvoiceScreen : {
       invoiceId?: string;

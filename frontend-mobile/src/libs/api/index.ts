@@ -30,6 +30,7 @@ api.interceptors.request.use(
 );
 export default {
   async get(endPoint: string, options?: AxiosRequestConfig) {
+    const token = await getToken();
     let query = '';
     if (options?.params) {
       query = qs.stringify(options.params, {
@@ -45,6 +46,7 @@ export default {
       method: 'GET',
     });
   },
+  
   async post(endPoint: string, options?: AxiosRequestConfig) {
     return api.request({
       url: endPoint,
@@ -58,7 +60,7 @@ export default {
       ...options,
       method: 'PUT',
     });
-  },
+  },  
   async patch(endPoint: string, options?: AxiosRequestConfig) {
     return api.request({
       url: endPoint,

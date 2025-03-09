@@ -1,8 +1,12 @@
 const mongoose = require('mongoose');
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const StoreSchema = new mongoose.Schema({
+    _id: {
+        type: Number
+    },
     owner: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.Number,
         ref: 'User',
         required: true
     },
@@ -24,7 +28,12 @@ const StoreSchema = new mongoose.Schema({
     createdAt : {
         type : Date,
         default : Date.now
-    }
+    },
+    customers: [{
+        type: mongoose.Schema.Types.Number,
+        ref: 'Customer'
+    }],
 })
 
+StoreSchema.plugin(AutoIncrement, { id: 'store_seq', inc_field: '_id'});
 module.exports = mongoose.model('Store', StoreSchema);

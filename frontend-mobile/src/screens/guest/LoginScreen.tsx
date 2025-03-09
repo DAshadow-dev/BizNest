@@ -12,19 +12,17 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Routes from '@utils/Routes';
 import { useNavigationRoot } from '@components/navigate/RootNavigation';
-import AuthActions from '@redux/auth/actions';
 import { RootState } from '@redux/root-reducer'; 
+import UserActions from '@redux/user/actions';
 
 const LoginScreen: React.FC = () => {
   const dispatch = useDispatch();
   const navigation = useNavigationRoot();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('cus1@gmail.com');
+  const [password, setPassword] = useState('12345678');
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const authState = useSelector((state: RootState) => state.User); 
-
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -53,11 +51,11 @@ const LoginScreen: React.FC = () => {
     if (!valid) return;
 
     dispatch({
-      type: AuthActions.LOGIN,
+      type: UserActions.LOGIN,
       payload: {
         data: { email, password },
         onSuccess: (user: any) => {
-          navigation.navigate(Routes.HomeScreen);
+          navigation.navigate(Routes.CUSTOMER_LIST);
         },
         onFailed: (message: string) => {
           alert('Login failed: ' + message);

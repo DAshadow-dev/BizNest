@@ -18,6 +18,11 @@ const ApiConstants = {
   // User
   CHANGE_PASSWORD: `${BASE_PREFIX}/user/changePassword`,
   UPDATE_INFORMATION: `${BASE_PREFIX}/user/updateInformation`,
+  //Customer
+  LIST_CUSTOMER: `${BASE_PREFIX}/customer`,
+  CREATE_CUSTOMER: `${BASE_PREFIX}/customer`,
+  DELETE_CUSTOMER: `${BASE_PREFIX}/customer`,
+  UPDATE_CUSTOMER: `${BASE_PREFIX}/customer`,
 };
 
 export default ApiConstants;

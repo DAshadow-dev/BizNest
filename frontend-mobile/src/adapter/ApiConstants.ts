@@ -21,6 +21,8 @@ const ApiConstants = {
   //Admin
   LIST_BUSSINESS_ONWER: `${BASE_PREFIX}/admin/businessOwners`,
   TOGGLE_ACCOUNT_STATUS: `${BASE_PREFIX}/admin/toggleStatus`,
+  APPROVE_ACCOUNT: `${BASE_PREFIX}/admin/approve`,
+  REJECT_ACCOUNT: `${BASE_PREFIX}/admin/reject`,
   //Customer
   LIST_CUSTOMER: `${BASE_PREFIX}/customer`,
   CREATE_CUSTOMER: `${BASE_PREFIX}/customer`,

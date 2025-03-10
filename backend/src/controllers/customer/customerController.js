@@ -5,7 +5,7 @@ const User = require('../../models/User');
 
 const getListCustomerByStoreId= asyncHandler( async (req, res) => {
     try {
-        const user= await User.findOne({email: req.email});
+        const user= await User.findOne({email: req.user.email});
         const store= await Store.findById(user.storeId).populate("customers");
         const listCustomer= store.customers;
         res.status(200);
@@ -19,7 +19,7 @@ const getListCustomerByStoreId= asyncHandler( async (req, res) => {
 const createListCustomer= asyncHandler( async (req, res) => {
     try {
         const newCustomer = await Customer.create(req.body);
-        const user= await User.findOne({email: req.email});
+        const user= await User.findOne({email: req.user.email});
         const store= await Store.findById(user.storeId)
         store.customers= [...store.customers, newCustomer.id]
         store.save();
@@ -43,7 +43,7 @@ const getCustomerById= asyncHandler( async (req, res) => {
 const deleteCustomerById= asyncHandler( async (req, res) => {
     try {
         const deleteCustomer = await Customer.findByIdAndDelete(req.params.id);
-        const user= await User.findOne({email: req.email});
+        const user= await User.findOne({email: req.user.email});
         const store= await Store.findById(user.storeId)
         store.customers= store.customers.filter((e,i) => e.id != req.params.id)
         store.save();

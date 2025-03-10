@@ -15,6 +15,18 @@ const Factories = {
     ) 
   },
 
+
+  approve_account: (id: number) => {
+    return api.put(
+      `${ApiConstants.TOGGLE_ACCOUNT_STATUS}/${id}`,
+    ) 
+  },
+
+  reject_account: (id: number) => {
+    return api.put(
+      `${ApiConstants.TOGGLE_ACCOUNT_STATUS}/${id}`,
+    ) 
+  },
 }
 
 export default Factories;

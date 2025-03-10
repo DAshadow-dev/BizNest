@@ -89,7 +89,7 @@ const CreateCustomerScreen= (props: {route: {params: {idUpdate: number}}})=> {
                 },
                 onError: (error: any) => {
                   Toast.show({
-                      type: "error",
+                      type: "success",
                       text1: "Error!",
                       text2: "Required or invalid data",
                       position: "top",

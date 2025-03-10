@@ -42,7 +42,7 @@ const AccountDetailScreen = (props: any) => {
     { date: "21/2/2025", price: "$20" },
     { date: "21/2/2025", price: "$20" },
   ];
-
+  
   const handleLockUnlock = () => {
     Alert.alert(
       "Confirm",

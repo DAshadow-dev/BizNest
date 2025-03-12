@@ -8,7 +8,7 @@ const changePasswordByUser = asyncHandler(async (req, res) => {
       res.status(400);
       throw new Error("All fields are mandatory!");
         }
-        let user= await User.findOne({email: req.email});
+        let user= await User.findOne({email: req.user.email});
         if(user && (await brcypt.compare(oldPassword, user.password))){
             if(oldPassword == newPassword){
                 return res.status(202).json({
@@ -43,7 +43,7 @@ const updateInformationByUser = asyncHandler(async (req, res) => {
       res.status(400);
       throw new Error("All fields are mandatory!");
     }
-    let user = await User.findOne({ email: req.email });
+    let user = await User.findOne({ email: req.user.email });
     user.email = email;
     user.phone = phone;
     user.username = username;

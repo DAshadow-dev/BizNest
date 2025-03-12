@@ -18,7 +18,7 @@ import UserActions from '@redux/user/actions';
 const LoginScreen: React.FC = () => {
   const dispatch = useDispatch();
   const navigation = useNavigationRoot();
-  const [email, setEmail] = useState('cus1@gmail.com');
+  const [email, setEmail] = useState('bus1@gmail.com');
   const [password, setPassword] = useState('12345678');
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState('');
@@ -55,7 +55,7 @@ const LoginScreen: React.FC = () => {
       payload: {
         data: { email, password },
         onSuccess: (user: any) => {
-          navigation.navigate(Routes.CUSTOMER_LIST);
+          navigation.navigate(Routes.PendingAccountsScreen);
         },
         onFailed: (message: string) => {
           alert('Login failed: ' + message);

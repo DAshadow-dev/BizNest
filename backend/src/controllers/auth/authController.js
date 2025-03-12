@@ -92,7 +92,7 @@ exports.login = async (req, res) => {
     return res.status(403).json({ message: "Email not verified" });
   }
 
-  const token = generateToken(email);
+  const token = generateToken(user);
   res.json({Data:{
     token: token,
     user: user
@@ -107,7 +107,7 @@ exports.forgotPassword = async (req, res) => {
     return res.status(404).json({ message: "User not found" });
   }
 
-  const token = generateToken(email);
+  const token = generateToken(user);
   await sendResetPasswordEmail(email, token);
 
   res.status(200).json({

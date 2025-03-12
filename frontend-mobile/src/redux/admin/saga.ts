@@ -50,11 +50,60 @@ import AdminActions from './actions';
         });
     }
 
+
+    function* approveAccount() {
+        yield takeEvery(AdminActions.APPROVE_ACCOUNT, function* (action: any): any {
+            const {id, onFailed, onError} = action.payload;
+            try {
+            const response: CommonResponse<CodeResponse> = yield call(() =>
+                Factories.toggle_account_status(id),
+            );
+            if (response?.status === 200) {
+                yield put({
+                type: AdminActions.APPROVE_ACCOUNT_SUCCESS,
+                payload: {
+                    id: id
+                },
+                });
+            }else{
+                onFailed && onFailed(response.data.MsgNo);
+            }
+            } catch (error) {
+            onError && onError(error);
+            }    
+        });
+    }
+
+    function* rejectAccount() {
+        yield takeEvery(AdminActions.REJECT_ACCOUNT, function* (action: any): any {
+            const {id, onFailed, onError} = action.payload;
+            try {
+            const response: CommonResponse<CodeResponse> = yield call(() =>
+                Factories.toggle_account_status(id),
+            );
+            if (response?.status === 200) {
+                yield put({
+                type: AdminActions.REJECT_ACCOUNT_SUCCESS,
+                payload: {
+                    id: id
+                },
+                });
+            }else{
+                onFailed && onFailed(response.data.MsgNo);
+            }
+            } catch (error) {
+            onError && onError(error);
+            }    
+        });
+    }
+
   
 
 export default function* adminSaga() {
   yield all([
     fork(fetchListBussinessOnwer),
     fork(toggleAccountStatus),
+    fork(approveAccount),
+    fork(rejectAccount),
   ]);
 }

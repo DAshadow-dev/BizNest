@@ -18,6 +18,8 @@ const ApiConstants = {
   // User
   CHANGE_PASSWORD: `${BASE_PREFIX}/user/changePassword`,
   UPDATE_INFORMATION: `${BASE_PREFIX}/user/updateInformation`,
+  //Chat
+  GET_MESSAGES : `${BASE_PREFIX}/chat/messages`,
 };
 
 export default ApiConstants;

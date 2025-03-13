@@ -9,34 +9,63 @@ import {
   Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
+import { io } from "socket.io-client";
+import ApiConstants from "src/adapter/ApiConstants";
 
-const ChatBox = ({ navigation }) => {
-  const [messages, setMessages] = useState([
-    { id: "1", text: "Hello! How can I assist you?", sender: "bot" },
-  ]);
+const API_URL = "http:/localhost:5000/api/chat"; 
+const socket = io("http://localhost:5000");
+
+const ChatBox = ({ navigation, route }: { navigation: any; route: any }) => {
+  const userId = route.params?.userId || "123"; 
+  const receiverId = route.params?.receiverId || "456";
+  const [messages, setMessages] = useState<any[]>([]);
   const [inputText, setInputText] = useState("");
-  const flatListRef = useRef(null);
+  const flatListRef = useRef<FlatList<any> | null>(null);
 
-  const sendMessage = () => {
+  // 🟢 Lấy danh sách tin nhắn khi mở màn hình
+  useEffect(() => {
+    axios
+      .get(ApiConstants.GET_MESSAGES+'?senderId=123&receiverId=456')
+      .then((res) => {
+        setMessages(res.data);
+      })
+      .catch((err) => console.error("Lỗi lấy tin nhắn:", err));
+  }, [userId, receiverId]);
+
+  // 🟢 Kết nối socket để nhận tin nhắn theo thời gian thực
+  useEffect(() => {
+    socket.emit("userOnline", userId);
+
+    socket.on("receiveMessage", (newMessage) => {
+      if (newMessage.senderId === receiverId) {
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+      }
+    });
+
+    return () => {
+      socket.off("receiveMessage");
+    };
+  }, [receiverId]);
+
+  // 🔵 Gửi tin nhắn lên server
+  const sendMessage = async () => {
     if (inputText.trim() === "") return;
 
     const newMessage = {
-      id: Date.now().toString(),
-      text: inputText,
-      sender: "user",
+      senderId: userId,
+      receiverId,
+      message: inputText,
     };
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
-    setInputText("");
 
-    // Simulate bot response
-    setTimeout(() => {
-      const botReply = {
-        id: Date.now().toString(),
-        text: "I received your message!",
-        sender: "bot",
-      };
-      setMessages((prevMessages) => [...prevMessages, botReply]);
-    }, 1000);
+    try {
+      const res = await axios.post(`${API_URL}/send`, newMessage);
+      setMessages((prevMessages) => [...prevMessages, res.data]);
+      socket.emit("sendMessage", res.data);
+      setInputText("");
+    } catch (error) {
+      console.error("Lỗi gửi tin nhắn:", error);
+    }
   };
 
   useEffect(() => {
@@ -51,31 +80,31 @@ const ChatBox = ({ navigation }) => {
           <Ionicons name="chevron-back" size={24} color="white" />
         </TouchableOpacity>
         <Image
-          source={{ uri: "https://i.pravatar.cc/150?img=10" }} // Bot Avatar
+          source={{ uri: "https://i.pravatar.cc/150?img=10" }}
           style={styles.avatar}
         />
-        <Text style={styles.headerText}>Support Center</Text>
+        <Text style={styles.headerText}>Chat with Support</Text>
       </View>
 
       {/* Chat Messages */}
       <FlatList
         ref={flatListRef}
         data={messages}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <View
             style={[
               styles.message,
-              item.sender === "user" ? styles.userMessage : styles.botMessage,
+              item.senderId === userId ? styles.userMessage : styles.botMessage,
             ]}
           >
             <Text
               style={[
                 styles.messageText,
-                item.sender === "bot" ? styles.botText : styles.userText,
+                item.senderId !== userId ? styles.botText : styles.userText,
               ]}
             >
-              {item.text}
+              {item.message}
             </Text>
           </View>
         )}

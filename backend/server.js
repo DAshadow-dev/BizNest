@@ -5,9 +5,10 @@ const http = require("http");
 const errorHandler = require("./src/middlewares/errorHandler");
 const connectToDB = require("./src/config/dbConnection");
 const authRoute = require("./src/routes/auth/authRoute");
-const { Server } = require("socket.io");
 const chatRoute = require("./src/routes/chatRoute");
-const userRoute = require('./src/routes/userRoute');
+const userRoute = require("./src/routes/userRoute");
+const Chat = require("./src/models/Chat");
+const { Server } = require("socket.io");
 
 const port = process.env.PORT || 5000;
 
@@ -15,37 +16,61 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
-//connect to DB
+// Kết nối DB
 connectToDB();
 
-//from router
+// Middleware
 app.use(express.json());
-
-//from cors
 app.use(cors());
-//from errorHandle
 app.use(errorHandler);
 
-//auth router
+// Routes
 app.use("/api/auth", authRoute);
-//chat router
-app.use("api/chat", chatRoute);
-//connect socket.io
+app.use("/api/chat", chatRoute);
+app.use("/api/user", userRoute);
+
+// Khởi tạo danh sách người dùng kết nối với socket
+global.users = {};
+
+// Kết nối Socket.IO
 io.on("connection", (socket) => {
-  console.log("User connected : " + socket.id);
-  //send message event
-  io.on("sendMessage", (msg) => {
-    io.emit("receiveMessage", msg);
+  console.log("🔵 New client connected:", socket.id);
+
+  // Lưu user vào danh sách khi họ kết nối
+  socket.on("userOnline", (userId) => {
+    global.users[userId] = socket.id;
+    console.log(`🟢 User ${userId} is online`);
   });
-  //disconnect event
+
+  // Xử lý tin nhắn mới
+  socket.on("sendMessage", async ({ senderId, receiverId, message }) => {
+    try {
+      const chat = new Chat({ senderId, receiverId, message });
+      await chat.save();
+
+      // Gửi tin nhắn ngay đến người nhận nếu họ online
+      if (global.users[receiverId]) {
+        io.to(global.users[receiverId]).emit("receiveMessage", chat);
+      }
+    } catch (error) {
+      console.error("Error sending message:", error.message);
+    }
+  });
+
+  // Xóa user khỏi danh sách khi họ rời đi
   socket.on("disconnect", () => {
-    console.log("User disconnected : " + socket.id);
+    Object.keys(global.users).forEach((key) => {
+      if (global.users[key] === socket.id) {
+        delete global.users[key];
+        console.log(`🔴 User ${key} disconnected`);
+      }
+    });
   });
 });
-app.use('/api/user', userRoute)
 
+// Đưa `io` vào `app` để sử dụng trong `chatController.js`
+app.set("socketio", io);
 
-
-app.listen(port, () => {
-  console.log("Server running on port: ", port);
+server.listen(port, () => {
+  console.log(`🚀 Server running on port ${port}`);
 });

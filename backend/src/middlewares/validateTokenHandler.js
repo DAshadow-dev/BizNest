@@ -11,7 +11,6 @@ const validateToken= asyncHandler( async(req, res, next) => {
             res.status(401);
             throw new Error("User is not authoried");
         }
-        console.log(decoded.email)
         req.email= decoded.email,
         next();
     });

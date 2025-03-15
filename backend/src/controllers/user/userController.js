@@ -13,7 +13,7 @@ const changePasswordByUser= asyncHandler( async (req, res) => {
         if(user && (await brcypt.compare(oldPassword, user.password))){
             if(oldPassword == newPassword){
                 return res.status(202).json({
-                    MsgNo: "Mật khẩu mới không được trùng mật khẩu cũ",
+                    MsgNo: "New password cannot be same old password",
                 })
             }
             if(newPassword == againNewPassword){
@@ -24,12 +24,12 @@ const changePasswordByUser= asyncHandler( async (req, res) => {
                 });
             }else{
                 return res.status(202).json({ 
-                    MsgNo: "Mật khẩu mới nhập lại không trùng với mật khẩu mới" 
+                    MsgNo: "New password must match new password." 
                 });
             }
         }else{
             res.status(202).json({ 
-                MsgNo: "Bạn nhập sai mật khẩu rồi" 
+                MsgNo: "You entered the wrong password." 
             });
         }
     }catch(error){
@@ -50,7 +50,7 @@ const updateInformationByUser= asyncHandler( async (req, res) => {
         user.username= username;
         user.image= image;
         await user.save();
-        res.status(200).json({Data: user});
+        return res.status(200).json({Data: user});
     }catch(error){
         res.status(500).json({ message: error.message || "Internal Server Error" });
     }

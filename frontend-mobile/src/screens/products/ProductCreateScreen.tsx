@@ -1,52 +1,45 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Image, Platform, Modal } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  Modal
+} from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
-import { useDispatch } from 'react-redux';
-import { useNavigationRoot } from '@components/navigate/RootNavigation';
-import staffActions from '../../redux/staff/actions';
-import * as Routes from '@utils/Routes';
-import { moderateScale, scale, verticalScale } from '@libs/reactResizeMatter/scalingUtils';
+import ProductActions from "../../redux/product/actions";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@redux/store";
+import { useNavigationRoot } from "@components/navigate/RootNavigation";
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
+import { moderateScale, scale, verticalScale } from "@libs/reactResizeMatter/scalingUtils";
+import * as ImagePicker from "expo-image-picker";
+import * as Routes from '@utils/Routes';
 
-interface RouteParams {
-  staff: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    role: string;
-    status: string;
-    image: string | null;
-    _id: string;
-    username?: string;
-  };
-}
-
-const EditStaffScreen = ({ route }: { route: { params: RouteParams } }) => {
+const CreateProductScreen = () => {
   const navigation = useNavigationRoot();
   const dispatch = useDispatch();
-  const { staff } = route.params;
-  const scrollViewRef = useRef<ScrollView>(null);
 
-  const [firstName, setFirstName] = useState(staff.firstName);
-  const [lastName, setLastName] = useState(staff.lastName);
-  const [email, setEmail] = useState(staff.email);
-  const [phone, setPhone] = useState(staff.phone);
-  const [role, setRole] = useState(staff.role);
-  const [status, setStatus] = useState(staff.status);
-  const [imageUri, setImageUri] = useState<string | null>(staff.image);
-  const [imageChanged, setImageChanged] = useState(false);
+  const [name, setName] = useState('');
+  const [price, setPrice] = useState('');
+  const [size, setSize] = useState('');
+  const [quantity, setQuantity] = useState('');
+  const [color, setColor] = useState('');
+  const [brand, setBrand] = useState('');
+  const [description, setDescription] = useState('');
+  const [imageUri, setImageUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  
+  // Thêm state cho Modal
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [errorTitle, setErrorTitle] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
-  useEffect(() => {
-    console.log('🔍 EditStaffScreen - Initial image from staff:', staff.image);
-  }, [staff.image]);
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -66,59 +59,71 @@ const EditStaffScreen = ({ route }: { route: { params: RouteParams } }) => {
     });
 
     if (!result.canceled && result.assets && result.assets[0]?.uri) {
-      console.log('🔄 EditStaffScreen - Image changed to new image:', result.assets[0].uri.substring(0, 50) + '...');
       setImageUri(result.assets[0].uri);
-      setImageChanged(true);
     }
   };
 
   const validateInputs = () => {
-    if (!firstName.trim()) {
+    if (!name.trim()) {
       // Hiển thị Modal lỗi thay vì Toast
       setErrorTitle('Validation Error');
-      setErrorMessage('First name is required');
+      setErrorMessage('Product name is required');
       setErrorModalVisible(true);
       return false;
     }
 
-    if (!lastName.trim()) {
+    if (!price.trim()) {
       // Hiển thị Modal lỗi thay vì Toast
       setErrorTitle('Validation Error');
-      setErrorMessage('Last name is required');
+      setErrorMessage('Price is required');
       setErrorModalVisible(true);
       return false;
     }
 
-    if (!email.trim()) {
+    if (isNaN(Number(price)) || Number(price) <= 0) {
       // Hiển thị Modal lỗi thay vì Toast
       setErrorTitle('Validation Error');
-      setErrorMessage('Email is required');
+      setErrorMessage('Price must be a valid number greater than 0');
       setErrorModalVisible(true);
       return false;
     }
 
-    // Simple email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!size.trim()) {
       // Hiển thị Modal lỗi thay vì Toast
       setErrorTitle('Validation Error');
-      setErrorMessage('Please enter a valid email address');
+      setErrorMessage('Size is required');
       setErrorModalVisible(true);
       return false;
     }
 
-    if (!phone.trim()) {
+    if (!color.trim()) {
       // Hiển thị Modal lỗi thay vì Toast
       setErrorTitle('Validation Error');
-      setErrorMessage('Phone number is required');
+      setErrorMessage('Color is required');
       setErrorModalVisible(true);
       return false;
     }
 
-    if (!role.trim()) {
+    if (!brand.trim()) {
       // Hiển thị Modal lỗi thay vì Toast
       setErrorTitle('Validation Error');
-      setErrorMessage('Role is required');
+      setErrorMessage('Brand is required');
+      setErrorModalVisible(true);
+      return false;
+    }
+
+    if (!quantity.trim()) {
+      // Hiển thị Modal lỗi thay vì Toast
+      setErrorTitle('Validation Error');
+      setErrorMessage('Quantity is required');
+      setErrorModalVisible(true);
+      return false;
+    }
+
+    if (isNaN(Number(quantity)) || Number(quantity) <= 0) {
+      // Hiển thị Modal lỗi thay vì Toast
+      setErrorTitle('Validation Error');
+      setErrorMessage('Quantity must be a valid number greater than 0');
       setErrorModalVisible(true);
       return false;
     }
@@ -130,64 +135,57 @@ const EditStaffScreen = ({ route }: { route: { params: RouteParams } }) => {
     if (!validateInputs()) return;
 
     setLoading(true);
-    console.log('🔄 UPDATE STAFF - Starting submission with ID:', staff._id);
-    console.log('🔄 UPDATE STAFF - Image changed?', imageChanged);
-    console.log('🔄 UPDATE STAFF - Current imageUri:', imageUri ? imageUri.substring(0, 50) + '...' : 'null');
 
-    const staffData: {
-      firstName: string;
-      lastName: string;
-      email: string;
-      phone: string;
-      role: string;
-      status: string;
-      storeId: string;
-      image?: string | null;
-    } = {
-      firstName,
-      lastName,
-      email,
-      phone,
-      role,
-      status,
-      storeId: '67b58b4cdf51987bf69c9914'
-    };
-
-    // Luôn gửi thông tin ảnh hiện tại, bất kể có thay đổi hay không
-    staffData.image = imageUri;
-    console.log('🔄 UPDATE STAFF - Including image in request:', imageUri ? 'Yes' : 'No');
-
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('price', price);
+    formData.append('size', size);
+    formData.append('color', color);
+    formData.append('brand', brand);
+    formData.append('quantity', quantity);
+    formData.append('description', description);
+    formData.append('categoryId', '67b58b31df51987bf69c9911');
+    formData.append('storeId', '67b58b4cdf51987bf69c9914');
+  
+    if (imageUri) {
+      const fileName = imageUri.split('/').pop();
+      const fileType = imageUri.split('.').pop();
+      formData.append('image', {
+        uri: imageUri,
+        name: fileName,
+        type: `image/${fileType}`,
+      } as any);
+    }
+  
     dispatch({
-      type: staffActions.UPDATE_STAFF,
+      type: ProductActions.CREATE_PRODUCT,
       payload: {
-        id: staff._id,
-        staff: staffData,
+        product: formData,
         onSuccess: () => {
           setLoading(false);
           
-          // Hiển thị Modal thành công
-          setSuccessMessage('Staff updated successfully');
+          // Hiển thị Modal thành công thay vì Toast
+          setSuccessMessage('Product created successfully');
           setSuccessModalVisible(true);
           
-          // Tăng thời gian chờ để đảm bảo người dùng thấy thông báo
+          // Chuyển màn hình sau khi hiển thị Modal
           setTimeout(() => {
             setSuccessModalVisible(false);
-            dispatch({ type: staffActions.FETCH_STAFFS });
-            navigation.navigate(Routes.StaffListScreen, { refresh: true });
+            navigation.navigate(Routes.WareHouse, { refresh: true });
           }, 2000);
-        },
-        onFailed: (error: string) => {
-          setLoading(false);
-          // Hiển thị Modal lỗi thay vì Toast
-          setErrorTitle('Failed');
-          setErrorMessage(error || 'Failed to update staff');
-          setErrorModalVisible(true);
         },
         onError: (error: any) => {
           setLoading(false);
           // Hiển thị Modal lỗi thay vì Toast
           setErrorTitle('Error');
           setErrorMessage(error?.message || 'An error occurred');
+          setErrorModalVisible(true);
+        },
+        onFailed: (error: string) => {
+          setLoading(false);
+          // Hiển thị Modal lỗi thay vì Toast
+          setErrorTitle('Failed');
+          setErrorMessage(error || 'Failed to create product');
           setErrorModalVisible(true);
         }
       }
@@ -245,15 +243,12 @@ const EditStaffScreen = ({ route }: { route: { params: RouteParams } }) => {
         </View>
       </Modal>
       
-      <ScrollView 
-        style={styles.container}
-        ref={scrollViewRef}
-      >
+      <ScrollView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Edit Staff</Text>
+          <Text style={styles.headerTitle}>Create New Product</Text>
           <View style={{ width: 24 }} />
         </View>
 
@@ -266,7 +261,7 @@ const EditStaffScreen = ({ route }: { route: { params: RouteParams } }) => {
               ) : (
                 <View style={styles.imagePickerPlaceholder}>
                   <FontAwesome name="camera" size={24} color="#6B7280" />
-                  <Text style={styles.imagePickerText}>Change Photo</Text>
+                  <Text style={styles.imagePickerText}>Add Photo</Text>
                 </View>
               )}
             </TouchableOpacity>
@@ -274,94 +269,86 @@ const EditStaffScreen = ({ route }: { route: { params: RouteParams } }) => {
 
           {/* Form Fields */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>First Name</Text>
+            <Text style={styles.label}>Product Name</Text>
             <TextInput
               style={styles.input}
-              value={firstName}
-              onChangeText={setFirstName}
-              placeholder="Enter first name"
+              value={name}
+              onChangeText={setName}
+              placeholder="Enter product name"
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Last Name</Text>
+            <Text style={styles.label}>Price</Text>
             <TextInput
               style={styles.input}
-              value={lastName}
-              onChangeText={setLastName}
-              placeholder="Enter last name"
+              value={price}
+              onChangeText={(value) => {
+                if (/^\d*\.?\d*$/.test(value)) {
+                  setPrice(value);
+                }
+              }}
+              placeholder="Enter product price"
+              keyboardType="numeric"
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>Size</Text>
             <TextInput
               style={styles.input}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Enter email"
-              keyboardType="email-address"
-              autoCapitalize="none"
+              value={size}
+              onChangeText={setSize}
+              placeholder="Enter product size"
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Phone</Text>
+            <Text style={styles.label}>Color</Text>
             <TextInput
               style={styles.input}
-              value={phone}
-              onChangeText={setPhone}
-              placeholder="Enter phone number"
-              keyboardType="phone-pad"
+              value={color}
+              onChangeText={setColor}
+              placeholder="Enter product color"
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Role</Text>
+            <Text style={styles.label}>Brand</Text>
             <TextInput
               style={styles.input}
-              value={role}
-              onChangeText={setRole}
-              placeholder="Enter role (e.g. Manager, Staff)"
+              value={brand}
+              onChangeText={setBrand}
+              placeholder="Enter product brand"
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Status</Text>
-            <View style={styles.statusContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.statusOption,
-                  status === 'active' && styles.statusOptionActive
-                ]}
-                onPress={() => setStatus('active')}
-              >
-                <Text
-                  style={[
-                    styles.statusText,
-                    status === 'active' && styles.statusTextActive
-                  ]}
-                >
-                  Active
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.statusOption,
-                  status === 'inactive' && styles.statusOptionActive
-                ]}
-                onPress={() => setStatus('inactive')}
-              >
-                <Text
-                  style={[
-                    styles.statusText,
-                    status === 'inactive' && styles.statusTextActive
-                  ]}
-                >
-                  Inactive
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <Text style={styles.label}>Quantity</Text>
+            <TextInput
+              style={styles.input}
+              value={quantity}
+              onChangeText={(value) => {
+                if (/^\d+$/.test(value) || value === '') {
+                  setQuantity(value);
+                }
+              }}
+              placeholder="Enter product quantity"
+              keyboardType="numeric"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Description</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={description}
+              onChangeText={setDescription}
+              placeholder="Enter product description"
+              multiline
+              numberOfLines={4}
+              textAlignVertical="top"
+            />
           </View>
 
           <TouchableOpacity
@@ -372,7 +359,7 @@ const EditStaffScreen = ({ route }: { route: { params: RouteParams } }) => {
             {loading ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text style={styles.submitButtonText}>Update Staff</Text>
+              <Text style={styles.submitButtonText}>Create Product</Text>
             )}
           </TouchableOpacity>
         </View>
@@ -408,12 +395,11 @@ const styles = StyleSheet.create({
   imagePickerContainer: {
     alignItems: 'center',
     marginBottom: 20,
-    zIndex: 1, // Đảm bảo ảnh avatar có zIndex thấp hơn Toast
   },
   imagePicker: {
     width: 100,
     height: 100,
-    borderRadius: 50,
+    borderRadius: 8,
     overflow: 'hidden',
   },
   imagePreview: {
@@ -449,29 +435,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#D1D5DB',
   },
-  statusContainer: {
-    flexDirection: 'row',
-    borderRadius: 8,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-  },
-  statusOption: {
-    flex: 1,
-    padding: 12,
-    alignItems: 'center',
-    backgroundColor: 'white',
-  },
-  statusOptionActive: {
-    backgroundColor: '#3B82F6',
-  },
-  statusText: {
-    fontSize: 16,
-    color: '#374151',
-  },
-  statusTextActive: {
-    color: 'white',
-    fontWeight: 'bold',
+  textArea: {
+    minHeight: 100,
+    textAlignVertical: 'top',
   },
   submitButton: {
     backgroundColor: '#3B82F6',
@@ -479,14 +445,14 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: 'center',
     marginTop: 24,
+    marginBottom: 32,
   },
   submitButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
   },
-  
-  // Styles for success modal
+  // Styles cho Modal
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -550,7 +516,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// Cấu hình Toast cục bộ
 const toastConfig = {
   success: (props: any) => (
     <BaseToast
@@ -560,21 +525,9 @@ const toastConfig = {
         backgroundColor: "white",
         marginTop: verticalScale(50),
         zIndex: 9999,
-        elevation: 20, // Tăng elevation cho Android
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        shadowColor: "#000", // Thêm shadow cho iOS
-        shadowOffset: {
-          width: 0,
-          height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
       }}
       contentContainerStyle={{
-        paddingHorizontal: verticalScale(15),
+        paddingHorizontal: verticalScale(0),
       }}
       text1Style={{
         fontSize: moderateScale(16),
@@ -595,18 +548,6 @@ const toastConfig = {
         backgroundColor: "white",
         marginTop: verticalScale(50),
         zIndex: 9999,
-        elevation: 20, // Tăng elevation cho Android
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        shadowColor: "#000", // Thêm shadow cho iOS
-        shadowOffset: {
-          width: 0,
-          height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
       }}
       contentContainerStyle={{
         paddingHorizontal: verticalScale(15),
@@ -624,4 +565,4 @@ const toastConfig = {
   ),
 };
 
-export default EditStaffScreen;
+export default CreateProductScreen;

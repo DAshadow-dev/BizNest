@@ -4,9 +4,9 @@ export type RootParamList = {
   AdminDashboardScreen : undefined,
   AccountListScreen : undefined,
   PendingAccountsScreen : undefined,
-  AccountDetailScreen : {  id: string;
-    name: string;
-    status: 'Active' | 'Blocked'},
+  AccountDetailScreen : {  
+    id: string
+  },
   InvoiceListScreen : undefined,
   CreateInvoiceScreen : {
       invoiceId?: string;
@@ -95,14 +95,19 @@ export type RootParamList = {
   PROFILE_SCREEN: undefined,
   PASSWORD_SCREEN: undefined,
   PROFILE: undefined,
-  CUSTOMER_LIST: undefined,
+  CUSTOMER_LIST: {showToast?: boolean, message?: string},
   CREATE_CUSTOMER: {idUpdate: number};
-  CUSTOMER_DETAIL: undefined;
+  CUSTOMER_DETAIL: {id: number};
   BUSINESS_DASHBOARD: undefined,
-  lOGIN_SCREEN: undefined,
+  LOGIN_SCREEN: undefined,
   ONBOARDING_SCREEN : undefined,
   REGISTER_SCREEN :undefined,
-  BUSINESSCATEGORY_SCREEN: undefined,
+  BUSINESSCATEGORY_SCREEN: {
+    email: string,
+    fullName: string,
+    mobile: string,
+    password : string,
+  },
   // HOME_SCREEN: undefined,
   CHAT_SCREEN :undefined,
 };

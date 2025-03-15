@@ -1,8 +1,12 @@
 const mongoose = require('mongoose');
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const StoreSchema = new mongoose.Schema({
-    ownerId: {
-        type: mongoose.Schema.Types.ObjectId,
+    _id: {
+        type: Number
+    },
+    owner: {
+        type: mongoose.Schema.Types.Number,
         ref: 'User',
         required: true
     },
@@ -19,12 +23,17 @@ const StoreSchema = new mongoose.Schema({
         type : String,
         required : [true, "Please enter a phone number"],
         unique : true,
-        match : /^\+?\d{1,3}?[-.\s]?\(?\d{1,4}?[-.\s]?\)?[-.\s]?\d{1,12}$/
+        // match : /^\+?\d{1,3}?[-.\s]?\(?\d{1,4}?[-.\s]?\)?[-.\s]?\d{1,12}$/
     },
     createdAt : {
         type : Date,
         default : Date.now
-    }
+    },
+    customers: [{
+        type: mongoose.Schema.Types.Number,
+        ref: 'Customer'
+    }],
 })
 
+StoreSchema.plugin(AutoIncrement, { id: 'store_seq', inc_field: '_id'});
 module.exports = mongoose.model('Store', StoreSchema);

@@ -59,34 +59,34 @@ function MyStack() {
       screenOptions={{
         headerShown: false,
       }}
-      initialRouteName={Routes.WareHouse}>
-      <Stack.Screen name={Routes.ONBOARDING_SCREEN} component={OnboardingScreen} />
-      <Stack.Screen name={Routes.LOGIN_SCREEN} component={LoginScreen} />
-      <Stack.Screen name={Routes.REGISTER_SCREEN} component={RegisterScreen} />
-      <Stack.Screen name={Routes.BUSINESSCATEGORY_SCREEN} component={BusinessCategoryScreen} />
-      <Stack.Screen name={Routes.HomeScreen} component={HomeScreen} />
-      {/* <Stack.Screen name={Routes.HOME_SCREEN} component={HomeScreen} /> */}
-      <Stack.Screen name={Routes.CHAT_SCREEN} component={Chatscreen} />
-      <Stack.Screen name={Routes.AdminDashboardScreen} component={AdminDashboardScreen} />
-      <Stack.Screen name={Routes.AccountListScreen} component={AccountListScreen} />
-      <Stack.Screen name={Routes.AccountDetailScreen} component={AccountDetailScreen} />
-      <Stack.Screen name={Routes.PendingAccountsScreen} component={PendingAccountScreen} />
-      <Stack.Screen name={Routes.InvoiceListScreen} component={InvoiceListScreen} />
-      <Stack.Screen name={Routes.InvoiceScreen} component={InvoiceScreen} />
-      <Stack.Screen name={Routes.CreateInvoiceScreen} component={CreateInvoiceScreen} />
-      <Stack.Screen name={Routes.PaymentScreen} component={PaymentScreen} />
-      {/* product */}
-      <Stack.Screen name={Routes.WareHouse} component={WareHouse} />
-      <Stack.Screen name={Routes.ProductCreateScreen} component={productCreateScreen} />
-      <Stack.Screen name={Routes.ProductDetailScreen} component={ProductDetailScreen} />
-      <Stack.Screen name={Routes.EditProductScreen} component={EditProductScreen} />
-      {/* staff */}
-      <Stack.Screen name={Routes.PROFILE_SCREEN} component={ProfileScreen} />
-      <Stack.Screen name={Routes.CreateStaffScreen} component={CreateStaffScreen} />
-      <Stack.Screen name={Routes.EditStaffScreen} component={EditStaffScreen} />
-      <Stack.Screen name={Routes.StaffDetailScreen} component={StaffDetailScreen} />
-      <Stack.Screen name={Routes.StaffListScreen} component={StaffListScreen} />
-
+      initialRouteName={Routes.ONBOARDING_SCREEN}>
+        <Stack.Screen name={Routes.ONBOARDING_SCREEN} component={OnboardingScreen} />
+        <Stack.Screen name={Routes.LOGIN_SCREEN} component={LoginScreen} />
+        <Stack.Screen name={Routes.REGISTER_SCREEN} component={RegisterScreen} />
+        <Stack.Screen name={Routes.BUSINESSCATEGORY_SCREEN} component={BusinessCategoryScreen} />
+        <Stack.Screen name={Routes.HomeScreen} component={HomeScreen} />
+        {/* <Stack.Screen name={Routes.HOME_SCREEN} component={HomeScreen} /> */}
+        <Stack.Screen name={Routes.CHAT_SCREEN} component={Chatscreen} />
+        <Stack.Screen name={Routes.AdminDashboardScreen} component={AdminDashboardScreen} />
+        <Stack.Screen name={Routes.AccountListScreen} component={AccountListScreen}/>
+        <Stack.Screen name={Routes.AccountDetailScreen} component={AccountDetailScreen}/>
+        <Stack.Screen name={Routes.PendingAccountsScreen} component={PendingAccountScreen} />
+        <Stack.Screen name={Routes.InvoiceListScreen} component={InvoiceListScreen} />
+        <Stack.Screen name={Routes.InvoiceScreen} component={InvoiceScreen} />
+        <Stack.Screen name={Routes.CreateInvoiceScreen} component={CreateInvoiceScreen} />
+        <Stack.Screen name={Routes.PaymentScreen} component={PaymentScreen} />
+         {/* product */}
+        <Stack.Screen name={Routes.WareHouse} component={WareHouse} />
+        <Stack.Screen name={Routes.ProductCreateScreen} component={productCreateScreen} />
+        <Stack.Screen name={Routes.ProductDetailScreen} component={ProductDetailScreen} />
+        <Stack.Screen name={Routes.EditProductScreen} component={EditProductScreen} />
+        {/* staff */}
+        <Stack.Screen name={Routes.PROFILE_SCREEN} component={ProfileScreen} />
+        <Stack.Screen name={Routes.CreateStaffScreen} component={CreateStaffScreen} />
+        <Stack.Screen name={Routes.EditStaffScreen} component={EditStaffScreen} />
+        <Stack.Screen name={Routes.StaffDetailScreen} component={StaffDetailScreen} />
+        <Stack.Screen name={Routes.StaffListScreen} component={StaffListScreen} />
+      
       <Stack.Screen name={Routes.PROFILE} component={MyProfile} />
       <Stack.Screen name={Routes.CUSTOMER_LIST} component={CustomerListScreen} />
       <Stack.Screen name={Routes.CREATE_CUSTOMER} component={CreateCustomerScreen} />

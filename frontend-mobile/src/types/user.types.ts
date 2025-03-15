@@ -8,13 +8,31 @@ export interface User {
   image?: string,
   status?: string,
   createAt?: Date,
-  lastLogin?: Date
+  lastLogin?: Date,
+  isAuthenticated?: boolean,
 }
+
+<<<<<<< HEAD
+export interface Customer {
+  _id?: number,
+  fullname?: string,
+  email?: string,
+  phone?: boolean,
+  gender?: boolean,
+  date_of_birth?: Date,
+  createdAt?: Date,
+}
+=======
+
+>>>>>>> 37fda09f2b94111ff33993360245314eb5b96d50
 
 export interface UserReducer {
   Auth: User;
 }
 
+export interface CustomerReducer {
+  ListCustomer: Array<Customer>;
+}
 export interface ChangePassword {
   oldPassword: string;
   newPassword: string;

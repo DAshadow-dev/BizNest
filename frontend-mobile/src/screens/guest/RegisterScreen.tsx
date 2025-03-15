@@ -6,22 +6,37 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  Alert,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // Import icon từ Expo
+import { Ionicons } from "@expo/vector-icons"; 
 import * as Routes from "@utils/Routes";
-import {
-    navigate,
-    useNavigationRoot,
-  } from "@components/navigate/RootNavigation";
-const RegisterScreen = () => {
-    const navigation = useNavigationRoot();
+import { useNavigationRoot } from "@components/navigate/RootNavigation";
+
+const RegisterScreen: React.FC = () => {
+  const navigation = useNavigationRoot();
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [mobile, setMobile] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleRegister = () => {
-    console.log("Đăng ký thành công!");
-    navigation.navigate(Routes.HomeScreen);  // Chuyển đến trang Home sau khi đăng ký
+    if (!email || !fullName || !mobile || !password || !confirmPassword) {
+      Alert.alert("Enter all fields to register");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert("Passwords do not match!");
+      return;
+    }
+
+    navigation.navigate(Routes.BUSINESSCATEGORY_SCREEN, {
+      email : email,
+      fullName: fullName,
+      mobile : mobile,
+      password: password,
+    });
   };
 
   return (
@@ -35,14 +50,17 @@ const RegisterScreen = () => {
       </TouchableOpacity>
 
       {/* Hình ảnh minh họa */}
-      <Image source={require("@assets/image/Register.png")} style={styles.image} />
+      <Image
+        source={require("@assets/image/Register.png")}
+        style={styles.image}
+      />
 
       <Text style={styles.title}>Sign up</Text>
 
       <TextInput
         style={styles.input}
         placeholder="Full name"
-        placeholderTextColor={"gray"}
+        placeholderTextColor="gray"
         value={fullName}
         onChangeText={setFullName}
       />
@@ -50,7 +68,7 @@ const RegisterScreen = () => {
       <TextInput
         style={styles.input}
         placeholder="Email"
-        placeholderTextColor={"gray"}
+        placeholderTextColor="gray"
         keyboardType="email-address"
         value={email}
         onChangeText={setEmail}
@@ -59,10 +77,30 @@ const RegisterScreen = () => {
       <TextInput
         style={styles.input}
         placeholder="Mobile"
-        placeholderTextColor={"gray"}
+        placeholderTextColor="gray"
         keyboardType="phone-pad"
         value={mobile}
         onChangeText={setMobile}
+      />
+
+      {/* Password Input */}
+      <TextInput
+        style={styles.input}
+        placeholder="Create Password"
+        placeholderTextColor="gray"
+        secureTextEntry={true}
+        value={password}
+        onChangeText={setPassword}
+      />
+
+      {/* Confirm Password Input */}
+      <TextInput
+        style={styles.input}
+        placeholder="Confirm Password"
+        placeholderTextColor="gray"
+        secureTextEntry={true}
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
       />
 
       <Text style={styles.policyText}>
@@ -71,16 +109,16 @@ const RegisterScreen = () => {
         <Text style={styles.link}>Privacy Policy</Text>
       </Text>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("BUSINESSCATEGORY_SCREEN")}
-      >
+      <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Continue</Text>
       </TouchableOpacity>
 
       <Text style={styles.footerText}>
         Joined us before?{" "}
-        <Text style={styles.link} onPress={() => navigation.navigate("LOGIN_SCREEN")}>
+        <Text
+          style={styles.link}
+          onPress={() => navigation.navigate("LOGIN_SCREEN")}
+        >
           Login
         </Text>
       </Text>
@@ -100,7 +138,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    top: 50, // Điều chỉnh vị trí theo thiết bị
+    top: 50,
     left: 20,
     zIndex: 10,
   },

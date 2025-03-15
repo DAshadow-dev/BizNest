@@ -25,18 +25,35 @@ const PasswordScreen= ()=> {
         },
     });
     const onSubmit = (data: any) => {
-        dispatch({type: UserActions.CHANGE_PASSWORD, 
-            payload: {
-                data, 
-                onSuccess: (data: any) => {
-                    console.log("Data: ", data)
-                },
-                onError: (error: any) => {
-                    console.log("Error: ", error)
-                },
-                onFailed: (MsgNo: string) => {
-                    console.log("Failed: ", MsgNo)
-                }
+        dispatch({type: UserActions.CHANGE_PASSWORD, payload: {
+            data, 
+            onSuccess: (data: any) => {
+                methods.reset();
+                Toast.show({
+                    type: "success",
+                    text1: "Success!",
+                    text2: "Changed your password successfully",
+                    position: "top",
+                    visibilityTime: 2000
+                });
+            },
+            onError: (error: any) => {
+                Toast.show({
+                    type: "error",
+                    text1: "Fail!",
+                    text2: error,
+                    position: "top",
+                    visibilityTime: 2000
+                });
+            },
+            onFailed: (MsgNo: string) => {
+                Toast.show({
+                    type: "error",
+                    text1: "Fail!",
+                    text2: MsgNo,
+                    position: "top",
+                    visibilityTime: 2000
+                });            
             }
         })
     };
@@ -98,7 +115,13 @@ const PasswordScreen= ()=> {
                     </View>
                     <View style={{width: scale(353), height: verticalScale(50), flexDirection: 'row', justifyContent: "space-between", marginTop: verticalScale(20)}}>
                         <TouchableOpacity
-                            onPress={() => {}}
+                            onPress={() => {
+                                methods.reset({
+                                    oldPassword: '',
+                                    newPassword: '',
+                                    againNewPassword: '',
+                                });
+                            }}
                         >
                             <View style={{width: scale(162.5), height: verticalScale(44), backgroundColor: "white", borderColor: 'red', borderWidth: 1, borderRadius: 8, justifyContent: "center", alignItems: "center"}}>
                                 <Text style={{fontSize: moderateScale(16), color: CommonColors.redColor, ...Fonts.defaultMedium}}>Cancel</Text>

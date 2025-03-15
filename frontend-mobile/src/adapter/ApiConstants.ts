@@ -18,7 +18,6 @@ const ApiConstants = {
   // User
   CHANGE_PASSWORD: `${BASE_PREFIX}/user/changePassword`,
   UPDATE_INFORMATION: `${BASE_PREFIX}/user/updateInformation`,
-
   // product
   GET_ALL_PRODUCTS: `${BASE_PREFIX}/products`,
   CREATE_PRODUCT: `${BASE_PREFIX}/products`,
@@ -32,6 +31,17 @@ const ApiConstants = {
   DELETE_STAFF: `${BASE_PREFIX}/staff`,
   GET_STAFF_DETAIL: `${BASE_PREFIX}/staff`,
   SEARCH_STAFF: `${BASE_PREFIX}/staff/search`,
+  //Admin
+  LIST_BUSSINESS_ONWER: `${BASE_PREFIX}/admin/businessOwners`,
+  TOGGLE_ACCOUNT_STATUS: `${BASE_PREFIX}/admin/toggleStatus`,
+  APPROVE_ACCOUNT: `${BASE_PREFIX}/admin/approve`,
+  REJECT_ACCOUNT: `${BASE_PREFIX}/admin/reject`,
+  //Customer
+  LIST_CUSTOMER: `${BASE_PREFIX}/customer`,
+  CREATE_CUSTOMER: `${BASE_PREFIX}/customer`,
+  DELETE_CUSTOMER: `${BASE_PREFIX}/customer`,
+  UPDATE_CUSTOMER: `${BASE_PREFIX}/customer`,
+
 };
 
 export default ApiConstants;

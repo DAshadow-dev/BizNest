@@ -55,7 +55,7 @@ const AccountListScreen = (props: any) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <TouchableOpacity onPress={() => navigation.navigate(Routes.ONBOARDING_SCREEN)}>
+          <TouchableOpacity onPress={() => navigation.navigate(Routes.HOME_ADMIN)}>
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>List Bussiness Owner </Text>

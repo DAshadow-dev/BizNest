@@ -46,6 +46,8 @@ import BusinessCategoryScreen from '@screens/guest/BusinessCategoryScreen';
 import Chatscreen from '@screens/guest/Chatscreen';
 import { Provider } from 'react-redux';
 import { store } from '@redux/store';
+import HomeAdminScreen from '@screens/HomeAdminScreen';
+import StatusScreen from '@screens/StatusScreen';
 
 
 const Stack = createStackNavigator<RootParamList>();
@@ -92,6 +94,9 @@ function MyStack() {
       <Stack.Screen name={Routes.CREATE_CUSTOMER} component={CreateCustomerScreen} />
       <Stack.Screen name={Routes.CUSTOMER_DETAIL} component={CustomerDetailScreen} />
       <Stack.Screen name={Routes.BUSINESS_DASHBOARD} component={BusinessDashBoardScreen} />
+      <Stack.Screen name={Routes.HOME_ADMIN} component={HomeAdminScreen} />
+      <Stack.Screen name={Routes.STATUS_SCREEN} component={StatusScreen} />
+
     </Stack.Navigator>
   );
 }

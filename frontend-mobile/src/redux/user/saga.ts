@@ -59,7 +59,7 @@ function* handleAuthSaga(action : any,factoryFunction : Function, successAction 
       if (response?.status === 200){
         storeToken(response.data.Data.token);
         yield put({type: successAction, payload: {user : response.data.Data.user}})
-        onSuccess && onSuccess(response);
+        onSuccess && onSuccess(response.data.Data.user);
     }
     else {
       onFailure && onFailure(response.data.MsgNo);

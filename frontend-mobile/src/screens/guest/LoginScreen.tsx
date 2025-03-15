@@ -55,7 +55,15 @@ const LoginScreen: React.FC = () => {
       payload: {
         data: { email, password },
         onSuccess: (user: any) => {
-          navigation.navigate(Routes.PendingAccountsScreen);
+          if(user.role == "admin"){
+            navigation.navigate(Routes.HOME_ADMIN)
+          }else{
+            if(user.status == "inactive" || user.status == "pending"){
+              navigation.navigate(Routes.STATUS_SCREEN, {status: user.status})
+            }else{
+              navigation.navigate(Routes.HomeScreen)
+            }
+          }
         },
         onFailed: (message: string) => {
           alert('Login failed: ' + message);

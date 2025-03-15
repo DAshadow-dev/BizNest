@@ -110,4 +110,6 @@ export type RootParamList = {
   },
   // HOME_SCREEN: undefined,
   CHAT_SCREEN :undefined,
+  HOME_ADMIN: undefined,
+  STATUS_SCREEN: {status: string}
 };

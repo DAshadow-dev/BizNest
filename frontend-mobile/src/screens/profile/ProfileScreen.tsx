@@ -88,6 +88,15 @@ const ProfileScreen: React.FC = () => {
       setImage(result.assets[0].uri);
     }
   };
+
+  const handleButtonCancel = () => {
+    methods.reset({
+      username: Auth.username,
+      email: Auth.email,
+      phone: Auth.phone,
+    });
+    setImage(Auth.image);
+  };
   return (
     <ScrollView style={styles.container}>
       {/* Header */}

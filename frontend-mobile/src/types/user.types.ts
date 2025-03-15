@@ -15,7 +15,12 @@ export interface User {
 
 
 export interface UserReducer {
-  Auth: User;
+  Auth: User,
+  Chat: {
+    messages: any[],
+    loading: boolean,
+    error: any,
+  }
 }
 
 export interface ChangePassword {

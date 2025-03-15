@@ -20,6 +20,8 @@ const ApiConstants = {
   UPDATE_INFORMATION: `${BASE_PREFIX}/user/updateInformation`,
   //Chat
   GET_MESSAGES : `${BASE_PREFIX}/chat/messages`,
+  SEND_MESSAGE : `${BASE_PREFIX}/chat/send`,
+  RECEIVE_MESSAGE : `${BASE_PREFIX}/chat/receive`,
 };
 
 export default ApiConstants;

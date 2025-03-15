@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -9,47 +9,55 @@ import {
   Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
 import { io } from "socket.io-client";
-import ApiConstants from "src/adapter/ApiConstants";
+import ChatActions from "@redux/chat/actions";
+import { RootState } from "@redux/root-reducer";
 
-const API_URL = "http:/localhost:5000/api/chat"; 
+
+
 const socket = io("http://localhost:5000");
 
 const ChatBox = ({ navigation, route }: { navigation: any; route: any }) => {
-  const userId = route.params?.userId || "123"; 
+  // Lấy dữ liệu từ Redux
+  const dispatch = useDispatch();
+  const messages = useSelector((state: RootState) => state.Chat.Chat.messages);
+
+  // Nhận userId, receiverId từ route (nếu có)
+  const userId = route.params?.userId || "123";
   const receiverId = route.params?.receiverId || "456";
-  const [messages, setMessages] = useState<any[]>([]);
+
   const [inputText, setInputText] = useState("");
   const flatListRef = useRef<FlatList<any> | null>(null);
 
-  // 🟢 Lấy danh sách tin nhắn khi mở màn hình
+  // 🟢 Lấy danh sách tin nhắn khi mở màn hình qua Redux Saga
   useEffect(() => {
-    axios
-      .get(ApiConstants.GET_MESSAGES+'?senderId=123&receiverId=456')
-      .then((res) => {
-        setMessages(res.data);
-      })
-      .catch((err) => console.error("Lỗi lấy tin nhắn:", err));
-  }, [userId, receiverId]);
+    dispatch({
+      type: ChatActions.FETCH_MESSAGES,
+      payload: { data: { senderId: userId, receiverId } },
+    });
+  }, [dispatch, userId, receiverId]);
 
   // 🟢 Kết nối socket để nhận tin nhắn theo thời gian thực
   useEffect(() => {
     socket.emit("userOnline", userId);
 
+    // Khi có tin nhắn mới từ server
     socket.on("receiveMessage", (newMessage) => {
-      if (newMessage.senderId === receiverId) {
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-      }
+      // Gửi action để reducer cập nhật messages
+      dispatch({
+        type: ChatActions.RECEIVE_MESSAGE,
+        payload: { message: newMessage },
+      });
     });
 
     return () => {
       socket.off("receiveMessage");
     };
-  }, [receiverId]);
+  }, [dispatch, userId]);
 
-  // 🔵 Gửi tin nhắn lên server
-  const sendMessage = async () => {
+  // 🔵 Gửi tin nhắn
+  const sendMessage = () => {
     if (inputText.trim() === "") return;
 
     const newMessage = {
@@ -58,16 +66,20 @@ const ChatBox = ({ navigation, route }: { navigation: any; route: any }) => {
       message: inputText,
     };
 
-    try {
-      const res = await axios.post(`${API_URL}/send`, newMessage);
-      setMessages((prevMessages) => [...prevMessages, res.data]);
-      socket.emit("sendMessage", res.data);
-      setInputText("");
-    } catch (error) {
-      console.error("Lỗi gửi tin nhắn:", error);
-    }
+    // Dispatch action cho Redux Saga gọi API
+    dispatch({
+      type: ChatActions.SEND_MESSAGE,
+      payload: { data: newMessage },
+    });
+
+    // Gửi tin nhắn qua socket để real-time
+    socket.emit("sendMessage", newMessage);
+
+    // Xóa nội dung input
+    setInputText("");
   };
 
+  // Cuộn FlatList xuống cuối khi có tin nhắn mới
   useEffect(() => {
     flatListRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
@@ -90,7 +102,7 @@ const ChatBox = ({ navigation, route }: { navigation: any; route: any }) => {
       <FlatList
         ref={flatListRef}
         data={messages}
-        keyExtractor={(item) => item._id}
+        keyExtractor={(item) => item._id || Math.random().toString()}
         renderItem={({ item }) => (
           <View
             style={[

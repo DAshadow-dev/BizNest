@@ -18,6 +18,19 @@ const ApiConstants = {
   // User
   CHANGE_PASSWORD: `${BASE_PREFIX}/user/changePassword`,
   UPDATE_INFORMATION: `${BASE_PREFIX}/user/updateInformation`,
+  // product
+  GET_ALL_PRODUCTS: `${BASE_PREFIX}/products`,
+  CREATE_PRODUCT: `${BASE_PREFIX}/products`,
+  UPDATE_PRODUCT: `${BASE_PREFIX}/products`,
+  DELETE_PRODUCT: `${BASE_PREFIX}/products`,
+  GET_PRODUCT_DETAIL: `${BASE_PREFIX}/products`,
+
+  GET_ALL_STAFFS: `${BASE_PREFIX}/staff`,
+  CREATE_STAFF: `${BASE_PREFIX}/staff`,
+  UPDATE_STAFF: `${BASE_PREFIX}/staff`,
+  DELETE_STAFF: `${BASE_PREFIX}/staff`,
+  GET_STAFF_DETAIL: `${BASE_PREFIX}/staff`,
+  SEARCH_STAFF: `${BASE_PREFIX}/staff/search`,
   //Admin
   LIST_BUSSINESS_ONWER: `${BASE_PREFIX}/admin/businessOwners`,
   TOGGLE_ACCOUNT_STATUS: `${BASE_PREFIX}/admin/toggleStatus`,
@@ -28,6 +41,7 @@ const ApiConstants = {
   CREATE_CUSTOMER: `${BASE_PREFIX}/customer`,
   DELETE_CUSTOMER: `${BASE_PREFIX}/customer`,
   UPDATE_CUSTOMER: `${BASE_PREFIX}/customer`,
+
 };
 
 export default ApiConstants;
@@ -39,4 +53,3 @@ export {
 export const API_URL: string = `http://${debuggerHost}:5000/api`;
 
 console.log('🌐 API_URL:', API_URL);
-

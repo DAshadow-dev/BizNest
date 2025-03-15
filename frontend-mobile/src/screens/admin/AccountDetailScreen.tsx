@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+
 import { useNavigationRoot } from "@components/navigate/RootNavigation";
 import * as Routes from "@utils/Routes";
 import { FontAwesome } from "@expo/vector-icons";
@@ -42,7 +43,6 @@ const AccountDetailScreen = (props: any) => {
     { date: "21/2/2025", price: "$20" },
     { date: "21/2/2025", price: "$20" },
   ];
-  
   const handleLockUnlock = () => {
     Alert.alert(
       "Confirm",
@@ -243,7 +243,6 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
 });
-
 
 // 🎨 Tuỳ chỉnh giao diện Toast
 const toastConfig = {

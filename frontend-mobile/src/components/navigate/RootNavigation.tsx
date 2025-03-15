@@ -33,6 +33,11 @@ export function resetStack(name: string, params?: object) {
   });
 }
 
+export function replace(name: string, params?: object) {
+  const replaceAction = StackActions.replace(name, params);
+  navigationRef.current?.dispatch(replaceAction);
+}
+
 
 export const useNavigationRoot = () => {
   return useNavigation<NavigationProp<RootParamList>>();

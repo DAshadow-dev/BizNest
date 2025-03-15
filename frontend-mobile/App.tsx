@@ -4,18 +4,20 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
 import HomeScreen from '@screens/HomeScreen';
-import InvoiceListScreen from '@screens/invoices/InvoiceListScreen';  
-import InvoiceScreen from '@screens/invoices/InvoiceScreen';  
+import InvoiceListScreen from '@screens/invoices/InvoiceListScreen';
+import InvoiceScreen from '@screens/invoices/InvoiceScreen';
 import PaymentScreen from '@screens/invoices/PaymentScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Routes from '@utils/Routes';
 import { RootParamList } from '@utils/RootParamList';
 import { createStackNavigator } from '@react-navigation/stack';
 //product
-import ProductListScreen from '@screens/products/ProductListScreen';
-import CreateProductScreen from '@screens/products/CreateProductScreen';
-import ProductDetailScreen from '@screens/products/productDetailScreen';
+import WareHouse from '@screens/products/WareHouse'
+import productCreateScreen from '@screens/products/ProductCreateScreen'
+import ProductDetailScreen from '@screens/products/productDetailScreen'
 import EditProductScreen from '@screens/products/EditProductScreen';
+//new product screen
+import ProductCreateScreen from '@screens/products/ProductCreateScreen'
 //staff
 import CreateStaffScreen from '@screens/staff/CreateStaffScreen';
 import EditStaffScreen from '@screens/staff/EditStaffScreen';
@@ -38,14 +40,17 @@ import OnboardingScreen from '@screens/guest/OnboardingScreen';
 import LoginScreen from '@screens/guest/LoginScreen';
 import RegisterScreen from '@screens/guest/RegisterScreen';
 import BusinessCategoryScreen from '@screens/guest/BusinessCategoryScreen';
+
+
 // import HomeScreen from '@screens/guest/HomeScreen';
 import Chatscreen from '@screens/guest/Chatscreen';
-import {Provider} from 'react-redux';
+import { Provider } from 'react-redux';
 import { store } from '@redux/store';
 
 
 const Stack = createStackNavigator<RootParamList>();
 const Tab = createBottomTabNavigator();
+
 
 
 function MyStack() {
@@ -70,8 +75,9 @@ function MyStack() {
         <Stack.Screen name={Routes.InvoiceScreen} component={InvoiceScreen} />
         <Stack.Screen name={Routes.CreateInvoiceScreen} component={CreateInvoiceScreen} />
         <Stack.Screen name={Routes.PaymentScreen} component={PaymentScreen} />
-        <Stack.Screen name={Routes.ProductListScreen} component={ProductListScreen} />
-        <Stack.Screen name={Routes.CreateProductScreen} component={CreateProductScreen} />
+         {/* product */}
+        <Stack.Screen name={Routes.WareHouse} component={WareHouse} />
+        <Stack.Screen name={Routes.ProductCreateScreen} component={productCreateScreen} />
         <Stack.Screen name={Routes.ProductDetailScreen} component={ProductDetailScreen} />
         <Stack.Screen name={Routes.EditProductScreen} component={EditProductScreen} />
         {/* staff */}
@@ -80,12 +86,12 @@ function MyStack() {
         <Stack.Screen name={Routes.EditStaffScreen} component={EditStaffScreen} />
         <Stack.Screen name={Routes.StaffDetailScreen} component={StaffDetailScreen} />
         <Stack.Screen name={Routes.StaffListScreen} component={StaffListScreen} />
-
-        <Stack.Screen name={Routes.PROFILE} component={MyProfile} />
-        <Stack.Screen name={Routes.CUSTOMER_LIST} component={CustomerListScreen} />
-        <Stack.Screen name={Routes.CREATE_CUSTOMER} component={CreateCustomerScreen} />
-        <Stack.Screen name={Routes.CUSTOMER_DETAIL} component={CustomerDetailScreen} />
-        <Stack.Screen name={Routes.BUSINESS_DASHBOARD} component={BusinessDashBoardScreen} />
+      
+      <Stack.Screen name={Routes.PROFILE} component={MyProfile} />
+      <Stack.Screen name={Routes.CUSTOMER_LIST} component={CustomerListScreen} />
+      <Stack.Screen name={Routes.CREATE_CUSTOMER} component={CreateCustomerScreen} />
+      <Stack.Screen name={Routes.CUSTOMER_DETAIL} component={CustomerDetailScreen} />
+      <Stack.Screen name={Routes.BUSINESS_DASHBOARD} component={BusinessDashBoardScreen} />
     </Stack.Navigator>
   );
 }
@@ -104,10 +110,11 @@ function MyProfile() {
         },
         tabBarIcon: ({ color, size }) => {
           if (route.name === Routes.PROFILE_SCREEN) {
-            return <FontAwesome name="user" size={size} color={color} />;          
+            return <FontAwesome name="user" size={size} color={color} />;
           } else if (route.name === Routes.PASSWORD_SCREEN) {
-            return <FontAwesome name="lock" size={size} color={color} />;          
-          }        },
+            return <FontAwesome name="lock" size={size} color={color} />;
+          }
+        },
         tabBarLabel: ({ focused, color }) => (
           <Text style={{ color, fontSize: 14, fontWeight: focused ? "bold" : "normal" }}>
             {route.name === Routes.PROFILE_SCREEN ? "Profile" : "Password"}
@@ -116,7 +123,7 @@ function MyProfile() {
         tabBarActiveTintColor: "#000000", // Màu khi active
         tabBarInactiveTintColor: "#888", // Màu khi không active
       })}
-      
+
       initialRouteName={Routes.PROFILE_SCREEN}>
       <Tab.Screen name={Routes.PROFILE_SCREEN} component={ProfileScreen} />
       <Tab.Screen name={Routes.PASSWORD_SCREEN} component={PasswordScreen} />
@@ -140,15 +147,15 @@ export default function App() {
     return null;
   }
   SplashScreen.hideAsync();
-  
-  
+
+
   return (
     <Provider store={store}>
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         <SafeAreaProvider>
           <StatusBar barStyle="light-content" />
           <NavigationContainer>
-            <MyStack/>
+            <MyStack />
           </NavigationContainer>
         </SafeAreaProvider>
       </View>

@@ -26,7 +26,6 @@ const ProfileScreen: React.FC = () => {
       ? 'https://i.pinimg.com/originals/c6/e5/65/c6e56503cfdd87da299f72dc416023d4.jpg' 
       : Auth.image
     );
-
   const methods = useForm({
       defaultValues: {
         username: Auth.username,
@@ -77,7 +76,6 @@ const ProfileScreen: React.FC = () => {
       alert("Bạn cần cấp quyền để chọn ảnh!");
       return;
     }
-
     // Mở thư viện ảnh
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -90,15 +88,6 @@ const ProfileScreen: React.FC = () => {
       setImage(result.assets[0].uri);
     }
   };
-
-  const handleButtonCancel= () => {
-    methods.reset({
-      username: Auth.username,
-      email: Auth.email,
-      phone: Auth.phone,
-    });
-    setImage(Auth.image)
-  }
   return (
     <ScrollView style={styles.container}>
       {/* Header */}

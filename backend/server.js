@@ -8,6 +8,10 @@ const authRoute = require("./src/routes/auth/authRoute");
 const { Server } = require("socket.io");
 const chatRoute = require("./src/routes/chatRoute");
 const userRoute = require('./src/routes/userRoute');
+const productRoutes = require('./src/routes/productRoutes');
+const categoryRoutes = require('./src/routes/categoryRoutes');
+const storeRoutes = require('./src/routes/storeRoutes');
+const staffRoutes = require('./src/routes/staffRoutes');
 const customerRoute = require('./src/routes/customerRoute');
 const adminRoute = require('./src/routes/admin/adminRouter');
 const port = process.env.PORT || 5000;
@@ -21,7 +25,15 @@ connectToDB();
 
 //from router
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }))
 
+// Routes
+app.use('/api', categoryRoutes);
+app.use('/api', storeRoutes);
+app.use('/api', productRoutes);
+app.use('/api', staffRoutes);
+//from errorHandle
+app.use(errorHandler);
 //from cors
 app.use(cors());
 //from errorHandle

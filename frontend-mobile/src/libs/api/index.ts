@@ -46,7 +46,6 @@ export default {
       method: 'GET',
     });
   },
-  
   async post(endPoint: string, options?: AxiosRequestConfig) {
     return api.request({
       url: endPoint,

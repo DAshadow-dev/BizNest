@@ -1,6 +1,20 @@
-const BASE_PREFIX = 'http://10.0.2.2:5001/api';
+// const BASE_PREFIX = 'http://10.0.2.2:5001/api';
+import Constants from 'expo-constants';
+
+interface ExpoConfig {
+  hostUri?: string;
+}
+
+const expoConfig: ExpoConfig = Constants.expoConfig || {};
+const debuggerHost: string = expoConfig.hostUri?.split(':').shift() || 'localhost';
+
+const BASE_PREFIX = `http://${debuggerHost}:5000/api`
 
 const ApiConstants = {
+  //Authentication & Authorization
+  LOGIN : `${BASE_PREFIX}/auth/login`,
+  REGISTER: `${BASE_PREFIX}/auth/register`,
+  VERIFY_EMAIL : `${BASE_PREFIX}/auth/verify-email`,
   // User
   CHANGE_PASSWORD: `${BASE_PREFIX}/user/changePassword`,
   UPDATE_INFORMATION: `${BASE_PREFIX}/user/updateInformation`,
@@ -10,6 +24,14 @@ const ApiConstants = {
   CREATE_PRODUCT: `${BASE_PREFIX}/products`,
   UPDATE_PRODUCT: `${BASE_PREFIX}/products`,
   DELETE_PRODUCT: `${BASE_PREFIX}/products`,
+  GET_PRODUCT_DETAIL: `${BASE_PREFIX}/products`,
+
+  GET_ALL_STAFFS: `${BASE_PREFIX}/staff`,
+  CREATE_STAFF: `${BASE_PREFIX}/staff`,
+  UPDATE_STAFF: `${BASE_PREFIX}/staff`,
+  DELETE_STAFF: `${BASE_PREFIX}/staff`,
+  GET_STAFF_DETAIL: `${BASE_PREFIX}/staff`,
+  SEARCH_STAFF: `${BASE_PREFIX}/staff/search`,
 };
 
 export default ApiConstants;
@@ -17,3 +39,7 @@ export default ApiConstants;
 export {
   BASE_PREFIX,
 };
+
+export const API_URL: string = `http://${debuggerHost}:5000/api`;
+
+console.log('🌐 API_URL:', API_URL);

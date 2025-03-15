@@ -1,23 +1,33 @@
-import ApiConstants from 'src/adapter/ApiConstants'
-import api from '@libs/api';
-
+import ApiConstants from 'src/adapter/ApiConstants';
+import api from '@libs/api/index2';
 
 // factories/factories.js
 const Factories = {
-  // Lấy danh sách sản phẩm
   getAllProducts: () => api.get(ApiConstants.GET_ALL_PRODUCTS),
+  // Tạo sản phẩm mới với multipart/form-data
+  createProduct: (product: any) => {
+    console.log('here is api post');
+    console.log('pr', product);
 
-  // Tạo sản phẩm mới
-  createProduct: (product) =>
-    api.post(ApiConstants.CREATE_PRODUCT, { data: product }),
+    return api.post(ApiConstants.CREATE_PRODUCT, product);
+  },
+    
+  
 
-  // Cập nhật sản phẩm
-  updateProduct: (id, product) =>
-    api.put(`${ApiConstants.UPDATE_PRODUCT}/${id}`, { data: product }),
+  // Các phương thức khác không thay đổi
+  updateProduct: (id, product) => {
+    console.log('here is api post');
+    console.log('pr', product);
+    console.log('id>>>>', id);
+    return api.put(`${ApiConstants.UPDATE_PRODUCT}/${id}`, product);
+  },
+  
 
-  // Xóa sản phẩm
   deleteProduct: (id) => api.delete(`${ApiConstants.DELETE_PRODUCT}/${id}`),
+  
+
+  getProductDetail: (id) => api.get(`${ApiConstants.GET_PRODUCT_DETAIL}/${id}`),
+
 };
 
 export default Factories;
-

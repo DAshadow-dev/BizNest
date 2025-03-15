@@ -1,3 +1,4 @@
+
 const HomeScreen= 'HomeScreen';
 const AdminDashboardScreen= 'AdminDashboardScreen';
 const AccountListScreen = 'AccountListScreen';
@@ -12,6 +13,11 @@ const ProductListScreen= 'ProductListScreen';
 const ProductDetailScreen= 'ProductDetailScreen';
 const CreateProductScreen= 'CreateProductScreen';
 const EditProductScreen= 'EditProductScreen';
+//new
+const WareHouse= 'WareHouse';
+const ProductCreateScreen= 'ProductCreateScreen';
+// const EditProductScreens= 'EditProductScreens';
+// const ProductDetailScreens= 'ProductDetailScreens';
 //staff screen
 const StaffListScreen = 'StaffListScreen';
 const StaffDetailScreen = 'StaffDetailScreen';
@@ -43,10 +49,14 @@ export {
   InvoiceScreen,
   CreateInvoiceScreen,
   PaymentScreen,
+  //product
   ProductListScreen,
   ProductDetailScreen,
-  CreateProductScreen,
   EditProductScreen,
+  WareHouse,
+  ProductCreateScreen,
+  
+
   //staff
   StaffListScreen,
   StaffDetailScreen,

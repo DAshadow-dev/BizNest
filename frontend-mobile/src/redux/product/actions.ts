@@ -14,10 +14,14 @@ const ProductActions = {
   DELETE_PRODUCT: 'DELETE_PRODUCT',
   DELETE_PRODUCT_SUCCESS: 'DELETE_PRODUCT_SUCCESS',
   DELETE_PRODUCT_FAILURE: 'DELETE_PRODUCT_FAILURE',
+
+  FETCH_PRODUCT_DETAIL: 'FETCH_PRODUCT_DETAIL',
+  FETCH_PRODUCT_DETAIL_SUCCESS: 'FETCH_PRODUCT_DETAIL_SUCCESS',
+  FETCH_PRODUCT_DETAIL_FAILURE: 'FETCH_PRODUCT_DETAIL_FAILURE',
 };
 
 // Action để fetch sản phẩm
-export const fetchProducts = (onSuccess, onFailed, onError) => ({
+export const fetchProducts = (onSuccess = () => {}, onFailed = () => {}, onError = () => {}) => ({
   type: ProductActions.FETCH_PRODUCTS,
   payload: { onSuccess, onFailed, onError },
 });
@@ -35,7 +39,7 @@ export const fetchProductsFailure = (error) => ({
 });
 
 // Action để tạo sản phẩm
-export const createProduct = (product, onSuccess, onFailed, onError) => ({
+export const createProduct = (product, onSuccess = () => {}, onFailed = () => {}, onError = () => {}) => ({
   type: ProductActions.CREATE_PRODUCT,
   payload: { product, onSuccess, onFailed, onError },
 });
@@ -53,7 +57,7 @@ export const createProductFailure = (error) => ({
 });
 
 // Action để cập nhật sản phẩm
-export const updateProduct = (id, product, onSuccess, onFailed, onError) => ({
+export const updateProduct = (id, product, onSuccess = () => {}, onFailed = () => {}, onError = () => {}) => ({
   type: ProductActions.UPDATE_PRODUCT,
   payload: { id, product, onSuccess, onFailed, onError },
 });
@@ -71,7 +75,7 @@ export const updateProductFailure = (error) => ({
 });
 
 // Action để xóa sản phẩm
-export const deleteProduct = (id, onSuccess, onFailed, onError) => ({
+export const deleteProduct = (id, onSuccess = () => {}, onFailed = () => {}, onError = () => {}) => ({
   type: ProductActions.DELETE_PRODUCT,
   payload: { id, onSuccess, onFailed, onError },
 });
@@ -88,4 +92,22 @@ export const deleteProductFailure = (error) => ({
   payload: error,
 });
 
+
+// ✅ Action để fetch chi tiết sản phẩm
+export const fetchProductDetail = (id, onSuccess = () => {}, onFailed = () => {}, onError = () => {}) => ({
+  type: ProductActions.FETCH_PRODUCT_DETAIL,
+  payload: { id, onSuccess, onFailed, onError },
+});
+
+// ✅ Action thành công khi lấy chi tiết sản phẩm
+export const fetchProductDetailSuccess = (product) => ({
+  type: ProductActions.FETCH_PRODUCT_DETAIL_SUCCESS,
+  payload: product,
+});
+
+// ✅ Action thất bại khi lấy chi tiết sản phẩm
+export const fetchProductDetailFailure = (error) => ({
+  type: ProductActions.FETCH_PRODUCT_DETAIL_FAILURE,
+  payload: error,
+});
 export default ProductActions;

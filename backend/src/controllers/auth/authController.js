@@ -39,13 +39,11 @@ exports.register = async (req, res) => {
     // Generate Token and verify email
     const token = generateToken(user);
     await sendVerificationEmail(email, token);
-
     res.status(200).json({Data:{
       message:
         "User and store registered successfully. Please verify your email.",
       token: token,
     }});
-    console.log("đây");
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message || "Internal Server Error" });

@@ -55,7 +55,7 @@ const PasswordScreen= ()=> {
                     visibilityTime: 2000
                 });            
             }
-        }});
+        }})
     };
 
     const Auth = useAppSelector((state: RootState) => state.User.Auth);

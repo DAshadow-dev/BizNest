@@ -6,21 +6,19 @@ import { LineChart } from "react-native-chart-kit";
 import * as Routes from "@utils/Routes";
 import { navigate, useNavigationRoot } from "@components/navigate/RootNavigation";
 
-const HomePage = () => {
+const HomeAdminScreen = () => {
   const navigation = useNavigationRoot();
   const categories = [
-    { id: "1", name: "Product", icon: "storefront", route: Routes.WareHouse },
-    { id: "2", name: "Staff", icon: "receipt", route: Routes.StaffListScreen },
-    { id: "3", name: "Customer", icon: "people", route: Routes.CUSTOMER_LIST },
-    { id: "4", name: "Business dashboard", icon: "bar-chart", route: Routes.BUSINESS_DASHBOARD },
-    { id: "5", name: "Invoice", icon: "account-balance-wallet", route: Routes.InvoiceListScreen },
+    { id: "1", name: "Pending", icon: "receipt", route: Routes.PendingAccountsScreen },
+    { id: "2", name: "List Onwer", icon: "people", route: Routes.AccountListScreen },
+    { id: "3", name: "Dashboard", icon: "bar-chart", route: Routes.AdminDashboardScreen },
   ];
 
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.headerText}>Dashboard</Text>
+          <Text style={styles.headerText}>Dashboard Admin</Text>
           <Ionicons name="notifications-outline" size={24} color="white" />
         </View>
 
@@ -57,36 +55,11 @@ const HomePage = () => {
       <TouchableOpacity style={styles.chatButton} onPress={() => navigation.navigate("CHAT_SCREEN")}>
         <Ionicons name="chatbubble" size={28} color="white" />
       </TouchableOpacity> */}
-
-      <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate(Routes.CUSTOMER_LIST,{showToast: false, message: ""})}>
-          <MaterialIcons name="people" size={28} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate(Routes.WareHouse, {refresh: false});
-          }}
-        >
-          <Ionicons name="cart" size={28} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.navigate(Routes.BUSINESS_DASHBOARD)}
-        >
-          <Ionicons name="stats-chart" size={28} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate(Routes.PROFILE);
-          }}
-        >
-          <Ionicons name="person" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
 
-export default HomePage;
+export default HomeAdminScreen;
 
 const styles = StyleSheet.create({
   container: {

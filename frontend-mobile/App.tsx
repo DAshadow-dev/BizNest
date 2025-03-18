@@ -40,6 +40,7 @@ import OnboardingScreen from '@screens/guest/OnboardingScreen';
 import LoginScreen from '@screens/guest/LoginScreen';
 import RegisterScreen from '@screens/guest/RegisterScreen';
 import BusinessCategoryScreen from '@screens/guest/BusinessCategoryScreen';
+import PaymentDetailScreen from '@screens/invoices/PaymentDetailScreen';
 
 
 // import HomeScreen from '@screens/guest/HomeScreen';
@@ -59,8 +60,8 @@ function MyStack() {
       screenOptions={{
         headerShown: false,
       }}
-      initialRouteName={Routes.ONBOARDING_SCREEN}>
-        <Stack.Screen name={Routes.ONBOARDING_SCREEN} component={OnboardingScreen} />
+      initialRouteName={Routes.PaymentScreen}>
+        {/* <Stack.Screen name={Routes.ONBOARDING_SCREEN} component={OnboardingScreen} /> */}
         <Stack.Screen name={Routes.LOGIN_SCREEN} component={LoginScreen} />
         <Stack.Screen name={Routes.REGISTER_SCREEN} component={RegisterScreen} />
         <Stack.Screen name={Routes.BUSINESSCATEGORY_SCREEN} component={BusinessCategoryScreen} />
@@ -74,7 +75,15 @@ function MyStack() {
         <Stack.Screen name={Routes.InvoiceListScreen} component={InvoiceListScreen} />
         <Stack.Screen name={Routes.InvoiceScreen} component={InvoiceScreen} />
         <Stack.Screen name={Routes.CreateInvoiceScreen} component={CreateInvoiceScreen} />
-        <Stack.Screen name={Routes.PaymentScreen} component={PaymentScreen} />
+        {/* <Stack.Screen name={Routes.PaymentScreen} component={PaymentScreen} /> */}
+        <NavigationContainer>
+      <Stack.Navigator initialRouteName="PaymentScreen">
+        <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+        <Stack.Screen name="PaymentDetailScreen" component={PaymentDetailScreen} /> {/* ✅ Ensure it's registered */}
+        <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
+        <Stack.Screen name="FailureScreen" component={FailureScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
          {/* product */}
         <Stack.Screen name={Routes.WareHouse} component={WareHouse} />
         <Stack.Screen name={Routes.ProductCreateScreen} component={productCreateScreen} />

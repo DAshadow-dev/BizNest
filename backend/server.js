@@ -12,6 +12,7 @@ const productRoutes = require('./src/routes/productRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes');
 const storeRoutes = require('./src/routes/storeRoutes');
 const staffRoutes = require('./src/routes/staffRoutes');
+const paymentRoutes = require('./src/routes/paymentRoutes');
 const customerRoute = require('./src/routes/customerRoute');
 const adminRoute = require('./src/routes/admin/adminRouter');
 const port = process.env.PORT || 5000;
@@ -49,6 +50,8 @@ app.use("api/chat", chatRoute);
 app.use('/api/user', userRoute)
 //customer router
 app.use('/api/customer', customerRoute)
+//payment router
+// app.use('/api/payment', paymentRoutes)
 
 //connect socket.io
 io.on("connection", (socket) => {

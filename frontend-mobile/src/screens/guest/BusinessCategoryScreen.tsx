@@ -60,6 +60,7 @@ const BusinessCategoryScreen = (props: {
         },
         onError: (error: any) => {
           setIsLoading(false); // Dừng hiển thị loading spinner
+          console.log(error);
           Alert.alert("Error", "There are any errors happening during the registration process");
         },
       },

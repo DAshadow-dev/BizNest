@@ -39,14 +39,11 @@ exports.register = async (req, res) => {
     // Generate Token and verify email
     const token = generateToken(user);
     await sendVerificationEmail(email, token);
-
-    res.status(200).json({
-      Data: {
-        message:
-          "User and store registered successfully. Please verify your email.",
-        token: token,
-      }
-    });
+    res.status(200).json({Data:{
+      message:
+        "User and store registered successfully. Please verify your email.",
+      token: token,
+    }});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message || "Internal Server Error" });
@@ -65,18 +62,19 @@ exports.verifyEmail = async (req, res) => {
     console.log("Decoded Token:", decodedToken);
 
     const user = await User.findOneAndUpdate(
-      { email: decodedToken.email },
+      { email: decodedToken.user.email },
       { $set: { verified: true } },
       { new: true }
     );
-
+    console.log("User:", user);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json({
-      message: "Email verified successfully. You can now login.",
-    });
+    res.status(200).json({Data:{
+      token: token,
+      message: "Email verified successfully"
+    }});
   } catch (error) {
     console.error("Error verifying email:", error);
     res.status(400).json({ message: "Invalid or expired token." });

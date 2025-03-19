@@ -14,15 +14,12 @@ import { io } from "socket.io-client";
 import ChatActions from "@redux/chat/actions";
 import { RootState } from "@redux/root-reducer";
 
-
-
 const socket = io("http://localhost:5000");
 
 const ChatBox = ({ navigation, route }: { navigation: any; route: any }) => {
   // Lấy dữ liệu từ Redux
   const dispatch = useDispatch();
-  const messages = useSelector((state: RootState) => state.Chat.Chat.messages);
-
+  const messages = useSelector((state: RootState) => state.Chat.messages);
   // Nhận userId, receiverId từ route (nếu có)
   const userId = route.params?.userId || "123";
   const receiverId = route.params?.receiverId || "456";
@@ -36,7 +33,7 @@ const ChatBox = ({ navigation, route }: { navigation: any; route: any }) => {
       type: ChatActions.FETCH_MESSAGES,
       payload: { data: { senderId: userId, receiverId } },
     });
-  }, [dispatch, userId, receiverId]);
+  }, [dispatch, userId, receiverId,messages]);
 
   // 🟢 Kết nối socket để nhận tin nhắn theo thời gian thực
   useEffect(() => {
@@ -47,7 +44,7 @@ const ChatBox = ({ navigation, route }: { navigation: any; route: any }) => {
       // Gửi action để reducer cập nhật messages
       dispatch({
         type: ChatActions.RECEIVE_MESSAGE,
-        payload: { message: newMessage },
+        payload: { data: newMessage },
       });
     });
 
@@ -71,9 +68,6 @@ const ChatBox = ({ navigation, route }: { navigation: any; route: any }) => {
       type: ChatActions.SEND_MESSAGE,
       payload: { data: newMessage },
     });
-
-    // Gửi tin nhắn qua socket để real-time
-    socket.emit("sendMessage", newMessage);
 
     // Xóa nội dung input
     setInputText("");
@@ -101,8 +95,10 @@ const ChatBox = ({ navigation, route }: { navigation: any; route: any }) => {
       {/* Chat Messages */}
       <FlatList
         ref={flatListRef}
-        data={messages}
-        keyExtractor={(item) => item._id || Math.random().toString()}
+        data={Array.isArray(messages.messages) ? messages.messages : []}
+        keyExtractor={(item) =>
+          item._id?.toString() || Math.random().toString()
+        }
         renderItem={({ item }) => (
           <View
             style={[
@@ -116,7 +112,7 @@ const ChatBox = ({ navigation, route }: { navigation: any; route: any }) => {
                 item.senderId !== userId ? styles.botText : styles.userText,
               ]}
             >
-              {item.message}
+              {item.message || "No message"}
             </Text>
           </View>
         )}

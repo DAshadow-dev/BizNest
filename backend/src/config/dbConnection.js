@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 // Connect to MongoDB
 const dbConnecion = async () =>{
     try{
-        const db = await mongoose.connect(process.env.MONGODB_ATLAS, {
+        const db = await mongoose.connect(process.env.MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });

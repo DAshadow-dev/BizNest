@@ -2,50 +2,73 @@ import { all, call, fork, put, takeEvery } from '@redux-saga/core/effects';
 import ChatActions from './actions';
 import Factories from './factories';
 
-function* handleChatSaga(action: any, factoryFunction: Function, successAction: string, failureAction: string) {
+// Saga cho Fetch Messages
+function* fetchMessagesSaga(action: any) {
   const { data, onSuccess, onFailure, onError } = action.payload;
-
   try {
-    const response: CommonResponse<CodeResponse> = yield call(() => factoryFunction(data));
-    
+    const response: CommonResponse<CodeResponse> = yield call(() => Factories.fetchMessages(data.senderId, data.receiverId));
     if (response?.status === 200) {
       onSuccess && onSuccess(response.data.Data);
-      yield put({ type: successAction, payload: { res: response.data.Data } });
+      yield put({ type: ChatActions.FETCH_MESSAGES_SUCCESS, payload: { messages: response.data.Data } });
     } else {
       onFailure && onFailure(response.data.MsgNo);
-      yield put({ type: failureAction });
+      yield put({ type: ChatActions.FETCH_MESSAGES_FAILURE });
     }
   } catch (error) {
     onError && onError(error);
-    yield put({ type: failureAction });
+    yield put({ type: ChatActions.FETCH_MESSAGES_FAILURE });
   }
 }
 
-// Xử lý gửi tin nhắn
-export function* sendMessage() {
-  yield takeEvery(ChatActions.SEND_MESSAGE, function* (action: any): any {
-    yield handleChatSaga(action, Factories.sendMessage, ChatActions.SEND_MESSAGE_SUCCESS, ChatActions.SEND_MESSAGE_FAILURE);
-  });
+// Saga cho Send Message
+function* sendMessageSaga(action: any) {
+  const { data, onSuccess, onFailure, onError } = action.payload;
+  try {
+    const response: CommonResponse<CodeResponse> = yield call(() => Factories.sendMessage(data));
+    
+    if (response?.status == 201) {
+     
+      onSuccess && onSuccess(response.data.Data);
+      console.log('tao pass');
+      yield put({ type: ChatActions.SEND_MESSAGE_SUCCESS, payload: { message: response?.data?.Data } });
+    } else {
+      console.log("tao co phei")
+      onFailure && onFailure(response.data.MsgNo);
+      yield put({ type: ChatActions.SEND_MESSAGE_FAILURE });
+    }
+  } catch (error) {
+    console.log(error)
+    onError && onError(error);
+    yield put({ type: ChatActions.SEND_MESSAGE_FAILURE });
+  }
 }
 
-// Xử lý nhận tin nhắn
-export function* receiveMessage() {
-  yield takeEvery(ChatActions.RECEIVE_MESSAGE, function* (action: any): any {
-    yield handleChatSaga(action, Factories.receiveMessage, ChatActions.RECEIVE_MESSAGE_SUCCESS, ChatActions.RECEIVE_MESSAGE_FAILURE);
-  });
+// Saga cho Receive Message
+function* receiveMessageSaga(action: any) {
+  const { data } = action.payload;
+  yield put({ type: ChatActions.RECEIVE_MESSAGE, payload: { data } });
 }
 
-// Xử lý lấy lịch sử tin nhắn
-export function* fetchChatHistory() {
-  yield takeEvery(ChatActions.FETCH_MESSAGES, function* (action: any): any {
-    yield handleChatSaga(action, Factories.fetchMessages, ChatActions.FETCH_MESSAGES_SUCCESS, ChatActions.FETCH_MESSAGES_FAILURE);
-  });
+// Watcher cho Fetch Messages
+export function* watchFetchMessages() {
+  yield takeEvery(ChatActions.FETCH_MESSAGES, fetchMessagesSaga);
 }
 
+// Watcher cho Send Message
+export function* watchSendMessage() {
+  yield takeEvery(ChatActions.SEND_MESSAGE, sendMessageSaga);
+}
+
+// Watcher cho Receive Message
+export function* watchReceiveMessage() {
+  yield takeEvery(ChatActions.RECEIVE_MESSAGE, receiveMessageSaga);
+}
+
+// Saga chính
 export default function* chatSaga() {
   yield all([
-    fork(sendMessage),
-    fork(receiveMessage),
-    fork(fetchChatHistory),
+    fork(watchFetchMessages),
+    fork(watchSendMessage),
+    fork(watchReceiveMessage), // Bỏ comment nếu cần
   ]);
 }

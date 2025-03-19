@@ -13,13 +13,12 @@ exports.sendMessage = async (req, res) => {
     const chat = new Chat({ senderId, receiverId, message });
     await chat.save();
 
-    // Gửi tin nhắn đến client theo thời gian thực
     const io = req.app.get("socketio");
     if (global.users[receiverId]) {
       io.to(global.users[receiverId]).emit("receiveMessage", chat);
     }
 
-    res.status(201).json(chat);
+    res.status(201).json({Data : chat});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -34,16 +33,17 @@ exports.getMessages = async (req, res) => {
       return res.status(400).json({ message: "Missing senderId or receiverId" });
     }
 
-    // const messages = await Chat.find({
-    //   $or: [
-    //     { senderId, receiverId },
-    //     { senderId: receiverId, receiverId: senderId },
-    //   ],
-    // }).sort({ createdAt: 1 });
-    const messages = await Chat.find();
+    const messages = await Chat.find({
+      $or: [
+        { senderId, receiverId },
+        { senderId: receiverId, receiverId: senderId },
+      ],
+    }).sort({ createdAt: 1 });
 
-    console.log(messages)
-    res.json(messages);
+    console.log("senderId: ", senderId);
+    console.log("receiverId: ", receiverId);
+    console.log("messages: ", messages);
+    res.json({Data : { messages }});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

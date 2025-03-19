@@ -2,7 +2,7 @@ import api from "@libs/api";
 import ApiConstants from "src/adapter/ApiConstants";
 
 const Factories = {
-  fetchMessages: (senderId: string, receiverId: string) => {
+  fetchMessages : (senderId: string, receiverId: string) => {
     return api.get(`${ApiConstants.GET_MESSAGES}?senderId=${senderId}&receiverId=${receiverId}`);
   },
 

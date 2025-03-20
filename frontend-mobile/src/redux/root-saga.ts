@@ -6,6 +6,7 @@ import productSaga from '@redux/product/saga'
 import staffSaga from './staff/saga';
 import adminSaga from './admin/saga';
 import customerSaga from '@redux/customer/saga';
+import categorySaga from '@redux/category/saga';
 
 export default function* rootSaga() {
   yield all([
@@ -14,6 +15,7 @@ export default function* rootSaga() {
     staffSaga(),
     adminSaga(),
     customerSaga(),
+    categorySaga(),
     // invoiceSaga(),
   ]);
 }

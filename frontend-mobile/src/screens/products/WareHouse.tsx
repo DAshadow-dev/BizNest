@@ -10,6 +10,7 @@ import { moderateScale, scale, verticalScale } from "@libs/reactResizeMatter/sca
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRoute } from '@react-navigation/native';
+import { RootState } from "@redux/root-reducer";
 
 const WareHouse = () => {
   const dispatch = useDispatch();
@@ -21,10 +22,15 @@ const WareHouse = () => {
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const productsPerPage = 10;
+  const Auth = useAppSelector((state: RootState) => state.User.Auth);
+  console.log('Auth: ', Auth)
   
   const navigation = useNavigationRoot();
   const route = useRoute();
 
+  // Thêm state để kiểm soát loading state tốt hơn
+  const [initialLoad, setInitialLoad] = useState(true);
+  
   useFocusEffect(
     useCallback(() => {
       const params = route.params as any;
@@ -37,8 +43,20 @@ const WareHouse = () => {
   useFocusEffect(
     useCallback(() => {
       fetchProducts();
+      // Đặt timeout để đảm bảo không bị loading mãi
+      const timer = setTimeout(() => {
+        setInitialLoad(false);
+      }, 5000);
+      return () => clearTimeout(timer);
     }, [dispatch])
   );
+
+  useEffect(() => {
+    // Cập nhật initialLoad state khi products thay đổi
+    if (products.length > 0 || error) {
+      setInitialLoad(false);
+    }
+  }, [products, error]);
 
   useEffect(() => {
     if (products.length > 0) {
@@ -47,7 +65,16 @@ const WareHouse = () => {
   }, [products, searchQuery, page]);
 
   const fetchProducts = () => {
-    dispatch({ type: ProductActions.FETCH_PRODUCTS });
+    console.log('Fetching products with storeId:', Auth?.storeId);
+    // Kiểm tra storeId
+    if (!Auth?.storeId) {
+      console.warn('No storeId available in Auth:', Auth);
+    }
+    
+    dispatch({ 
+      type: ProductActions.FETCH_PRODUCTS, 
+      payload: { storeId: Auth?.storeId } 
+    });
     setRefreshing(false);
     setPage(1); // Reset to first page when fetching new data
   };
@@ -102,33 +129,40 @@ const WareHouse = () => {
     }
   };
 
-  const renderProductItem = ({ item }: { item: any }) => (
-    <TouchableOpacity
-      style={styles.productItem}
-      onPress={() => navigation.navigate(Routes.ProductDetailScreen, { product: item })}
-    >
-      <View style={styles.productInfo}>
-        {item.image ? (
-          <Image 
-            source={{ uri: item.image }} 
-            style={styles.productImage}
-          />
-        ) : (
-          <View style={styles.productImagePlaceholder}>
-            <Text style={styles.productImagePlaceholderText}>
-              {item.name.charAt(0)}
-            </Text>
+  const renderProductItem = ({ item }: { item: any }) => {
+    // Xử lý hiển thị category name
+    const categoryName = item.categoryId && typeof item.categoryId === 'object' && item.categoryId.name 
+      ? item.categoryId.name 
+      : 'General Category';
+    
+    return (
+      <TouchableOpacity
+        style={styles.productItem}
+        onPress={() => navigation.navigate(Routes.ProductDetailScreen, { product: item })}
+      >
+        <View style={styles.productInfo}>
+          {item.image ? (
+            <Image 
+              source={{ uri: item.image }} 
+              style={styles.productImage}
+            />
+          ) : (
+            <View style={styles.productImagePlaceholder}>
+              <Text style={styles.productImagePlaceholderText}>
+                {item.name.charAt(0)}
+              </Text>
+            </View>
+          )}
+          <View style={styles.productDetails}>
+            <Text style={styles.productName}>{item.name}</Text>
+            <Text style={styles.productCategory}>{categoryName}</Text>
+            <Text style={styles.productPrice}>${item.price || '0.00'}</Text>
           </View>
-        )}
-        <View style={styles.productDetails}>
-          <Text style={styles.productName}>{item.name}</Text>
-          <Text style={styles.productCategory}>{item.category || 'Product'}</Text>
-          <Text style={styles.productPrice}>${item.price || '0.00'}</Text>
         </View>
-      </View>
-      <Ionicons name="chevron-forward-outline" size={18} color="#3B82F6" />
-    </TouchableOpacity>
-  );
+        <Ionicons name="chevron-forward-outline" size={18} color="#3B82F6" />
+      </TouchableOpacity>
+    );
+  };
 
   const renderFooter = () => {
     if (!loadingMore) return null;
@@ -184,10 +218,25 @@ const WareHouse = () => {
       </View>
 
       {/* Product List */}
-      {loading && !refreshing ? (
+      {loading && initialLoad ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#3B82F6" />
           <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      ) : error ? (
+        <View style={styles.errorContainer}>
+          <Ionicons name="alert-circle-outline" size={50} color="#f87171" />
+          <Text style={styles.errorText}>
+            {typeof error === 'string' 
+              ? error 
+              : 'An error occurred while loading products. Please try again.'}
+          </Text>
+          <TouchableOpacity 
+            style={styles.retryButton}
+            onPress={fetchProducts}
+          >
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -385,6 +434,29 @@ const styles = StyleSheet.create({
   footerText: {
     marginLeft: 8,
     color: '#6B7280',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#4b5563',
+    textAlign: 'center',
+  },
+  retryButton: {
+    marginTop: 20,
+    backgroundColor: '#3B82F6',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

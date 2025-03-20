@@ -41,7 +41,9 @@ const ApiConstants = {
   CREATE_CUSTOMER: `${BASE_PREFIX}/customer`,
   DELETE_CUSTOMER: `${BASE_PREFIX}/customer`,
   UPDATE_CUSTOMER: `${BASE_PREFIX}/customer`,
-
+  // Category
+  GET_CATEGORIES: `${BASE_PREFIX}/categories`,
+  CREATE_CATEGORY: `${BASE_PREFIX}/categories`,
 };
 
 export default ApiConstants;

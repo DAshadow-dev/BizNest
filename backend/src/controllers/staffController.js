@@ -13,6 +13,11 @@ const createStaff = async (req, res) => {
       if (role !== 'staff') {
         return res.status(400).json({ msgNo: 'Role must be staff', Data: null });
       }
+
+      // Kiểm tra storeId được cung cấp
+      if (!storeId) {
+        return res.status(400).json({ msgNo: 'Store ID is required', Data: null });
+      }
   
       // Nếu có ảnh, kiểm tra URL ảnh, không cần upload lên Cloudinary
       let imageUrl = '';
@@ -48,14 +53,28 @@ const createStaff = async (req, res) => {
   };
   
 
-
 const getAllStaff = async (req, res) => {
     try {
       console.log('>>>> get all staff');
-        const staffList = await User.find({ role: 'staff' }); // Lọc theo role = staff
-        res.status(200).json({msgNo: "get all staff successful",Data: staffList});
+      const { storeId } = req.query;
+      
+      // Nếu có storeId, lọc nhân viên theo cửa hàng
+      let filter = { role: 'staff' };
+      if (storeId) {
+        // Convert storeId to number to ensure type matching with database
+        // MongoDB will convert string to number in the query but being explicit helps with debugging
+        filter.storeId = Number(storeId);
+        console.log('>>>> Filtering staff by storeId:', filter.storeId, typeof filter.storeId);
+      }
+      
+      // Tìm tất cả nhân viên theo filter
+      const staffList = await User.find(filter);
+      console.log(`>>>> Found ${staffList.length} staff members with filter:`, filter);
+      
+      res.status(200).json({msgNo: "get all staff successful", Data: staffList});
     } catch (err) {
-        res.status(500).json({ msgNo: 'Server error', Data: null });
+      console.error('>>>> Error in getAllStaff:', err);
+      res.status(500).json({ msgNo: 'Server error', Data: null });
     }
 };
 
@@ -73,6 +92,11 @@ const updateStaff = async (req, res) => {
       const existingStaff = await User.findById(staffId);
       if (!existingStaff) {
         return res.status(404).json({ msgNo: 'Staff not found', Data: null });
+      }
+      
+      // Kiểm tra nếu nhân viên thuộc về cửa hàng khác (nếu storeId được cung cấp)
+      if (storeId && existingStaff.storeId && existingStaff.storeId.toString() !== storeId.toString()) {
+        return res.status(403).json({ msgNo: 'You cannot update staff from another store', Data: null });
       }
   
       // Xử lý ảnh
@@ -125,52 +149,78 @@ const updateStaff = async (req, res) => {
 const deleteStaff = async (req, res) => {
     try {
         const { staffId } = req.params;
+        const { storeId } = req.query;  // Lấy storeId từ query params
+        
+        console.log(`>>>> Deleting staff with ID: ${staffId} for storeId: ${storeId}`);
 
-        const deletedStaff = await User.findByIdAndDelete(staffId);
-
-        if (!deletedStaff) {
+        // Tìm nhân viên và kiểm tra nếu thuộc về cửa hàng đang yêu cầu
+        const staff = await User.findById(staffId);
+        
+        if (!staff) {
             return res.status(404).json({ msgNo: 'Staff not found', Data: null });
         }
+        
+        // Kiểm tra nếu nhân viên thuộc về cửa hàng khác
+        if (storeId && staff.storeId) {
+            const requestStoreId = Number(storeId);
+            const staffStoreId = Number(staff.storeId);
+            
+            console.log(`>>>> Comparing storeIds: Request=${requestStoreId}(${typeof requestStoreId}), Staff=${staffStoreId}(${typeof staffStoreId})`);
+            
+            if (requestStoreId !== staffStoreId) {
+                return res.status(403).json({ msgNo: 'You cannot delete staff from another store', Data: null });
+            }
+        }
 
-        res.status(200).json({msgNo: "delete successful",Data: deletedStaff});
+        const deletedStaff = await User.findByIdAndDelete(staffId);
+        res.status(200).json({msgNo: "delete successful", Data: deletedStaff});
     } catch (err) {
         res.status(500).json({ msgNo: 'Server error', Data: null });
     }
 };
 
+// Hàm tìm kiếm nhân viên
 const searchStaff = async (req, res) => {
-    try {
-        const { query } = req.query; // Lấy từ khóa tìm kiếm từ query params
-
-        console.log('>>> Searching staff with query:', query);
-
-        if (!query) {
-            return res.status(400).json({ msgNo: 'Search query is required', Data: null });
-        }
-
-        // Tìm kiếm với regex trong username, email, phone và chỉ lấy nhân viên có role là 'staff'
-        const searchResults = await User.find({
-            role: 'staff', // Chỉ tìm kiếm nhân viên
-            $or: [
-                { username: { $regex: query, $options: 'i' } }, // Tìm kiếm username
-                { email: { $regex: query, $options: 'i' } },    // Tìm kiếm email
-                { phone: { $regex: query, $options: 'i' } },    // Tìm kiếm phone
-            ]
-        });
-
-        console.log(`>>> Found ${searchResults.length} staff matching query "${query}"`);
-
-        // Trả về kết quả tìm kiếm, ngay cả khi không có kết quả nào
-        return res.status(200).json({ msgNo: "search successful", Data: searchResults });
-    } catch (err) {
-        console.error('>>> Search staff error:', err);
-        res.status(500).json({ msgNo: 'Server error', Data: null });
+  try {
+    const { query, storeId } = req.query;
+    console.log(`>>>> Searching staff with query: ${query} for storeId: ${storeId}`);
+    
+    if (!query) {
+      return res.status(400).json({ msgNo: 'Search query is required', Data: null });
     }
+
+    // Tạo điều kiện tìm kiếm
+    let filter = {
+      role: 'staff',
+      $or: [
+        { username: { $regex: query, $options: 'i' } },
+        { email: { $regex: query, $options: 'i' } },
+        { phone: { $regex: query, $options: 'i' } }
+      ]
+    };
+
+    // Nếu có storeId, thêm vào filter
+    if (storeId) {
+      filter.storeId = Number(storeId);
+      console.log('>>>> Added storeId to filter:', filter.storeId, typeof filter.storeId);
+    }
+
+    const staffList = await User.find(filter);
+    console.log(`>>>> Found ${staffList.length} staff matching query with filter:`, filter);
+
+    res.status(200).json({msgNo: "search staff successful", Data: staffList});
+  } catch (err) {
+    console.error('>>>> Error in searchStaff:', err);
+    res.status(500).json({ msgNo: 'Server error', Data: null });
+  }
 };
 
 const getStaffById = async (req, res) => {
     try {
       const { staffId } = req.params;  // Lấy staffId từ params
+      const { storeId } = req.query;   // Lấy storeId từ query params
+      
+      console.log(`>>>> Getting staff with ID: ${staffId} for storeId: ${storeId}`);
   
       // Tìm nhân viên theo ID
       const staff = await User.findById(staffId);
@@ -178,6 +228,18 @@ const getStaffById = async (req, res) => {
       // Kiểm tra xem nhân viên có tồn tại không
       if (!staff) {
         return res.status(404).json({ msgNo: 'Staff not found', Data: null });
+      }
+      
+      // Kiểm tra nếu nhân viên thuộc về cửa hàng khác
+      if (storeId && staff.storeId) {
+        const requestStoreId = Number(storeId);
+        const staffStoreId = Number(staff.storeId);
+        
+        console.log(`>>>> Comparing storeIds: Request=${requestStoreId}(${typeof requestStoreId}), Staff=${staffStoreId}(${typeof staffStoreId})`);
+        
+        if (requestStoreId !== staffStoreId) {
+          return res.status(403).json({ msgNo: 'You cannot view staff from another store', Data: null });
+        }
       }
   
       // Trả về thông tin nhân viên

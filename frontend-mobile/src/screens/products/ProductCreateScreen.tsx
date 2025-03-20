@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,12 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
-  Modal
+  Modal,
+  FlatList
 } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import ProductActions from "../../redux/product/actions";
+import CategoryActions from "../../redux/category/actions"; 
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@redux/store";
 import { useNavigationRoot } from "@components/navigate/RootNavigation";
@@ -19,10 +21,20 @@ import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 import { moderateScale, scale, verticalScale } from "@libs/reactResizeMatter/scalingUtils";
 import * as ImagePicker from "expo-image-picker";
 import * as Routes from '@utils/Routes';
+import { RootState } from "@redux/root-reducer";
+
+// Định nghĩa mặc định categoryId - cần thay đổi thành ID thực tế trong database
+const DEFAULT_CATEGORY_ID = 1;
 
 const CreateProductScreen = () => {
   const navigation = useNavigationRoot();
   const dispatch = useDispatch();
+  const Auth = useAppSelector((state: RootState) => state.User.Auth);
+  const { categories, loading: categoriesLoading } = useAppSelector((state: RootState) => state.Category);
+  
+  // Sử dụng loại category mặc định
+  const [selectedCategoryId, setSelectedCategoryId] = useState(DEFAULT_CATEGORY_ID);
+  const [categoryModalVisible, setCategoryModalVisible] = useState(false);
 
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
@@ -40,6 +52,27 @@ const CreateProductScreen = () => {
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [errorTitle, setErrorTitle] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Lấy danh sách categories khi component mount
+  useEffect(() => {
+    dispatch({ 
+      type: CategoryActions.FETCH_CATEGORIES,
+      payload: {
+        onError: (error: any) => {
+          setErrorTitle('Error');
+          setErrorMessage('Failed to fetch categories: ' + error.message);
+          setErrorModalVisible(true);
+        }
+      }
+    });
+  }, [dispatch]);
+
+  // Tìm category name dựa vào ID đã chọn
+  const getSelectedCategoryName = () => {
+    if (!categories || categories.length === 0) return 'Loading categories...';
+    const category = categories.find((cat: any) => cat._id === selectedCategoryId);
+    return category ? category.name : 'Select category';
+  };
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -131,41 +164,89 @@ const CreateProductScreen = () => {
     return true;
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!validateInputs()) return;
 
     setLoading(true);
 
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('price', price);
-    formData.append('size', size);
-    formData.append('color', color);
-    formData.append('brand', brand);
-    formData.append('quantity', quantity);
-    formData.append('description', description);
-    formData.append('categoryId', '67b58b31df51987bf69c9911');
-    formData.append('storeId', '67b58b4cdf51987bf69c9914');
-  
-    if (imageUri) {
-      const fileName = imageUri.split('/').pop();
-      const fileType = imageUri.split('.').pop();
-      formData.append('image', {
-        uri: imageUri,
-        name: fileName,
-        type: `image/${fileType}`,
-      } as any);
-    }
-  
-    dispatch({
-      type: ProductActions.CREATE_PRODUCT,
-      payload: {
-        product: formData,
-        onSuccess: () => {
+    try {
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('price', price);
+      formData.append('size', size);
+      formData.append('color', color);
+      formData.append('brand', brand);
+      formData.append('quantity', quantity);
+      formData.append('description', description);
+      formData.append('categoryId', selectedCategoryId.toString());
+      formData.append('storeId', Auth?.storeId?.toString() || '');
+    
+      if (imageUri) {
+        const fileName = imageUri.split('/').pop();
+        const fileType = imageUri.split('.').pop();
+        formData.append('image', {
+          uri: imageUri,
+          name: fileName,
+          type: `image/${fileType}`,
+        } as any);
+      }
+
+      // Log tất cả dữ liệu đang gửi
+      console.log('[CreateProduct] Chuẩn bị dữ liệu FormData:');
+      console.log('- name:', name);
+      console.log('- price:', price);
+      console.log('- size:', size);
+      console.log('- color:', color);
+      console.log('- brand:', brand);
+      console.log('- quantity:', quantity);
+      console.log('- description:', description);
+      console.log('- categoryId:', selectedCategoryId.toString());
+      console.log('- storeId:', Auth?.storeId?.toString() || '');
+      console.log('- image:', imageUri ? 'Attached' : 'Not attached');
+    
+      // Đợi 2 giây để đảm bảo token được khởi tạo đầy đủ
+      console.log('[CreateProduct] Đợi 2 giây để đảm bảo token đã được lấy...');
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Thực hiện tối đa 3 lần thử
+      let attempts = 0;
+      const maxAttempts = 3;
+      let success = false;
+      let lastError = null;
+
+      while (attempts < maxAttempts && !success) {
+        attempts++;
+        console.log(`[CreateProduct] Lần thử ${attempts}/${maxAttempts}`);
+
+        try {
+          // Sử dụng Promise để đợi kết quả từ API call
+          await new Promise((resolve, reject) => {
+            dispatch({
+              type: ProductActions.CREATE_PRODUCT,
+              payload: {
+                product: formData,
+                onSuccess: (data: any) => {
+                  console.log('[CreateProduct] Tạo sản phẩm thành công:', data);
+                  resolve(data);
+                },
+                onError: (error: any) => {
+                  console.error('[CreateProduct] Lỗi:', error);
+                  reject(error);
+                },
+                onFailed: (msg: string) => {
+                  console.error('[CreateProduct] Thất bại:', msg);
+                  reject(new Error(msg));
+                }
+              }
+            });
+          });
+
+          // Nếu không có lỗi, đánh dấu thành công
+          success = true;
+
+          // Hiển thị thông báo thành công
           setLoading(false);
-          
-          // Hiển thị Modal thành công thay vì Toast
-          setSuccessMessage('Product created successfully');
+          setSuccessMessage('Sản phẩm đã được tạo thành công');
           setSuccessModalVisible(true);
           
           // Chuyển màn hình sau khi hiển thị Modal
@@ -173,24 +254,74 @@ const CreateProductScreen = () => {
             setSuccessModalVisible(false);
             navigation.navigate(Routes.WareHouse, { refresh: true });
           }, 2000);
-        },
-        onError: (error: any) => {
-          setLoading(false);
-          // Hiển thị Modal lỗi thay vì Toast
-          setErrorTitle('Error');
-          setErrorMessage(error?.message || 'An error occurred');
-          setErrorModalVisible(true);
-        },
-        onFailed: (error: string) => {
-          setLoading(false);
-          // Hiển thị Modal lỗi thay vì Toast
-          setErrorTitle('Failed');
-          setErrorMessage(error || 'Failed to create product');
-          setErrorModalVisible(true);
+
+        } catch (error: any) {
+          lastError = error;
+          
+          // Log chi tiết lỗi
+          if (error.response) {
+            console.error('[CreateProduct] Lỗi server:', error.response.status, error.response.data);
+          } else if (error.request) {
+            console.error('[CreateProduct] Không nhận được phản hồi:', error.request);
+          } else {
+            console.error('[CreateProduct] Lỗi thiết lập request:', error.message);
+          }
+          
+          // Nếu là lỗi mạng, thử lại sau 2 giây
+          if (error.message?.includes('network') || 
+              error.code === 'ECONNABORTED' || 
+              !error.response) {
+            
+            console.log(`[CreateProduct] Đợi 2 giây trước khi thử lại...`);
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            continue;
+          } else {
+            // Nếu không phải lỗi mạng, không cần thử lại
+            break;
+          }
         }
       }
-    });
+
+      // Xử lý kết quả cuối cùng
+      if (!success) {
+        setLoading(false);
+        setErrorTitle('Tạo Sản Phẩm Thất Bại');
+        setErrorMessage(
+          lastError?.response?.data?.msgNo || 
+          lastError?.message || 
+          'Không thể tạo sản phẩm sau nhiều lần thử'
+        );
+        setErrorModalVisible(true);
+      }
+
+    } catch (error: any) {
+      console.error('[CreateProduct] Lỗi ngoài dự kiến:', error.message);
+      setLoading(false);
+      setErrorTitle('Lỗi');
+      setErrorMessage(error?.message || 'Đã xảy ra lỗi không mong đợi');
+      setErrorModalVisible(true);
+    }
   };
+
+  const renderCategoryItem = ({ item }: { item: any }) => (
+    <TouchableOpacity
+      style={styles.categoryItem}
+      onPress={() => {
+        setSelectedCategoryId(item._id);
+        setCategoryModalVisible(false);
+      }}
+    >
+      <Text style={[
+        styles.categoryItemText, 
+        selectedCategoryId === item._id ? styles.selectedCategoryText : {}
+      ]}>
+        {item.name}
+      </Text>
+      {selectedCategoryId === item._id && (
+        <Ionicons name="checkmark" size={20} color="#3B82F6" />
+      )}
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.mainContainer}>
@@ -243,6 +374,45 @@ const CreateProductScreen = () => {
         </View>
       </Modal>
       
+      {/* Modal chọn danh mục */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={categoryModalVisible}
+        onRequestClose={() => {
+          setCategoryModalVisible(false);
+        }}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.categoryModalContent}>
+            <View style={styles.categoryModalHeader}>
+              <Text style={styles.categoryModalTitle}>Select Category</Text>
+              <TouchableOpacity onPress={() => setCategoryModalVisible(false)}>
+                <Ionicons name="close" size={24} color="#374151" />
+              </TouchableOpacity>
+            </View>
+            
+            {categoriesLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#3B82F6" />
+                <Text style={styles.loadingText}>Loading categories...</Text>
+              </View>
+            ) : categories && categories.length > 0 ? (
+              <FlatList
+                data={categories}
+                renderItem={renderCategoryItem}
+                keyExtractor={(item) => item._id.toString()}
+                contentContainerStyle={styles.categoryList}
+              />
+            ) : (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No categories available</Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
+      
       <ScrollView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -276,6 +446,20 @@ const CreateProductScreen = () => {
               onChangeText={setName}
               placeholder="Enter product name"
             />
+          </View>
+
+          {/* Category Selector */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Category</Text>
+            <TouchableOpacity 
+              style={styles.categorySelector}
+              onPress={() => setCategoryModalVisible(true)}
+            >
+              <Text style={styles.categorySelectorText}>
+                {getSelectedCategoryName()}
+              </Text>
+              <Ionicons name="chevron-down" size={20} color="#6B7280" />
+            </TouchableOpacity>
           </View>
 
           <View style={styles.inputGroup}>
@@ -513,6 +697,78 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  // Styles cho Category Selector
+  categorySelector: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  categorySelectorText: {
+    fontSize: 16,
+    color: '#374151',
+  },
+  categoryModalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    width: '90%',
+    maxHeight: '70%',
+    padding: 0,
+    overflow: 'hidden',
+  },
+  categoryModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  categoryModalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#374151',
+  },
+  categoryList: {
+    padding: 8,
+  },
+  categoryItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  categoryItemText: {
+    fontSize: 16,
+    color: '#374151',
+  },
+  selectedCategoryText: {
+    color: '#3B82F6',
+    fontWeight: 'bold',
+  },
+  loadingContainer: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#6B7280',
+  },
+  emptyContainer: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#6B7280',
   },
 });
 

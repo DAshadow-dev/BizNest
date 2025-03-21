@@ -7,6 +7,9 @@ import staffActions from '../../redux/staff/actions';
 import * as Routes from '@utils/Routes';
 import { moderateScale, scale, verticalScale } from '@libs/reactResizeMatter/scalingUtils';
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
+import { useFocusEffect } from '@react-navigation/native';
+import { useAppSelector } from '@redux/store';
+import { RootState } from '@redux/root-reducer';
 
 interface Staff {
   _id: string;
@@ -25,97 +28,80 @@ const StaffListScreen = () => {
   const [search, setSearch] = useState('');
   const [searchQuery, setSearchQuery] = useState(''); // Lưu trữ từ khóa tìm kiếm thực tế
   const [staffList, setStaffList] = useState<Staff[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
 
-  useEffect(() => {
-    fetchStaffList();
-  }, []);
+  // Lấy thông tin user và storeId từ Redux store
+  const auth = useAppSelector((state: RootState) => state.User.Auth);
+  const storeId = auth?.storeId;
+  const userRole = auth?.role as string | undefined;
 
-  const fetchStaffList = () => {
+  useEffect(() => {
+    if (storeId) {
+      loadStaffList();
+    } else {
+      // Nếu không có storeId, hiển thị thông báo
+      setLoading(false);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'No store assigned to your account',
+      });
+    }
+  }, [storeId, dispatch]);
+
+  const loadStaffList = () => {
     setLoading(true);
+    console.log('StaffListScreen: Loading staff list for storeId:', storeId);
+    
     dispatch({
       type: staffActions.FETCH_STAFFS,
       payload: {
         onSuccess: (data: Staff[]) => {
+          console.log(`StaffListScreen: Loaded ${data.length} staff members`);
           setStaffList(data);
           setLoading(false);
-          setRefreshing(false);
-        },
-        onFailed: (error: string) => {
-          setTimeout(() => {
-            Toast.show({
-              type: 'error',
-              text1: 'Error',
-              text2: error || 'Failed to fetch staff list',
-              position: 'top',
-              visibilityTime: 2000
-            });
-          }, 500);
-          setLoading(false);
-          setRefreshing(false);
         },
         onError: (error: any) => {
-          setTimeout(() => {
-            Toast.show({
-              type: 'error',
-              text1: 'Error',
-              text2: error?.message || 'An error occurred',
-              position: 'top',
-              visibilityTime: 2000
-              });
-          }, 500);
+          console.error('StaffListScreen: Error loading staff list:', error);
+          Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: 'Failed to load staff list. ' + error.message,
+          });
           setLoading(false);
-          setRefreshing(false);
         }
       }
     });
   };
 
-  const handleSearch = () => {
-    // Nếu ô tìm kiếm trống, hiển thị lại toàn bộ danh sách
-    if (!search.trim()) {
-      setSearchQuery('');
-      fetchStaffList();
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    
+    if (query.trim().length === 0) {
+      loadStaffList();
       return;
     }
-
-    // Lưu từ khóa tìm kiếm hiện tại
-    setSearchQuery(search);
-    setSearchLoading(true);
     
+    setLoading(true);
     dispatch({
       type: staffActions.SEARCH_STAFFS,
       payload: {
-        query: search,
+        query,
         onSuccess: (data: Staff[]) => {
+          console.log(`StaffListScreen: Search found ${data.length} staff members`);
           setStaffList(data);
-          setSearchLoading(false);
-        },
-        onFailed: (error: string) => {
-          setTimeout(() => {
-            Toast.show({
-              type: 'error',
-              text1: 'Error',
-              text2: error || 'Failed to search staff',
-              position: 'top',
-              visibilityTime: 2000
-            });
-          }, 500);
-          setSearchLoading(false);
+          setLoading(false);
         },
         onError: (error: any) => {
-          setTimeout(() => {
-            Toast.show({
-              type: 'error',
-              text1: 'Error',
-              text2: error?.message || 'An error occurred',
-              position: 'top',
-              visibilityTime: 2000
-            });
-          }, 500);
-          setSearchLoading(false);
+          console.error('StaffListScreen: Search error:', error);
+          Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: 'Search failed. ' + error.message,
+          });
+          setLoading(false);
         }
       }
     });
@@ -124,14 +110,14 @@ const StaffListScreen = () => {
   const handleClearSearch = () => {
     setSearch('');
     setSearchQuery('');
-    fetchStaffList();
+    loadStaffList();
   };
 
   const handleRefresh = () => {
     setRefreshing(true);
     setSearch('');
     setSearchQuery('');
-    fetchStaffList();
+    loadStaffList();
   };
 
   const navigateToStaffDetail = (staff: Staff) => {
@@ -182,41 +168,23 @@ const StaffListScreen = () => {
       {/* Header */}
       <Toast config={toastConfig} />
       <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.navigate(Routes.HomeScreen)}>
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
         <Text style={styles.headerText}>Staff Management</Text>
-        <Ionicons name="settings-outline" size={24} color="white" />
+        <View style={{ width: 24 }} />
       </View>
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <View style={styles.searchBox}>
-          {/* <Ionicons name="search-outline" size={18} color="#B3B3B3" style={styles.searchIcon} /> */}
+          <Ionicons name="search-outline" size={20} color="#6B7280" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search staff..."
-            value={search}
-            onChangeText={setSearch}
-            onSubmitEditing={handleSearch}
-            returnKeyType="search"
+            value={searchQuery}
+            onChangeText={handleSearch}
           />
-          {searchLoading && (
-            <ActivityIndicator size="small" color="#3B82F6" style={styles.searchLoader} />
-          )}
-          {search.length > 0 && !searchLoading && (
-            <TouchableOpacity 
-              onPress={handleClearSearch}
-              style={styles.clearButton}
-            >
-              <Ionicons name="close-circle" size={18} color="#B3B3B3" />
-            </TouchableOpacity>
-          )}
-          {!searchLoading && (
-            <TouchableOpacity 
-              onPress={handleSearch}
-              style={styles.searchButton}
-            >
-              <Ionicons name="search" size={20} color="#3B82F6" />
-            </TouchableOpacity>
-          )}
         </View>
       </View>
 
@@ -226,7 +194,7 @@ const StaffListScreen = () => {
           <ActivityIndicator size="large" color="#3B82F6" />
           <Text style={styles.loadingText}>Loading...</Text>
         </View>
-      ) : (
+      ) : storeId ? (
         <FlatList
           data={staffList}
           renderItem={renderStaffItem}
@@ -239,21 +207,28 @@ const StaffListScreen = () => {
               <Text style={styles.emptyText}>
                 {searchQuery.length > 0 
                   ? `No staff found matching "${searchQuery}"`
-                  : "No staff found"}
+                  : "No staff found for this store"}
               </Text>
             </View>
           }
         />
+      ) : (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>
+            No store assigned to your account
+          </Text>
+        </View>
       )}
 
-      {/* New Button */}
-      <View style={styles.newButtonContainer}>
-        <TouchableOpacity style={styles.newButton} onPress={navigateToCreateStaff}>
-          <Ionicons name="add-outline" size={18} color="white" />
-          <Text style={styles.newButtonText}>New Staff</Text>
-        </TouchableOpacity>
-      </View>
-      
+      {/* New Button - Chỉ hiển thị khi có storeId và có quyền business owner */}
+      {storeId && (userRole === 'business owner' || userRole === 'admin') && (
+        <View style={styles.newButtonContainer}>
+          <TouchableOpacity style={styles.newButton} onPress={navigateToCreateStaff}>
+            <Ionicons name="add-outline" size={18} color="white" />
+            <Text style={styles.newButtonText}>New Staff</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -394,20 +369,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#6B7280',
   },
-  searchLoader: {
-    marginLeft: 8,
-  },
-  clearButton: {
-    padding: 4,
-  },
   loadingText: {
     marginTop: 8,
     color: '#6B7280',
     fontSize: 16,
-  },
-  searchButton: {
-    padding: 8,
-    marginLeft: 4,
   },
 });
 

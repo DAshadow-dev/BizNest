@@ -21,10 +21,22 @@ import * as Routes from '@utils/Routes';
 import { moderateScale, scale, verticalScale } from '@libs/reactResizeMatter/scalingUtils';
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 import { useNavigationRoot } from '@components/navigate/RootNavigation';
+import { useAppSelector } from '@redux/store';
+import { RootState } from '@redux/root-reducer';
+
+// Hàm kiểm tra email hợp lệ
+const validateEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
 
 const CreateStaffScreen = () => {
   const navigation = useNavigationRoot();
   const dispatch = useDispatch();
+  
+  // Lấy storeId từ Redux store
+  const auth = useAppSelector((state: RootState) => state.User.Auth);
+  const storeId = auth?.storeId;
 
   // State của form
   const [firstName, setFirstName] = useState('');
@@ -89,8 +101,7 @@ const CreateStaffScreen = () => {
     }
 
     // Simple email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!validateEmail(email)) {
       // Hiển thị Modal lỗi thay vì Toast
       setErrorTitle('Validation Error');
       setErrorMessage('Please enter a valid email address');
@@ -129,6 +140,12 @@ const CreateStaffScreen = () => {
   const onSubmit = () => {
     if (!validateInputs()) return;
 
+    if (!storeId) {
+      setErrorMessage('No store assigned to your account. Cannot create staff.');
+      setErrorModalVisible(true);
+      return;
+    }
+
     setLoading(true);
 
     const staffData = {
@@ -139,7 +156,7 @@ const CreateStaffScreen = () => {
       password,
       status,
       image: imageUri,
-      storeId: '67b58b4cdf51987bf69c9914' // Thêm storeId mặc định
+      storeId: storeId
     };
 
     dispatch({

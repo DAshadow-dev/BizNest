@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
-import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Image, Modal } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Image, Modal, FlatList } from 'react-native';
 import ProductActions from "../../redux/product/actions";
+import CategoryActions from "../../redux/category/actions";
 import { useDispatch } from "react-redux";
 import { useNavigationRoot } from "@components/navigate/RootNavigation";
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
@@ -8,6 +9,15 @@ import * as ImagePicker from "expo-image-picker";
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 import * as Routes from '@utils/Routes';
 import { scale, verticalScale, moderateScale } from '@libs/reactResizeMatter/scalingUtils';
+import { useAppSelector } from "@redux/store";
+import { RootState } from "@redux/root-reducer";
+
+interface Category {
+  _id: string | number;
+  name: string;
+  description?: string;
+  image?: string;
+}
 
 interface RouteParams {
   product: {
@@ -16,11 +26,11 @@ interface RouteParams {
     size: string;
     color: string;
     brand: string;
-    quantity: number;
+    quantity: string | number;
     image: string | null;
     description: string;
     _id: string;
-    category: string;
+    categoryId: string | number;
   };
 }
 
@@ -28,6 +38,41 @@ const EditProductScreen = ({ route }: { route: { params: RouteParams } }) => {
   const navigation = useNavigationRoot();
   const dispatch = useDispatch();
   const { product } = route.params;
+  const Auth = useAppSelector((state: RootState) => state.User.Auth);
+  
+  // Get categories to display the correct category name
+  const { categories, loading: categoriesLoading } = useAppSelector((state: RootState) => state.Category);
+  
+  // State for category selection
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | number>(product.categoryId);
+  const [categoryModalVisible, setCategoryModalVisible] = useState(false);
+  
+  // Find the current category name
+  const [categoryName, setCategoryName] = useState('Không có danh mục');
+  
+  useEffect(() => {
+    // Fetch categories when component mounts
+    dispatch({ 
+      type: CategoryActions.FETCH_CATEGORIES,
+      payload: {
+        onError: (error: any) => {
+          setErrorTitle('Error');
+          setErrorModalMessage('Failed to fetch categories: ' + error.message);
+          setErrorModalVisible(true);
+        }
+      }
+    });
+  }, [dispatch]);
+  
+  useEffect(() => {
+    // Update category name when categories load or selected ID changes
+    if (categories && categories.length > 0) {
+      const category = categories.find((cat: any) => cat._id.toString() === selectedCategoryId.toString());
+      if (category) {
+        setCategoryName(category.name);
+      }
+    }
+  }, [categories, selectedCategoryId]);
 
   const [name, setName] = useState(product.name);
   const [price, setPrice] = useState(product.price.toString());
@@ -90,68 +135,183 @@ const EditProductScreen = ({ route }: { route: { params: RouteParams } }) => {
     return true;
   };
 
+  const renderCategoryItem = ({ item }: { item: any }) => (
+    <TouchableOpacity
+      style={styles.categoryItem}
+      onPress={() => {
+        setSelectedCategoryId(item._id);
+        setCategoryModalVisible(false);
+      }}
+    >
+      <Text style={[
+        styles.categoryItemText, 
+        selectedCategoryId.toString() === item._id.toString() ? styles.selectedCategoryText : {}
+      ]}>
+        {item.name}
+      </Text>
+      {selectedCategoryId.toString() === item._id.toString() && (
+        <Ionicons name="checkmark" size={20} color="#3B82F6" />
+      )}
+    </TouchableOpacity>
+  );
+
   const onSubmit = async () => {
     if (!validateInputs()) return; // Kiểm tra validate trước khi submit
 
     setLoading(true);
 
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('price', price);
-    formData.append('size', size);
-    formData.append('color', color);
-    formData.append('brand', brand);
-    formData.append('categoryId', '67b58b31df51987bf69c9911');
-    formData.append('storeId', '67b58b4cdf51987bf69c9914');
-    formData.append('description', product.description);
-    formData.append('quantity', quantity); // Đảm bảo quantity là chuỗi cho FormData
+    try {
+      // Chuẩn bị FormData
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('price', price);
+      formData.append('size', size);
+      formData.append('color', color);
+      formData.append('brand', brand);
+      formData.append('categoryId', selectedCategoryId.toString());
+      formData.append('storeId', Auth?.storeId?.toString() || '');
+      formData.append('description', product.description);
+      formData.append('quantity', quantity); // Đảm bảo quantity là chuỗi cho FormData
 
-    if (imageUri) {
-        const fileName = imageUri.split('/').pop();
-        const fileType = imageUri.split('.').pop();
-        formData.append('image', {
-            uri: imageUri,
-            name: fileName,
-            type: `image/${fileType}`,
-        } as any);
-    }
+      // Log thông tin FormData
+      console.log('[EditProduct] FormData prepared with fields:');
+      console.log('- name:', name);
+      console.log('- price:', price);
+      console.log('- size:', size);
+      console.log('- color:', color);
+      console.log('- brand:', brand);
+      console.log('- categoryId:', selectedCategoryId.toString());
+      console.log('- storeId:', Auth?.storeId?.toString() || '');
+      console.log('- description:', product.description);
+      console.log('- quantity:', quantity);
 
-    dispatch({
-        type: ProductActions.UPDATE_PRODUCT,
-        payload: {
-            id: product._id,
-            product: formData,
-            onSuccess: () => {
-                setLoading(false);
-                
-                // Hiển thị Modal thành công thay vì Toast
-                setSuccessMessage('Product updated successfully');
-                setSuccessModalVisible(true);
-                
-                // Chuyển màn hình sau khi hiển thị Modal
-                setTimeout(() => {
-                    setSuccessModalVisible(false);
-                    dispatch({ type: ProductActions.FETCH_PRODUCTS });
-                    navigation.navigate(Routes.WareHouse, { refresh: true });
-                }, 2000);
-            },
-            onError: (error: any) => {
-                setLoading(false);
-                // Hiển thị Modal lỗi thay vì Toast
-                setErrorTitle('Error');
-                setErrorModalMessage(error?.message || 'An error occurred');
-                setErrorModalVisible(true);
-            },
-            onFailed: (error: string) => {
-                setLoading(false);
-                // Hiển thị Modal lỗi thay vì Toast
-                setErrorTitle('Failed');
-                setErrorModalMessage(error || 'Failed to update product');
-                setErrorModalVisible(true);
+      if (imageUri) {
+          const fileName = imageUri.split('/').pop();
+          const fileType = imageUri.split('.').pop();
+          formData.append('image', {
+              uri: imageUri,
+              name: fileName,
+              type: `image/${fileType}`,
+          } as any);
+          console.log('- image:', fileName);
+      } else {
+          console.log('- No image attached');
+      }
+
+      // Thay đổi cách xử lý cập nhật sản phẩm
+      // Không sử dụng Redux Saga mà trực tiếp gọi API để kiểm soát tốt hơn
+      try {
+        console.log('[EditProduct] Đang cập nhật sản phẩm...');
+        
+        // Trước tiên, tạo một Promise để đợi token đã được khởi tạo
+        // Sử dụng setTimeout với Promise để đảm bảo bất đồng bộ hoạt động đúng
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Khởi tạo biến đếm số lần thử
+        let attempts = 0;
+        const maxAttempts = 3;
+        let success = false;
+        let lastError = null;
+        
+        // Thử lại tối đa 3 lần
+        while (attempts < maxAttempts && !success) {
+          attempts++;
+          console.log(`[EditProduct] Lần thử ${attempts}/${maxAttempts}`);
+          
+          try {
+            // Trực tiếp dispatch action để cập nhật sản phẩm
+            // Sử dụng Promise để đợi kết quả từ action
+            const result = await new Promise((resolve, reject) => {
+              dispatch({
+                type: ProductActions.UPDATE_PRODUCT,
+                payload: {
+                  id: product._id,
+                  product: formData,
+                  onSuccess: (data: any) => {
+                    console.log('[EditProduct] Cập nhật thành công:', data);
+                    resolve(data);
+                  },
+                  onError: (error: any) => {
+                    console.error('[EditProduct] Lỗi:', error);
+                    reject(error);
+                  },
+                  onFailed: (msg: string) => {
+                    console.error('[EditProduct] Thất bại:', msg);
+                    reject(new Error(msg));
+                  }
+                }
+              });
+            });
+            
+            // Nếu không có lỗi, đánh dấu thành công
+            success = true;
+            
+            // Hiển thị thông báo thành công
+            setLoading(false);
+            setSuccessMessage('Sản phẩm đã được cập nhật thành công');
+            setSuccessModalVisible(true);
+            
+            // Chuyển màn hình sau 2 giây
+            setTimeout(() => {
+              setSuccessModalVisible(false);
+              dispatch({ type: ProductActions.FETCH_PRODUCTS });
+              navigation.navigate(Routes.WareHouse, { refresh: true });
+            }, 2000);
+            
+          } catch (error: any) {
+            lastError = error;
+            
+            // Log chi tiết lỗi
+            if (error.response) {
+              console.error('[EditProduct] Lỗi server:', error.response.status, error.response.data);
+            } else if (error.request) {
+              console.error('[EditProduct] Không nhận được phản hồi:', error.request);
+            } else {
+              console.error('[EditProduct] Lỗi thiết lập request:', error.message);
             }
+            
+            // Nếu là lỗi mạng, thử lại sau 2 giây
+            if (error.message?.includes('network') || 
+                error.code === 'ECONNABORTED' || 
+                !error.response) {
+              
+              console.log(`[EditProduct] Đợi 2 giây trước khi thử lại...`);
+              await new Promise(resolve => setTimeout(resolve, 2000));
+              continue;
+            } else {
+              // Nếu không phải lỗi mạng, không cần thử lại
+              break;
+            }
+          }
         }
-    });
-};
+        
+        // Xử lý kết quả cuối cùng
+        if (!success) {
+          setLoading(false);
+          setErrorTitle('Cập Nhật Thất Bại');
+          setErrorModalMessage(
+            lastError?.response?.data?.msgNo || 
+            lastError?.message || 
+            'Không thể cập nhật sản phẩm sau nhiều lần thử'
+          );
+          setErrorModalVisible(true);
+        }
+        
+      } catch (innerError: any) {
+        console.error('[EditProduct] Lỗi trong quá trình cập nhật:', innerError);
+        setLoading(false);
+        setErrorTitle('Lỗi Cập Nhật');
+        setErrorModalMessage(innerError?.message || 'Đã xảy ra lỗi trong quá trình cập nhật');
+        setErrorModalVisible(true);
+      }
+    } catch (error: any) {
+      console.error('[EditProduct] Lỗi không mong đợi:', error.message);
+      setLoading(false);
+      setErrorTitle('Lỗi');
+      setErrorModalMessage(error?.message || 'Đã xảy ra lỗi không mong đợi');
+      setErrorModalVisible(true);
+    }
+  };
 
   return (
     <View style={styles.mainContainer}>
@@ -204,6 +364,45 @@ const EditProductScreen = ({ route }: { route: { params: RouteParams } }) => {
         </View>
       </Modal>
       
+      {/* Modal chọn danh mục */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={categoryModalVisible}
+        onRequestClose={() => {
+          setCategoryModalVisible(false);
+        }}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.categoryModalContent}>
+            <View style={styles.categoryModalHeader}>
+              <Text style={styles.categoryModalTitle}>Select Category</Text>
+              <TouchableOpacity onPress={() => setCategoryModalVisible(false)}>
+                <Ionicons name="close" size={24} color="#374151" />
+              </TouchableOpacity>
+            </View>
+            
+            {categoriesLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#3B82F6" />
+                <Text style={styles.loadingText}>Loading categories...</Text>
+              </View>
+            ) : categories && categories.length > 0 ? (
+              <FlatList
+                data={categories}
+                renderItem={renderCategoryItem}
+                keyExtractor={(item) => item._id.toString()}
+                contentContainerStyle={styles.categoryList}
+              />
+            ) : (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No categories available</Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
+      
       <ScrollView 
         style={styles.container}
         ref={scrollViewRef}
@@ -233,13 +432,26 @@ const EditProductScreen = ({ route }: { route: { params: RouteParams } }) => {
 
           {/* Form Fields */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Name</Text>
+            <Text style={styles.label}>Product Name</Text>
             <TextInput
               style={styles.input}
               value={name}
               onChangeText={setName}
               placeholder="Enter product name"
             />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Category</Text>
+            <TouchableOpacity 
+              style={styles.categorySelector}
+              onPress={() => setCategoryModalVisible(true)}
+            >
+              <Text style={styles.categorySelectorText}>
+                {categoryName}
+              </Text>
+              <Ionicons name="chevron-down" size={20} color="#6B7280" />
+            </TouchableOpacity>
           </View>
 
           <View style={styles.inputGroup}>
@@ -460,6 +672,79 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  categorySelector: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  categorySelectorText: {
+    fontSize: 16,
+    color: '#374151',
+  },
+  // Styles cho Category Selector Modal
+  categoryModalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    width: '90%',
+    maxHeight: '70%',
+    padding: 0,
+    overflow: 'hidden',
+  },
+  categoryModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  categoryModalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#374151',
+  },
+  categoryList: {
+    padding: 8,
+  },
+  categoryItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  categoryItemText: {
+    fontSize: 16,
+    color: '#374151',
+  },
+  selectedCategoryText: {
+    color: '#3B82F6',
+    fontWeight: 'bold',
+  },
+  loadingContainer: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#6B7280',
+  },
+  emptyContainer: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#6B7280',
   },
 });
 

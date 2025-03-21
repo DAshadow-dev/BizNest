@@ -8,17 +8,24 @@ import * as Routes from '@utils/Routes';
 import { moderateScale, scale, verticalScale } from '@libs/reactResizeMatter/scalingUtils';
 import { useFocusEffect, useRoute } from '@react-navigation/native';
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
+import { useAppSelector } from '@redux/store';
+import { RootState } from '@redux/root-reducer';
+
+interface Staff {
+  _id: string;
+  username: string;
+  email: string;
+  phone?: string;
+  role: string;
+  image?: string;
+  status: string;
+  storeId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 interface RouteParams {
-  staff: {
-    username: string;
-    email: string;
-    phone: string;
-    role: string;
-    status: string;
-    image: string | null;
-    _id: string;
-  };
+  staff: Staff;
 }
 
 const StaffDetailScreen = ({ route }: { route: { params: RouteParams } }) => {
@@ -30,6 +37,24 @@ const StaffDetailScreen = ({ route }: { route: { params: RouteParams } }) => {
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [errorTitle, setErrorTitle] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Lấy thông tin user và storeId từ Redux store
+  const auth = useAppSelector((state: RootState) => state.User.Auth);
+  const currentStoreId = auth?.storeId;
+  const userRole = auth?.role as string | undefined;
+  
+  // Kiểm tra quyền truy cập thông tin nhân viên
+  useEffect(() => {
+    // Kiểm tra nếu nhân viên không thuộc cửa hàng hiện tại
+    if (staff.storeId && currentStoreId && staff.storeId !== currentStoreId) {
+      setErrorMessage('You do not have permission to view this staff member.');
+      setErrorModalVisible(true);
+      // Delay navigation to allow modal to be seen
+      setTimeout(() => {
+        navigation.goBack();
+      }, 2000);
+    }
+  }, [currentStoreId, staff.storeId, navigation]);
 
   // Refresh staff details when screen is focused
   useFocusEffect(
@@ -115,15 +140,20 @@ const StaffDetailScreen = ({ route }: { route: { params: RouteParams } }) => {
   };
 
   const navigateToEditStaff = () => {
+    // Split username into firstName and lastName
     const { firstName, lastName } = convertUsernameToNames(staff.username);
-
-    const staffForEdit = {
+    
+    // Chuyển đổi kiểu dữ liệu nếu cần để phù hợp với kiểu tham số của màn hình EditStaffScreen
+    const staffParams = {
       ...staff,
       firstName,
-      lastName
+      lastName,
+      phone: staff.phone || '', // Đảm bảo phone luôn là string, không phải undefined
+      image: staff.image || null, // Ensure image is string | null, not undefined
     };
-
-    navigation.navigate(Routes.EditStaffScreen, { staff: staffForEdit });
+    
+    console.log('🔄 StaffDetailScreen - Navigating to EditStaffScreen with staffParams:', staffParams);
+    navigation.navigate(Routes.EditStaffScreen, { staff: staffParams });
   };
 
   const convertUsernameToNames = (username: string) => {

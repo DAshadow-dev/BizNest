@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import Config from 'react-native-config';
+import { getToken } from '@utils/handleToken';
 
 const axiosRequestConfig: AxiosRequestConfig = {
   baseURL: Config.API_URL,
@@ -12,6 +13,32 @@ const axiosRequestConfig: AxiosRequestConfig = {
 };
 
 const api: AxiosInstance = axios.create(axiosRequestConfig);
+
+// Thêm interceptor để tự động đính kèm token vào mọi request
+api.interceptors.request.use(
+  async (config) => {
+    try {
+      // Lấy token từ AsyncStorage
+      const token = await getToken();
+      console.log('[API Interceptor] Token retrieved:', token ? 'Yes' : 'No');
+      
+      // Chỉ thêm Authorization header nếu có token
+      if (token) {
+        config.headers = config.headers || {};
+        config.headers.Authorization = `Bearer ${token}`;
+        console.log('[API Interceptor] Added auth token to request');
+      }
+      return config;
+    } catch (error) {
+      console.error('[API Interceptor] Error retrieving token:', error);
+      return config;
+    }
+  },
+  (error) => {
+    console.error('[API Interceptor] Request error:', error);
+    return Promise.reject(error);
+  }
+);
 
 export default {
   async get(endPoint: string, options?: AxiosRequestConfig) {
@@ -39,15 +66,12 @@ export default {
     return api.request({
       url: endPoint,
       ...options,
-      headers: {
-        ...headers,
-        Authorization: `Bearer `, // Add your token here if needed
-      },
+      headers,
       method: 'POST',
       data: formData, // Ensure formData is sent as the request body
     });
   },
-  async put(endPoint: string, formData: FormData, options?: AxiosRequestConfig) { // Add data parameter
+  async put(endPoint: string, formData: FormData, options?: AxiosRequestConfig) {
     const headers = options && options.headers ? { ...options.headers } : {};
 
     // Set the Content-Type to multipart/form-data if data is FormData
@@ -58,10 +82,7 @@ export default {
     return api.request({
       url: endPoint,
       ...options,
-      headers: {
-        ...headers,
-        Authorization: `Bearer `, // Add your token here if needed
-      },
+      headers,
       method: 'PUT',
       data: formData, 
     });
@@ -72,10 +93,7 @@ export default {
     return api.request({
       url: endPoint,
       ...options,
-      headers: {
-        ...headers,
-        Authorization: `Bearer `, // Add your token here if needed
-      },
+      headers,
       method: 'PATCH',
     });
   },
@@ -85,10 +103,7 @@ export default {
     return api.request({
       url: endPoint,
       ...options,
-      headers: {
-        ...headers,
-        Authorization: `Bearer `, // Add your token here if needed
-      },
+      headers,
       method: 'DELETE',
     });
   },

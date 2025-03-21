@@ -5,19 +5,28 @@ import Factories from './factories';
 // ✅ Saga lấy danh sách sản phẩm
 export function* fetchProducts() {
   yield takeEvery(ProductActions.FETCH_PRODUCTS, function* (action: any): any {
-    const { onSuccess = () => {}, onFailed = () => {}, onError = () => {} } = action.payload || {};
-    console.log('Fetching product list...');
+    const { storeId, onSuccess = () => {}, onFailed = () => {}, onError = () => {} } = action.payload || {};
+    console.log('Fetching product list with storeId:', storeId);
 
     try {
+      console.log('Calling API to get products...');
       const response = yield call(Factories.getAllProducts);
+      console.log('API response:', response);
+      
       if (response?.status === 200) {
+        console.log('Products fetched successfully:', response.data.Data);
         onSuccess(response.data.Data);
         yield put({ type: ProductActions.FETCH_PRODUCTS_SUCCESS, payload: response.data.Data });
       } else {
+        console.log('Failed to fetch products:', response.data);
         onFailed(response.data.MsgNo);
+        yield put({ type: ProductActions.FETCH_PRODUCTS_FAILURE, payload: response.data.MsgNo });
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error fetching products:', error);
+      console.error('Error details:', error.response?.data || error.message);
       onError(error);
+      yield put({ type: ProductActions.FETCH_PRODUCTS_FAILURE, payload: error.message });
     }
   });
 }

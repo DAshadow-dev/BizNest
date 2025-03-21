@@ -17,6 +17,15 @@ import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 import { moderateScale, scale, verticalScale } from "@libs/reactResizeMatter/scalingUtils";
 import { useDispatch } from "react-redux";
 import { useFocusEffect } from '@react-navigation/native';
+import { useAppSelector } from "@redux/store";
+import { RootState } from "@redux/root-reducer";
+
+interface Category {
+  _id: string | number;
+  name: string;
+  description?: string;
+  image?: string;
+}
 
 interface RouteParams {
   product: {
@@ -29,7 +38,7 @@ interface RouteParams {
     image: string | null;
     description: string;
     _id: string;
-    category: string;
+    categoryId: string | Category;
   };
 }
 
@@ -37,6 +46,7 @@ const ProductDetailScreen = ({ route }: { route: { params: RouteParams } }) => {
   const navigation = useNavigationRoot();
   const { product } = route.params;
   const dispatch = useDispatch();
+  const Auth = useAppSelector((state: RootState) => state.User.Auth);
   
   // Thêm state cho Modal
   const [successModalVisible, setSuccessModalVisible] = useState(false);
@@ -98,8 +108,14 @@ const ProductDetailScreen = ({ route }: { route: { params: RouteParams } }) => {
 
   useFocusEffect(
     useCallback(() => {
-      dispatch({ type: ProductActions.FETCH_PRODUCT_DETAIL, payload: { id: product._id } });
-    }, [dispatch, product._id])
+      dispatch({ 
+        type: ProductActions.FETCH_PRODUCT_DETAIL, 
+        payload: { 
+          id: product._id,
+          storeId: Auth?.storeId
+        } 
+      });
+    }, [dispatch, product._id, Auth?.storeId])
   );
 
   return (
@@ -186,7 +202,11 @@ const ProductDetailScreen = ({ route }: { route: { params: RouteParams } }) => {
             </View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Category</Text>
-              <Text style={styles.infoValue}>{product.category || 'N/A'}</Text>
+              <Text style={styles.infoValue}>
+                {product.categoryId && typeof product.categoryId === 'object' && product.categoryId.name 
+                  ? product.categoryId.name 
+                  : 'Không có danh mục'}
+              </Text>
             </View>
           </View>
 
@@ -241,14 +261,28 @@ const ProductDetailScreen = ({ route }: { route: { params: RouteParams } }) => {
         {/* Edit Button */}
         <TouchableOpacity 
           style={styles.editButton} 
-          onPress={() => navigation.navigate(Routes.EditProductScreen, { 
-            product: {
-              ...product,
-              image: product.image || '',
-              categoryId: product.category || '',
-              quantity: product.quantity?.toString() || '0'
-            } 
-          })}
+          onPress={() => {
+            // Đảm bảo lấy categoryId chính xác từ product
+            let categoryId;
+            if (product.categoryId) {
+              if (typeof product.categoryId === 'object' && product.categoryId._id) {
+                categoryId = product.categoryId._id.toString();
+              } else {
+                categoryId = product.categoryId.toString();
+              }
+            } else {
+              categoryId = '1'; // Default category ID nếu không có
+            }
+            
+            navigation.navigate(Routes.EditProductScreen, { 
+              product: {
+                ...product,
+                image: product.image || '',
+                categoryId: categoryId,
+                quantity: product.quantity?.toString() || '0'
+              } 
+            });
+          }}
         >
           <Text style={styles.editButtonText}>Edit Product</Text>
         </TouchableOpacity>

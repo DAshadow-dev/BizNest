@@ -10,9 +10,9 @@ export interface User {
   createAt?: Date,
   lastLogin?: Date,
   isAuthenticated?: boolean,
+  storeId?: string,
 }
 
-<<<<<<< HEAD
 export interface Customer {
   _id?: number,
   fullname?: string,
@@ -22,9 +22,6 @@ export interface Customer {
   date_of_birth?: Date,
   createdAt?: Date,
 }
-=======
-
->>>>>>> 37fda09f2b94111ff33993360245314eb5b96d50
 
 export interface UserReducer {
   Auth: User;

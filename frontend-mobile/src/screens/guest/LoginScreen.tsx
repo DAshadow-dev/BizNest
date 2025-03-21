@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,23 +6,29 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useDispatch, useSelector } from 'react-redux';
-import * as Routes from '@utils/Routes';
-import { useNavigationRoot } from '@components/navigate/RootNavigation';
-import { RootState } from '@redux/root-reducer'; 
-import UserActions from '@redux/user/actions';
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
+import * as Routes from "@utils/Routes";
+import { useNavigationRoot } from "@components/navigate/RootNavigation";
+import { RootState } from "@redux/root-reducer";
+import UserActions from "@redux/user/actions";
+import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
+import {
+  moderateScale,
+  scale,
+  verticalScale,
+} from "@libs/reactResizeMatter/scalingUtils";
 
 const LoginScreen: React.FC = () => {
   const dispatch = useDispatch();
   const navigation = useNavigationRoot();
-  const [email, setEmail] = useState('bus1@gmail.com');
-  const [password, setPassword] = useState('12345678');
+  const [email, setEmail] = useState("admin@biznest.com");
+  const [password, setPassword] = useState("Admin@123");
   const [showPassword, setShowPassword] = useState(false);
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -32,20 +38,20 @@ const LoginScreen: React.FC = () => {
     let valid = true;
 
     if (!email || !validateEmail(email)) {
-      setEmailError('Please enter a valid email address.');
+      setEmailError("Please enter a valid email address.");
       valid = false;
     } else {
-      setEmailError('');
+      setEmailError("");
     }
 
     if (!password) {
-      setPasswordError('Please enter a password.');
+      setPasswordError("Please enter a password.");
       valid = false;
     } else if (password.length < 8) {
-      setPasswordError('Password must be at least 8 characters long.');
+      setPasswordError("Password must be at least 8 characters long.");
       valid = false;
     } else {
-      setPasswordError('');
+      setPasswordError("");
     }
 
     if (!valid) return;
@@ -55,21 +61,35 @@ const LoginScreen: React.FC = () => {
       payload: {
         data: { email, password },
         onSuccess: (user: any) => {
-          if(user.role == "admin"){
-            navigation.navigate(Routes.HOME_ADMIN)
-          }else{
-            if(user.status == "inactive" || user.status == "pending"){
-              navigation.navigate(Routes.STATUS_SCREEN, {status: user.status})
-            }else{
-              navigation.navigate(Routes.HomeScreen)
+          if (user.role == "admin") {
+            navigation.navigate(Routes.HOME_ADMIN);
+          } else {
+            if (user.status == "inactive" || user.status == "pending") {
+              navigation.navigate(Routes.STATUS_SCREEN, {
+                status: user.status,
+              });
+            } else {
+              navigation.navigate(Routes.HomeScreen);
             }
           }
         },
         onFailed: (message: string) => {
-          alert('Login failed: ' + message);
+          Toast.show({
+            type: "error",
+            text1: "Error!",
+            text2: "Username or password are incorrect",
+            position: "top",
+            visibilityTime: 2000,
+          });
         },
         onError: (error: any) => {
-          alert('Network error');
+          Toast.show({
+            type: "error",
+            text1: "Error!",
+            text2: "Username or password are incorrect",
+            position: "top",
+            visibilityTime: 2000,
+          });
         },
       },
     });
@@ -78,41 +98,41 @@ const LoginScreen: React.FC = () => {
   const handleEmailChange = (text: string) => {
     setEmail(text);
     if (!validateEmail(text)) {
-      setEmailError('Please enter a valid email address.');
+      setEmailError("Please enter a valid email address.");
     } else {
-      setEmailError('');
+      setEmailError("");
     }
   };
 
   const handlePasswordChange = (text: string) => {
     setPassword(text);
     if (text.length < 8) {
-      setPasswordError('Password must be at least 8 characters long.');
+      setPasswordError("Password must be at least 8 characters long.");
     } else {
-      setPasswordError('');
+      setPasswordError("");
     }
   };
 
   return (
     <View style={styles.container}>
-      <Image source={require('@assets/image/Login.png')} style={styles.image} />
+      <Image source={require("@assets/image/Login.png")} style={styles.image} />
       <Text style={styles.title}>Login</Text>
 
       {/* Email Input */}
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons
-          name='email-outline'
+          name="email-outline"
           size={20}
-          color='#888'
+          color="#888"
           style={styles.icon}
         />
         <TextInput
           style={styles.input}
-          placeholder='Email ID'
-          placeholderTextColor={'gray'}
+          placeholder="Email ID"
+          placeholderTextColor={"gray"}
           value={email}
           onChangeText={handleEmailChange}
-          keyboardType='email-address'
+          keyboardType="email-address"
         />
       </View>
       {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
@@ -120,24 +140,24 @@ const LoginScreen: React.FC = () => {
       {/* Password Input */}
       <View style={styles.inputContainer}>
         <MaterialCommunityIcons
-          name='lock-outline'
+          name="lock-outline"
           size={20}
-          color='#888'
+          color="#888"
           style={styles.icon}
         />
         <TextInput
           style={styles.input}
-          placeholder='Password'
-          placeholderTextColor={'gray'}
+          placeholder="Password"
+          placeholderTextColor={"gray"}
           value={password}
           onChangeText={handlePasswordChange}
           secureTextEntry={!showPassword}
         />
         <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
           <Ionicons
-            name={showPassword ? 'eye' : 'eye-off'}
+            name={showPassword ? "eye" : "eye-off"}
             size={20}
-            color='#888'
+            color="#888"
           />
         </TouchableOpacity>
       </View>
@@ -160,20 +180,21 @@ const LoginScreen: React.FC = () => {
 
       {/* Google Login Button */}
       <TouchableOpacity style={styles.googleButton}>
-        <Ionicons name='logo-google' size={20} color='#000' />
+        <Ionicons name="logo-google" size={20} color="#000" />
         <Text style={styles.googleText}>Login with Google</Text>
       </TouchableOpacity>
 
       {/* Register Link */}
       <Text style={styles.registerText}>
-        New to Logistics?{' '}
+        New to Logistics?{" "}
         <Text
-          style={{ color: '#0164FF' }}
-          onPress={() => navigation.navigate('REGISTER_SCREEN')}
+          style={{ color: "#0164FF" }}
+          onPress={() => navigation.navigate("REGISTER_SCREEN")}
         >
           Register
         </Text>
       </Text>
+      <Toast config={toastConfig} />
     </View>
   );
 };
@@ -181,27 +202,27 @@ const LoginScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
   },
   image: {
     width: 250,
     height: 250,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   title: {
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    backgroundColor: '#f5f5f5',
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    backgroundColor: "#f5f5f5",
     borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom: 5,
@@ -215,42 +236,42 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   errorText: {
-    color: 'red',
+    color: "red",
     fontSize: 12,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     marginBottom: 15,
   },
   forgotPassword: {
-    textAlign: 'right', // Aligns to the right
-    color: '#007bff',
+    textAlign: "right", // Aligns to the right
+    color: "#007bff",
     marginBottom: 15,
-    width: '100%', // Ensures it aligns to the right
+    width: "100%", // Ensures it aligns to the right
   },
   loginButton: {
-    backgroundColor: '#007bff',
-    width: '100%',
+    backgroundColor: "#007bff",
+    width: "100%",
     padding: 15,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   loginText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   orText: {
     marginVertical: 10,
     fontSize: 16,
-    color: 'gray',
+    color: "gray",
   },
   googleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
     padding: 10,
     borderRadius: 10,
-    width: '100%',
-    justifyContent: 'center',
+    width: "100%",
+    justifyContent: "center",
   },
   googleText: {
     fontSize: 16,
@@ -259,8 +280,51 @@ const styles = StyleSheet.create({
   registerText: {
     marginTop: 20,
     fontSize: 14,
-    color: 'gray',
+    color: "gray",
   },
 });
 
+// 🎨 Tuỳ chỉnh giao diện Toast
+const toastConfig = {
+  success: (props: any) => (
+    <BaseToast
+      {...props}
+      style={{
+        borderLeftColor: "green",
+        backgroundColor: "white",
+        marginTop: scale(0),
+      }}
+      contentContainerStyle={{ paddingHorizontal: verticalScale(15) }}
+      text1Style={{
+        fontSize: moderateScale(16),
+        fontWeight: "bold",
+        color: "green",
+      }}
+      text2Style={{
+        fontSize: moderateScale(14),
+        color: "#333",
+      }}
+    />
+  ),
+  error: (props: any) => (
+    <ErrorToast
+      {...props}
+      style={{
+        borderLeftColor: "red",
+        backgroundColor: "white",
+        marginTop: scale(0),
+      }}
+      contentContainerStyle={{ paddingHorizontal: verticalScale(15) }}
+      text1Style={{
+        fontSize: moderateScale(16),
+        fontWeight: "bold",
+        color: "red",
+      }}
+      text2Style={{
+        fontSize: moderateScale(14),
+        color: "#333",
+      }}
+    />
+  ),
+};
 export default LoginScreen;

@@ -180,6 +180,13 @@ const WareHouse = () => {
       {/* Header */}
       <Toast config={toastConfig} />
       <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate(Routes.HomeScreen)
+          }}
+        >
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
         <Text style={styles.headerText}>Product Management</Text>
         <Ionicons name="settings-outline" size={24} color="white" />
       </View>

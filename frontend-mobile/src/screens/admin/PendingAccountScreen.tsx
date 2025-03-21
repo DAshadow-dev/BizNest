@@ -14,7 +14,9 @@ import AdminActions from "@redux/admin/actions";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@redux/store";
 import { RootState } from "@redux/root-reducer";
-
+import { useRoute } from '@react-navigation/native';
+import * as Routes from '@utils/Routes';
+import { Ionicons } from "@expo/vector-icons";
 
 const PendingAccountScreen: React.FC = () => {
   const navigation = useNavigationRoot();
@@ -102,24 +104,43 @@ const PendingAccountScreen: React.FC = () => {
   );
 
   return (
+   <View style={{flex: 1}}>
+     <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate(Routes.HOME_ADMIN)
+          }}
+        >
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.headerText}>Approve Bussiness Management</Text>
+        <Ionicons name="settings-outline" size={24} color="white" />
+      </View>
     <View style={styles.container}>
-      <Text style={styles.title}>Pending Account Screen</Text>
       <FlatList
         data={filteredBussinessOnwers}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
       />
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Text style={styles.backButtonText}>Back</Text>
-      </TouchableOpacity>
     </View>
+   </View>
   );
 };
 
 const styles = StyleSheet.create({
+  header: {
+    backgroundColor: '#3B82F6',
+    padding: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 35, // Adjust for status bar
+  },
+  headerText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
   container: {
     flex: 1,
     padding: 20,

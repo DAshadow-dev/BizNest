@@ -1,17 +1,41 @@
-
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Button } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Button,
+} from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LineChart } from "react-native-chart-kit";
 import * as Routes from "@utils/Routes";
-import { navigate, useNavigationRoot } from "@components/navigate/RootNavigation";
+import {
+  navigate,
+  useNavigationRoot,
+} from "@components/navigate/RootNavigation";
 
 const HomeAdminScreen = () => {
   const navigation = useNavigationRoot();
   const categories = [
-    { id: "1", name: "Pending", icon: "receipt", route: Routes.PendingAccountsScreen },
-    { id: "2", name: "List Onwer", icon: "people", route: Routes.AccountListScreen },
-    { id: "3", name: "Dashboard", icon: "bar-chart", route: Routes.AdminDashboardScreen },
+    {
+      id: "1",
+      name: "Pending",
+      icon: "receipt",
+      route: Routes.PendingAccountsScreen,
+    },
+    {
+      id: "2",
+      name: "List Onwer",
+      icon: "people",
+      route: Routes.AccountListScreen,
+    },
+    {
+      id: "3",
+      name: "Dashboard",
+      icon: "bar-chart",
+      route: Routes.AdminDashboardScreen,
+    },
   ];
 
   return (
@@ -19,7 +43,15 @@ const HomeAdminScreen = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.headerText}>Dashboard Admin</Text>
-          <Ionicons name="notifications-outline" size={24} color="white" />
+          <View style={{ flexDirection: "row" }}>
+            <Ionicons name="notifications-outline" size={24} color="white" />
+            <View style={{ width: 10 }} />
+            <TouchableOpacity
+              onPress={() => navigation.navigate(Routes.LOGIN_SCREEN)}
+            >
+              <Ionicons name="log-out-outline" size={24} color="white" />
+            </TouchableOpacity>
+          </View>{" "}
         </View>
 
         <View style={styles.chartContainer}>
@@ -44,14 +76,18 @@ const HomeAdminScreen = () => {
 
         <View style={styles.categoryContainer}>
           {categories.map((item) => (
-            <TouchableOpacity key={item.id} style={styles.categoryItem} onPress={() => navigation.navigate(item.route)}>
+            <TouchableOpacity
+              key={item.id}
+              style={styles.categoryItem}
+              onPress={() => navigation.navigate(item.route)}
+            >
               <MaterialIcons name={item.icon} size={32} color="#007AFF" />
               <Text style={styles.categoryText}>{item.name}</Text>
             </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
-{/* 
+      {/* 
       <TouchableOpacity style={styles.chatButton} onPress={() => navigation.navigate("CHAT_SCREEN")}>
         <Ionicons name="chatbubble" size={28} color="white" />
       </TouchableOpacity> */}

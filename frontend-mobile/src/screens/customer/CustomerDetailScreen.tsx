@@ -118,9 +118,9 @@ const CustomerDetailScreen = (props: any) => {
                 </Text>
               </View>
       
-              <Text style={styles.sectionTitle}>Transaction history</Text>
+              {/* <Text style={styles.sectionTitle}>Transaction history</Text> */}
       
-              <FlatList
+              {/* <FlatList
                   data={transactions}
                   keyExtractor={(item, index) => index.toString()} // Đảm bảo key là string
                   renderItem={({ item }) => (
@@ -165,7 +165,7 @@ const CustomerDetailScreen = (props: any) => {
                       </TouchableOpacity>
                   )}
                   contentContainerStyle={{ paddingBottom: 20 }} // Tránh che mất item cuối cùng
-                  />
+                  /> */}
             </ScrollView>
           </View>
       }      

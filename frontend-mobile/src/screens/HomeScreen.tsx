@@ -21,8 +21,16 @@ const HomePage = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.headerText}>Dashboard</Text>
-          <Ionicons name="notifications-outline" size={24} color="white" />
-        </View>
+          <View style={{flexDirection: 'row'}}>
+            <Ionicons name="notifications-outline" size={24} color="white" />
+            <View style={{width: 10}}/>
+            <TouchableOpacity
+              onPress={() => navigation.navigate(Routes.LOGIN_SCREEN)}
+            >
+              <Ionicons name="log-out-outline" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
+      </View>
 
         <View style={styles.chartContainer}>
           <Text style={styles.chartTitle}>Doanh thu gần đây</Text>

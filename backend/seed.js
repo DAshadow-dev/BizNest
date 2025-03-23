@@ -7,6 +7,7 @@ const Store = require('./src/models/Store');
 const Category = require('./src/models/Category');
 const Product = require('./src/models/Product');
 const Role = require('./src/models/Role');
+const Invoice = require('./src/models/Invoice');
 
 /**
  * Hàm reset sequence counter

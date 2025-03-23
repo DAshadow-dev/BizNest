@@ -61,7 +61,7 @@ function MyStack() {
       screenOptions={{
         headerShown: false,
       }}
-      initialRouteName={Routes.CreateInvoiceScreen}>
+      initialRouteName={Routes.ONBOARDING_SCREEN}>
         <Stack.Screen name={Routes.ONBOARDING_SCREEN} component={OnboardingScreen} />
         <Stack.Screen name={Routes.LOGIN_SCREEN} component={LoginScreen} />
         <Stack.Screen name={Routes.REGISTER_SCREEN} component={RegisterScreen} />

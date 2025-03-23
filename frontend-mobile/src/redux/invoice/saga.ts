@@ -1,56 +1,132 @@
-// import {all, call, fork, put, takeEvery} from '@redux-saga/core/effects';
-// import InvoiceActions from './actions';
-// import Factories from './factories';
+import { all, call, fork, put, takeEvery, takeLatest } from "@redux-saga/core/effects";
+import InvoiceActions, { fetchInvoiceDetailFailure, fetchInvoiceDetailSuccess } from "./actions";
+import Factories from "./factories";
 
-// function* createInvoiceSaga(action: { type: string; payload: any }) {
-//   try {
-//     const response = yield call(Factories.createInvoice, action.payload);
-//     yield put({ type: InvoiceActions.CREATE_INVOICE_SUCCESS, payload: response.data });
-//   } catch (error) {
-//     yield put({ type: InvoiceActions.CREATE_INVOICE_FAILED, payload: error });
-//   }
-// }
+// ✅ Saga lấy danh sách hóa đơn
+export function* fetchInvoices() {
+  yield takeEvery(InvoiceActions.FETCH_INVOICES, function* (action: any): any {
+    const { onSuccess = () => {}, onFailed = () => {}, onError = () => {} } = action.payload || {};
+    console.log("Fetching invoice list...");
 
-// function* updateInvoiceSaga(action: { type: string; payload: { invoiceId: string; data: any } }) {
-//   try {
-//     const response = yield call(Factories.updateInvoice, action.payload.invoiceId, action.payload.data);
-//     yield put({ type: InvoiceActions.UPDATE_INVOICE_SUCCESS, payload: response.data });
-//   } catch (error) {
-//     yield put({ type: InvoiceActions.UPDATE_INVOICE_FAILED, payload: error });
-//   }
-// }
+    try {
+      const response = yield call(Factories.getAllInvoices);
+      console.log("API response:", response);
 
-// function* getInvoiceSaga(action: { type: string; payload: string }) {
-//   try {
-//     const response = yield call(Factories.getInvoice, action.payload);
-//     yield put({ type: InvoiceActions.GET_INVOICE_SUCCESS, payload: response.data });
-//   } catch (error) {
-//     yield put({ type: InvoiceActions.GET_INVOICE_FAILED, payload: error });
-//   }
-// }
+      if (response?.status === 200) {
+        console.log("Invoices fetched successfully:", response.data.Data);
+        onSuccess(response.data.Data);
+        yield put({ type: InvoiceActions.FETCH_INVOICES_SUCCESS, payload: response.data.Data });
+      } else {
+        console.log("Failed to fetch invoices:", response.data);
+        onFailed(response.data.MsgNo);
+        yield put({ type: InvoiceActions.FETCH_INVOICES_FAILURE, payload: response.data.MsgNo });
+      }
+    } catch (error: any) {
+      console.error("Error fetching invoices:", error);
+      onError(error);
+      yield put({ type: InvoiceActions.FETCH_INVOICES_FAILURE, payload: error.message });
+    }
+  });
+}
 
-// function* deleteInvoiceSaga(action: { type: string; payload: string }) {
-//   try {
-//     yield call(Factories.deleteInvoice, action.payload);
-//     yield put({ type: InvoiceActions.DELETE_INVOICE_SUCCESS, payload: action.payload });
-//   } catch (error) {
-//     yield put({ type: InvoiceActions.DELETE_INVOICE_FAILED, payload: error });
-//   }
-// }
+// ✅ Saga tạo hóa đơn
+export function* createInvoice() {
+  yield takeEvery(InvoiceActions.CREATE_INVOICE, function* (action: any): any {
+    const { invoice, onSuccess = () => {}, onFailed = () => {}, onError = () => {} } = action.payload || {};
+    console.log("Creating invoice...");
 
-// function* fetchInvoiceListSaga() {
-//   try {
-//     const invoices = yield call(fetchInvoiceList);
-//     yield put(getInvoiceListSuccess(invoices));
-//   } catch (error: any) {
-//     yield put(getInvoiceListFailed(error.message));
-//   }
-// }
+    try {
+      const response = yield call(() => Factories.createInvoice(invoice));
+      if (response?.status === 201) {
+        onSuccess(response.data.Data);
+        yield put({ type: InvoiceActions.CREATE_INVOICE_SUCCESS, payload: response.data.Data });
 
-// export default function* invoiceSaga() {
-//   yield takeLatest(InvoiceActions.CREATE_INVOICE, createInvoiceSaga);
-//   yield takeLatest(InvoiceActions.UPDATE_INVOICE, updateInvoiceSaga);
-//   yield takeLatest(InvoiceActions.GET_INVOICE, getInvoiceSaga);
-//   yield takeLatest(InvoiceActions.DELETE_INVOICE, deleteInvoiceSaga);
-//   yield takeLatest(InvoiceActions.GET_INVOICE_LIST, fetchInvoiceListSaga);
-// }
+        // ✅ Fetch lại danh sách hóa đơn sau khi tạo mới
+        yield put({ type: InvoiceActions.FETCH_INVOICES });
+      } else {
+        onFailed(response.data.MsgNo);
+      }
+    } catch (error) {
+      onError(error);
+    }
+  });
+}
+
+// ✅ Saga cập nhật hóa đơn
+export function* updateInvoice() {
+  yield takeEvery(InvoiceActions.UPDATE_INVOICE, function* (action: any): any {
+    const { id, invoice, onSuccess = () => {}, onFailed = () => {}, onError = () => {} } = action.payload || {};
+    console.log("Updating invoice...");
+
+    try {
+      const response = yield call(() => Factories.updateInvoice(id, invoice));
+
+      if (response?.status === 200) {
+        onSuccess(response.data.Data);
+        yield put({ type: InvoiceActions.UPDATE_INVOICE_SUCCESS, payload: response.data.Data });
+
+        // ✅ Load lại danh sách hóa đơn sau khi cập nhật
+        yield put({ type: InvoiceActions.FETCH_INVOICES });
+      } else {
+        onFailed(response.data.MsgNo);
+      }
+    } catch (error) {
+      onError(error);
+    }
+  });
+}
+
+// ✅ Saga xóa hóa đơn
+export function* deleteInvoice() {
+  yield takeEvery(InvoiceActions.DELETE_INVOICE, function* (action: any): any {
+    const { id, onSuccess = () => {}, onFailed = () => {}, onError = () => {} } = action.payload || {};
+    console.log("Deleting invoice...");
+
+    try {
+      const response = yield call(() => Factories.deleteInvoice(id));
+      if (response?.status === 200) {
+        onSuccess(response.data.Data);
+        yield put({ type: InvoiceActions.DELETE_INVOICE_SUCCESS, payload: id });
+
+        // ✅ Load lại danh sách hóa đơn sau khi xóa
+        yield put({ type: InvoiceActions.FETCH_INVOICES });
+      } else {
+        onFailed(response.data.MsgNo);
+      }
+    } catch (error) {
+      onError(error);
+    }
+  });
+}
+
+// ✅ Saga lấy chi tiết hóa đơn
+export function* fetchInvoiceDetailSaga() {
+  yield takeLatest(InvoiceActions.FETCH_INVOICE_DETAIL, function* (action: any): any {
+    const { id, onSuccess, onFailed, onError } = action.payload;
+    console.log("Fetching invoice detail for ID:", id);
+
+    try {
+      const response = yield call(() => Factories.getInvoiceDetail(id));
+      if (response?.status === 200) {
+        yield put(fetchInvoiceDetailSuccess(response.data));
+        onSuccess && onSuccess(response.data);
+      } else {
+        onFailed && onFailed(response.data.MsgNo);
+      }
+    } catch (error) {
+      yield put(fetchInvoiceDetailFailure(error.message));
+      onError && onError(error.message);
+    }
+  });
+}
+
+// ✅ Root Saga
+export default function* invoiceSaga() {
+  yield all([
+    fork(fetchInvoices),
+    fork(createInvoice),
+    fork(updateInvoice),
+    fork(deleteInvoice),
+    takeLatest(InvoiceActions.FETCH_INVOICE_DETAIL, fetchInvoiceDetailSaga),
+  ]);
+}

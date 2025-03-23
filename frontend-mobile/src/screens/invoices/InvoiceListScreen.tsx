@@ -1,128 +1,140 @@
-import React from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  StyleSheet,
-} from "react-native";
-import * as Routes from "@utils/Routes";
-import { useNavigationRoot } from "@components/navigate/RootNavigation";
+import React, { useEffect } from "react";
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchInvoices } from "@redux/invoice/actions";
+import { RootState } from "@redux/rootReducer";
 
-const invoices = Array.from({ length: 10 }, (_, index) => ({
-  id: index + 1,
-  number: `${1000 + index}`,
-  amount: (Math.random() * 500).toFixed(2),
-  date: new Date().toISOString().split("T")[0],
-}));
+const InvoiceListScreen = ({ navigation }: { navigation: any }) => {
+  const dispatch = useDispatch();
+  const { invoices = [], loading, error } = useSelector((state: RootState) => {
+    const invoiceData = state.Invoice || { invoices: [], loading: false, error: null };
+    console.log("Raw API Response:", invoiceData); // Debugging API response
+    return {
+      ...invoiceData,
+      invoices: invoiceData.invoices || [],
+    };
+  });
 
-const InvoiceListScreen = () => {
-  const navigation = useNavigationRoot();
+  useEffect(() => {
+    dispatch(fetchInvoices());
+  }, [dispatch]);
 
-  const renderItem = ({ item }) => (
-    <View style={styles.invoiceItem}>
-      <Text style={styles.invoiceText}>Invoice ID: #{item.number}</Text>
-      <Text style={styles.invoiceText}>Amount: ${item.amount}</Text>
-      <Text style={styles.invoiceText}>Date: {item.date}</Text>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          //   navigation.navigate(Routes.InvoiceScreen, { invoice: item })
-          navigation.navigate(Routes.InvoiceScreen)
-        }
-      >
-        <Text style={styles.buttonText}>More detail</Text>
-      </TouchableOpacity>
-    </View>
+  const handleInvoicePress = (item: any) => {
+    navigation.navigate("InvoiceDetail", item);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "paid": return "#28A745";
+      case "pending": return "#FFC107";
+      case "overdue": return "#FF5733";
+      default: return "#777";
+    }
+  };
+
+  const renderItem = ({ item }: { item: any }) => (
+    <TouchableOpacity style={styles.item} onPress={() => handleInvoicePress(item)}>
+      <Text style={styles.itemTitle}>Invoice #{item.invoiceNumber}</Text>
+      <Text style={styles.itemSubtitle}>Customer: {item.customerName} ({item.customerEmail})</Text>
+      <Text style={styles.itemTotal}>Total: ${item.totalAmount}</Text>
+      <Text style={[styles.itemStatus, { color: getStatusColor(item.status) }]}>Status: {item.status}</Text>
+      <Text style={styles.itemDate}>Due Date: {new Date(item.dueDate).toLocaleDateString()}</Text>
+    </TouchableOpacity>
   );
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>Error: {error?.message || "An unexpected error occurred."}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.navigate(Routes.HomeScreen)}>
-        <Text style={styles.buttonTextSecondary}>Home</Text>
-      </TouchableOpacity>
-      <Text style={styles.title}>Invoice List</Text>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          navigation.navigate(Routes.CreateInvoiceScreen)
-        }
-      >
-        <Text style={styles.buttonText}>Create new invoice</Text>
-      </TouchableOpacity>
-      <FlatList
-        data={invoices}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItem}
-      />
-
-      {/* Navigate to Home */}
-      <TouchableOpacity
-        style={styles.buttonSecondary}
-        onPress={() => navigation.navigate(Routes.HomeScreen)}
-      >
-        <Text style={styles.buttonTextSecondary}>Home</Text>
-      </TouchableOpacity>
+      <Text style={styles.title}>Invoices</Text>
+      {Array.isArray(invoices) && invoices.length > 0 ? (
+        <FlatList
+          data={invoices}
+          renderItem={renderItem}
+          keyExtractor={(item) => item._id?.toString() || Math.random().toString()}
+        />
+      ) : (
+        <Text style={styles.noInvoices}>No invoices available.</Text>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "center",
-    backgroundColor: "#E9E9E9",
-    padding: 16,
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#f0f4f8",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
-    color: "#333",
+    marginBottom: 15,
+    textAlign: "center",
+    color: "#007AFF",
   },
-  invoiceItem: {
-    display: "flex",
-    flexDirection: "column",
-    backgroundColor: "#FFF",
-    padding: 15,
-    borderRadius: 20,
-    marginVertical: 10,
-    width: "100%",
+  item: {
+    padding: 20,
+    backgroundColor: "#ffffff",
+    borderRadius: 15,
     shadowColor: "#000",
-    shadowOffset: { width: 100, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 5,
+    marginBottom: 15,
+    borderLeftWidth: 5,
+    borderLeftColor: "#007AFF",
   },
-  invoiceText: {
-    fontSize: 16,
+  itemTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
     color: "#333",
-    marginBottom: 5,
   },
-  button: {
-    backgroundColor: "#4A90E2",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    marginTop: 10,
-    alignItems: "center",
+  itemSubtitle: {
+    fontSize: 14,
+    color: "#555",
+    marginTop: 5,
   },
-  buttonText: {
-    color: "#FFF",
+  itemTotal: {
     fontSize: 16,
     fontWeight: "bold",
+    color: "#007AFF",
+    marginTop: 8,
   },
-  buttonSecondary: {
-    backgroundColor: "#E3F2FD",
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    marginVertical: 10,
-    minWidth: 180,
-    alignItems: "center",
+  itemStatus: {
+    fontSize: 14,
+    marginTop: 5,
   },
-  buttonTextSecondary: {
-    color: "#4A90E2",
+  itemDate: {
+    fontSize: 14,
+    color: "#777",
+    marginTop: 5,
+  },
+  errorText: {
     fontSize: 16,
-    fontWeight: "bold",
+    color: "red",
+    textAlign: "center",
+  },
+  noInvoices: {
+    fontSize: 16,
+    textAlign: "center",
+    color: "#777",
+    marginTop: 20,
   },
 });
 

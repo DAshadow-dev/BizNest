@@ -44,6 +44,13 @@ const ApiConstants = {
   // Category
   GET_CATEGORIES: `${BASE_PREFIX}/categories`,
   CREATE_CATEGORY: `${BASE_PREFIX}/categories`,
+
+  // Invoice
+  GET_INVOICES: `${BASE_PREFIX}/invoice`,
+  CREATE_INVOICE: `${BASE_PREFIX}/invoice`,
+  UPDATE_INVOICE: `${BASE_PREFIX}/invoice`,
+  DELETE_INVOICE: `${BASE_PREFIX}/invoice`,
+  GET_INVOICE_DETAIL: `${BASE_PREFIX}/invoice`,
 };
 
 export default ApiConstants;
@@ -54,4 +61,4 @@ export {
 
 export const API_URL: string = `http://${debuggerHost}:5000/api`;
 
-console.log('🌐 API_URL:', API_URL);
+console.log('API_URL:', API_URL);

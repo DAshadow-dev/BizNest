@@ -1,99 +1,100 @@
-import { useNavigationRoot } from "@components/navigate/RootNavigation";
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  Keyboard,
-} from "react-native";
-import Factories from "@redux/invoice/factories";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { useDispatch } from "react-redux";
 
-const CreateInvoiceScreen = () => {
-  const navigation = useNavigationRoot();
+import { createInvoice } from "@redux/invoice/actions";
 
-  const [amount, setAmount] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Default to today
-  const [customer, setCustomer] = useState("");
-  const [address, setAddress] = useState("");
-  const [createdBy, setCreatedBy] = useState("User123"); // Replace with actual user
-  const [loading, setLoading] = useState(false);
+const CreateInvoiceScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
 
-  const handleCreateInvoice = async () => {
-    if (!amount || !date || !customer || !address) {
-      Alert.alert("Missing Fields", "Please fill in all required fields.");
+  const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [totalAmount, setTotalAmount] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [items, setItems] = useState([
+    { description: "Graphic Design Service", quantity: 1, price: 300 },
+    { description: "Website Development", quantity: 1, price: 1200 }
+  ]);
+
+  const handleCreateInvoice = () => {
+    if (!invoiceNumber || !customerName || !customerEmail || !totalAmount || !dueDate || items.length === 0) {
+      Alert.alert("Error", "Please fill in all fields");
       return;
     }
 
-    Keyboard.dismiss();
-    setLoading(true);
-
-    try {
-      const newInvoice = await Factories.createInvoice({
-        amount,
-        date,
-        customer,
-        address,
-        createdBy,
-      });
-
-      Alert.alert("Success", "Invoice created successfully.");
-      setAmount("");
-      setDate(new Date().toISOString().split("T")[0]); // Reset to today
-      setCustomer("");
-      setAddress("");
-      navigation.goBack();
-    } catch (error) {
-      Alert.alert("Error", error.message || "Failed to create invoice.");
-      console.error(error);
-    } finally {
-      setLoading(false);
+    if (isNaN(parseFloat(totalAmount))) {
+      Alert.alert("Error", "Total amount must be a valid number");
+      return;
     }
+
+    const formattedDate = new Date(dueDate);
+    if (isNaN(formattedDate.getTime())) {
+      Alert.alert("Error", "Invalid due date format. Use YYYY-MM-DD.");
+      return;
+    }
+
+    const newInvoice = {
+      invoiceNumber,
+      customerName,
+      customerEmail,
+      items,
+      totalAmount: parseFloat(totalAmount),
+      issuedDate: new Date().toISOString(),
+      dueDate: formattedDate.toISOString(),
+      status: "Pending",
+    };
+
+    console.log("Invoice Data Sent:", newInvoice);
+
+    dispatch(createInvoice(newInvoice))
+      .then(() => {
+        Alert.alert("Success", "Invoice created successfully!");
+        navigation.goBack();
+      })
+      .catch((error) => {
+        Alert.alert("Error", `Failed to create invoice: ${error.message}`);
+      });
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create Invoice</Text>
-      <View style={styles.inputBox}>
-        <TextInput
-          style={styles.input}
-          placeholder="Amount"
-          value={amount}
-          keyboardType="numeric"
-          onChangeText={setAmount}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Date (YYYY-MM-DD)"
-          value={date}
-          onChangeText={setDate}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Customer"
-          value={customer}
-          onChangeText={setCustomer}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Address"
-          value={address}
-          onChangeText={setAddress}
-        />
-      </View>
-      <TouchableOpacity
-        style={[styles.button, loading && styles.buttonDisabled]}
-        onPress={handleCreateInvoice}
-        disabled={loading}
-      >
-        <Text style={styles.buttonText}>
-          {loading ? "Creating..." : "Create Invoice"}
-        </Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Invoice Number"
+        value={invoiceNumber}
+        onChangeText={setInvoiceNumber}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Customer Name"
+        value={customerName}
+        onChangeText={setCustomerName}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Customer Email"
+        value={customerEmail}
+        onChangeText={setCustomerEmail}
+        keyboardType="email-address"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Total Amount"
+        value={totalAmount}
+        onChangeText={(text) => setTotalAmount(text.replace(/[^0-9.]/g, ""))}
+        keyboardType="numeric"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Due Date (YYYY-MM-DD)"
+        value={dueDate}
+        onChangeText={setDueDate}
+      />
+      <TouchableOpacity style={styles.button} onPress={handleCreateInvoice}>
+        <Text style={styles.buttonText}>Create Invoice</Text>
       </TouchableOpacity>
-      <Button title="Go Back" onPress={() => navigation.goBack()} />
     </View>
   );
 };
@@ -102,49 +103,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#f0f4f8",
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
-  },
-  inputBox: {
-    padding: 20,
-    backgroundColor: "#ffffff",
-    borderRadius: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    width: "100%",
-    marginBottom: 15,
+    marginBottom: 20,
+    textAlign: "center",
+    color: "#007AFF",
   },
   input: {
-    height: 40,
+    height: 50,
     borderColor: "#ccc",
     borderWidth: 1,
-    borderRadius: 20,
-    marginBottom: 10,
-    paddingLeft: 10,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 15,
     backgroundColor: "#fff",
   },
   button: {
-    backgroundColor: "#4A90E2",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    marginTop: 10,
+    backgroundColor: "#007AFF",
+    paddingVertical: 15,
+    borderRadius: 8,
     alignItems: "center",
   },
   buttonText: {
-    color: "#FFF",
+    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
-  },
-  buttonDisabled: {
-    backgroundColor: "#AAB8C2",
   },
 });
 

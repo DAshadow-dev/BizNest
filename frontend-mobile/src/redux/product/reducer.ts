@@ -24,7 +24,7 @@ const productReducer = (state = initialState, action: any) => {
     case ProductActions.CREATE_PRODUCT_SUCCESS:
       return {
         ...state,
-        loading: false,
+        loading: falrese,
         products: [...state.products, action.payload],
       };
 

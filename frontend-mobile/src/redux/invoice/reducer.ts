@@ -1,70 +1,68 @@
-// import ApiConstants from "src/adapter/ApiConstants";
-// import api from "@libs/api";
-// import type { InvoiceData } from "@type/invoice.types";
-// import InvoiceActions from "./actions";
+import InvoiceActions from "./actions";
 
-// // Define the initial state
-// const initialState = {
-//   invoices: [] as InvoiceData[],
-//   invoiceList: [],
-//   loading: false,
-//   error: null,
-// };
+const initialState = {
+  invoices: [],
+  invoiceDetail: null,
+  loading: false,
+  error: null,
+};
 
-// const reducer = (
-//   state = initialState,
-//   action: {
-//     type: string;
-//     payload?: InvoiceData | { invoiceId: string };
-//   }
-// ) => {
-//   switch (action.type) {
-//     case InvoiceActions.CREATE_INVOICE_SUCCESS:
-//       return {
-//         ...state,
-//         invoices: [...state.invoices, action.payload as InvoiceData],
-//       };
+const invoiceReducer = (state = initialState, action: any) => {
+  switch (action.type) {
+    case InvoiceActions.FETCH_INVOICES:
+    case InvoiceActions.CREATE_INVOICE:
+    case InvoiceActions.UPDATE_INVOICE:
+    case InvoiceActions.DELETE_INVOICE:
+    case InvoiceActions.FETCH_INVOICE_DETAIL:
+      return { ...state, loading: true, error: null };
 
-//     case InvoiceActions.UPDATE_INVOICE_SUCCESS:
-//       return {
-//         ...state,
-//         invoices: state.invoices.map((invoice) =>
-//           invoice.id === (action.payload as InvoiceData).id
-//             ? (action.payload as InvoiceData)
-//             : invoice
-//         ),
-//       };
+    case InvoiceActions.FETCH_INVOICES_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        invoices: Array.isArray(action.payload?.data?.invoices)
+          ? action.payload.data.invoices
+          : [],
+      };
 
-//     case InvoiceActions.GET_INVOICE_SUCCESS:
-//       return {
-//         ...state,
-//         invoices: [
-//           ...state.invoices.filter(
-//             (invoice) => invoice.id !== (action.payload as InvoiceData).id
-//           ),
-//           action.payload as InvoiceData,
-//         ],
-//       };
+    case InvoiceActions.CREATE_INVOICE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        invoices: [...state.invoices, action.payload],
+      };
 
-//     case InvoiceActions.DELETE_INVOICE_SUCCESS:
-//       return {
-//         ...state,
-//         invoices: state.invoices.filter(
-//           (invoice) =>
-//             invoice.id !== (action.payload as { invoiceId: string }).invoiceId
-//         ),
-//       };
-//     case InvoiceActions.GET_INVOICE_LIST:
-//       return { ...state, loading: true, error: null };
+    case InvoiceActions.UPDATE_INVOICE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        invoices: state.invoices.map((invoice) =>
+          invoice.id === action.payload.id ? action.payload : invoice
+        ),
+      };
 
-//     case InvoiceActions.GET_INVOICE_LIST_SUCCESS:
-//       return { ...state, loading: false, invoiceList: action.payload };
+    case InvoiceActions.DELETE_INVOICE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        invoices: state.invoices.filter(
+          (invoice) => invoice.id !== action.payload
+        ),
+      };
 
-//     case InvoiceActions.GET_INVOICE_LIST_FAILED:
-//       return { ...state, loading: false, error: action.payload };
-//     default:
-//       return state;
-//   }
-// };
+    case InvoiceActions.FETCH_INVOICE_DETAIL_SUCCESS:
+      return { ...state, loading: false, invoiceDetail: action.payload };
 
-// export default reducer;
+    case InvoiceActions.FETCH_INVOICES_FAILURE:
+    case InvoiceActions.CREATE_INVOICE_FAILURE:
+    case InvoiceActions.UPDATE_INVOICE_FAILURE:
+    case InvoiceActions.DELETE_INVOICE_FAILURE:
+    case InvoiceActions.FETCH_INVOICE_DETAIL_FAILURE:
+      return { ...state, loading: false, error: action.payload };
+
+    default:
+      return state;
+  }
+};
+
+export default invoiceReducer;

@@ -1,7 +1,7 @@
 import 'regenerator-runtime/runtime';
 import { all } from 'redux-saga/effects';
 import userSaga from '@redux/user/saga';
-// import invoiceSaga from '@redux/invoice/saga';
+import invoiceSaga from '@redux/invoice/saga';
 import productSaga from '@redux/product/saga'
 import staffSaga from './staff/saga';
 import adminSaga from './admin/saga';
@@ -16,6 +16,6 @@ export default function* rootSaga() {
     adminSaga(),
     customerSaga(),
     categorySaga(),
-    // invoiceSaga(),
+    invoiceSaga(),
   ]);
 }

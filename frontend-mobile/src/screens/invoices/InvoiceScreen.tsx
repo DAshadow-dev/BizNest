@@ -1,74 +1,70 @@
-import { useNavigationRoot } from "@components/navigate/RootNavigation";
-import React from "react";
-import * as Routes from "@utils/Routes";
-import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useEffect } from "react";
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchInvoices } from "@redux/invoice/actions";
+import { RootState } from "@redux/rootReducer";
 
-const InvoiceScreen = (props: {
-  route: {
-    params: {
-      invoiceId: string;
-      amount: string;
-      date: string;
-      customer: string;
-      address: string;
-      createdBy: string;
-      createdDate: string;
-    };
+const InvoiceListScreen = ({ navigation }: { navigation: any }) => {
+  const dispatch = useDispatch();
+  const { invoices = [], loading, error } = useSelector((state: RootState) => state.Invoice || { invoices: [], loading: false, error: null });
+
+  useEffect(() => {
+    dispatch(fetchInvoices());
+  }, [dispatch]);
+
+  const handleInvoicePress = (item: any) => {
+    navigation.navigate("InvoiceDetail", {
+      id: item._id,
+      invoiceNumber: item.invoiceNumber,
+      customerName: item.customerName,
+      customerEmail: item.customerEmail,
+      items: item.items,
+      total: item.totalAmount,
+      dueDate: item.dueDate,
+      issuedDate: item.issuedDate,
+      status: item.status,
+    });
   };
-}) => {
-  //   const { invoiceId, amount, date, customer, address, createdBy, createdDate } =
-  //     props.route.params;
-  const navigation = useNavigationRoot();
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Invoice Details</Text>
-      <View style={styles.detailBox}>
-        {/* <Text style={styles.label}>Invoice ID: {invoiceId}</Text>
-                <Text style={styles.label}>Amount: {amount}</Text>
-                <Text style={styles.label}>Date: {date}</Text>
-                <Text style={styles.label}>Customer: {customer}</Text>
-                <Text style={styles.label}>Address: {address}</Text>
-                <Text style={styles.label}>Created By: {createdBy}</Text>
-                <Text style={styles.label}>Created Date: {createdDate}</Text> */}
-
-        <Text style={styles.label}>Invoice ID: 10003</Text>
-        <Text style={styles.label}>Amount: 30.000.000 VNĐ</Text>
-        <Text style={styles.label}>Date: 22/09/2025</Text>
-        <Text style={styles.label}>Customer: Truong</Text>
-        <Text style={styles.label}>Address: 29.SonLa Str</Text>
-        <Text style={styles.label}>Created By: Admin</Text>
-        <Text style={styles.label}>Created Date: 22/09/2019</Text>
-      </View>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate(Routes.PaymentScreen)}
-      >
-        <Text style={styles.buttonText}>Pay this invoice</Text>
-      </TouchableOpacity>
-      <Button title="Go back" onPress={() => navigation.goBack()} />
-    </View>
+  const renderItem = ({ item }: { item: any }) => (
+    <TouchableOpacity style={styles.item} onPress={() => handleInvoicePress(item)}>
+      <Text style={styles.itemTitle}>Invoice #{item.invoiceNumber}</Text>
+      <Text style={styles.itemSubtitle}>Customer: {item.customerName} ({item.customerEmail})</Text>
+      <Text style={styles.itemTotal}>Total: ${item.totalAmount}</Text>
+      <Text style={styles.itemStatus}>Status: {item.status}</Text>
+      <Text style={styles.itemDate}>Due Date: {new Date(item.dueDate).toLocaleDateString()}</Text>
+    </TouchableOpacity>
   );
-};
 
-const DemoScreen = ({ navigation }: any) => {
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>Error: {error}</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Demo Screen</Text>
-      <Button
-        title="Go to Invoice"
-        onPress={() =>
-          navigation.navigate("InvoiceScreen", {
-            invoiceId: "INV12345",
-            amount: "$250.00",
-            date: "2025-02-14",
-            customer: "John Doe",
-            address: "123 Main St, City, Country",
-            createdBy: "Admin",
-            createdDate: "2025-02-01",
-          })
-        }
-      />
+      <Text style={styles.title}>Invoices</Text>
+      console.log("invoices", invoices);
+      {Array.isArray(invoices) && invoices.length > 0 ? (
+        <FlatList
+          data={invoices}
+          renderItem={renderItem}
+          keyExtractor={(item) => item._id.toString()}
+        />
+      ) : (
+        <Text style={styles.noInvoices}>No invoices available.</Text>
+      )}
     </View>
   );
 };
@@ -77,58 +73,65 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#f0f4f8",
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 15,
+    textAlign: "center",
+    color: "#007AFF",
   },
-  detailBox: {
+  item: {
     padding: 20,
     backgroundColor: "#ffffff",
-    borderRadius: 20,
+    borderRadius: 15,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    width: "100%",
+    shadowRadius: 6,
+    elevation: 5,
     marginBottom: 15,
+    borderLeftWidth: 5,
+    borderLeftColor: "#007AFF",
   },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
+  itemTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
     color: "#333",
   },
-  button: {
-    backgroundColor: "#4A90E2",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    marginTop: 10,
-    alignItems: "center",
+  itemSubtitle: {
+    fontSize: 14,
+    color: "#555",
+    marginTop: 5,
   },
-  buttonText: {
-    color: "#FFF",
+  itemTotal: {
     fontSize: 16,
     fontWeight: "bold",
+    color: "#007AFF",
+    marginTop: 8,
   },
-  buttonSecondary: {
-    backgroundColor: "#E3F2FD",
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    marginVertical: 10,
-    minWidth: 180,
-    alignItems: "center",
+  itemStatus: {
+    fontSize: 14,
+    color: "#FF5733",
+    marginTop: 5,
   },
-  buttonTextSecondary: {
-    color: "#4A90E2",
+  itemDate: {
+    fontSize: 14,
+    color: "#777",
+    marginTop: 5,
+  },
+  errorText: {
     fontSize: 16,
-    fontWeight: "bold",
+    color: "red",
+    textAlign: "center",
+  },
+  noInvoices: {
+    fontSize: 16,
+    textAlign: "center",
+    color: "#777",
+    marginTop: 20,
   },
 });
 
-export default InvoiceScreen;
-export { DemoScreen };
+export default InvoiceListScreen;

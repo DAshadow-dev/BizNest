@@ -14,12 +14,13 @@ const InvoiceSchema = new Schema({
     },
     customerEmail: {
         type: String,
-        required: true
+        required: true,
+        match: [/.+@.+\..+/, "Email không hợp lệ"] // Regex xác thực email
     },
     items: [{
-        description: String,
-        quantity: Number,
-        price: Number
+        description: { type: String, required: true },
+        quantity: { type: Number, required: true, min: 1 }, // Đảm bảo ít nhất 1 sản phẩm
+        price: { type: Number, required: true, min: 0 } // Đảm bảo giá không âm
     }],
     totalAmount: {
         type: Number,
@@ -38,7 +39,23 @@ const InvoiceSchema = new Schema({
         enum: ['Pending', 'Paid', 'Overdue'],
         default: 'Pending'
     }
+}, { timestamps: true });
+
+// Virtual field để tính tổng mỗi mục
+InvoiceSchema.virtual('items.subTotal').get(function () {
+    return this.items.map(item => ({
+        description: item.description,
+        subTotal: item.quantity * item.price
+    }));
 });
+
+// Trước khi lưu, cập nhật totalAmount dựa trên items
+InvoiceSchema.pre('save', function (next) {
+    this.totalAmount = this.items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+    next();
+});
+
+module.exports = mongoose.model('Invoice', InvoiceSchema);
 
 // Sample response from the API
 // {
@@ -72,5 +89,3 @@ const InvoiceSchema = new Schema({
 //     }
 // }
 
-
-module.exports = mongoose.model('Invoice', InvoiceSchema);

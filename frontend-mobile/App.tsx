@@ -48,6 +48,7 @@ import { Provider } from 'react-redux';
 import { store } from '@redux/store';
 import HomeAdminScreen from '@screens/HomeAdminScreen';
 import StatusScreen from '@screens/StatusScreen';
+import ReviewScreen from '@screens/admin/ReviewScreen';
 
 
 const Stack = createStackNavigator<RootParamList>();
@@ -96,7 +97,7 @@ function MyStack() {
       <Stack.Screen name={Routes.BUSINESS_DASHBOARD} component={BusinessDashBoardScreen} />
       <Stack.Screen name={Routes.HOME_ADMIN} component={HomeAdminScreen} />
       <Stack.Screen name={Routes.STATUS_SCREEN} component={StatusScreen} />
-
+      <Stack.Screen name={Routes.ReviewScreen} component={ReviewScreen} />
     </Stack.Navigator>
   );
 }
@@ -107,8 +108,7 @@ function MyProfile() {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: "#fff", // Màu nền của tab bar
-          borderTopWidth: 1,
+          backgroundColor: "#fff", 
           borderTopColor: "#ddd",
           height: 60,
           paddingBottom: 10,

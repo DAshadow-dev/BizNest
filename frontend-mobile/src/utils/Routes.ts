@@ -39,6 +39,7 @@ const BUSINESSCATEGORY_SCREEN ='BUSINESSCATEGORY_SCREEN';
 const CHAT_SCREEN ='CHAT_SCREEN';
 const HOME_ADMIN= 'HOME_ADMIN';
 const STATUS_SCREEN= 'STATUS_SCREEN';
+const ReviewScreen= 'ReviewScreen';
 
 export {
   HomeScreen,
@@ -78,5 +79,6 @@ export {
   // HOME_SCREEN,
   CHAT_SCREEN,
   HOME_ADMIN,
-  STATUS_SCREEN
+  STATUS_SCREEN,
+  ReviewScreen
 }

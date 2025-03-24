@@ -36,6 +36,12 @@ const HomeAdminScreen = () => {
       icon: "bar-chart",
       route: Routes.AdminDashboardScreen,
     },
+    {
+      id: "4",
+      name: "Review",
+      icon: "rate-review",
+      route: Routes.ReviewScreen,
+    }
   ];
 
   return (

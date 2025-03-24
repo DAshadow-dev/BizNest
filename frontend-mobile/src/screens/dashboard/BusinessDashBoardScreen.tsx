@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
@@ -6,9 +6,15 @@ import { moderateScale, scale, verticalScale } from "@libs/reactResizeMatter/sca
 import IconBack from "@assets/svg/header/ic_back.svg";
 import { FontAwesome } from "@expo/vector-icons";
 import { CommonColors, Fonts } from "@utils/CommonStyles";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@redux/store";
+import { RootState } from "@redux/root-reducer";
+import CustomerActions from "@redux/customer/actions";
 
 const BusinessDashBoardScreen = () => {
   const screenWidth = Dimensions.get("window").width - 40;
+  const dispatch = useDispatch();
+  const customers = useAppSelector((state: RootState) => state.Customer.ListCustomer);
 
   const revenueData = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "July", "Aug", "Sep", "Oct", "Nov", "Dec"],
@@ -19,6 +25,20 @@ const BusinessDashBoardScreen = () => {
       },
     ],
   };
+
+    useEffect(() => {
+      dispatch({
+        type: CustomerActions.FETCH_LIST_CUSTOMER,
+        payload: {
+          onError: (error: any) => {
+            console.log(error);
+          },
+          onFailed: (MsgNo: string) => {
+            console.log(MsgNo);
+          },
+        },
+      });
+    }, [customers]);
 
   return (
     <ScrollView style={styles.container}>
@@ -56,8 +76,8 @@ const BusinessDashBoardScreen = () => {
           <Text style={styles.value}>1,200</Text>
         </View>
         <View style={styles.card}>
-          <Text style={styles.title}>Tổng Khách Hàng</Text>
-          <Text style={styles.value}>850</Text>
+          <Text style={styles.title}>Customers</Text>
+          <Text style={styles.value}>{customers.length}</Text>
         </View>
       </View>
 

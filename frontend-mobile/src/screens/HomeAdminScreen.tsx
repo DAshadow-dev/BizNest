@@ -55,7 +55,7 @@ const HomeAdminScreen = () => {
         </View>
 
         <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>Doanh thu gần đây</Text>
+          <Text style={styles.chartTitle}>Revenue</Text>
           <LineChart
             data={{
               labels: ["T1", "T2", "T3", "T4", "T5", "T6"],

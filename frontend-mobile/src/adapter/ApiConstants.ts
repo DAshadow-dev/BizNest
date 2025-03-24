@@ -46,11 +46,11 @@ const ApiConstants = {
   CREATE_CATEGORY: `${BASE_PREFIX}/categories`,
 
   // Invoice
-  GET_INVOICES: `${BASE_PREFIX}/invoice`,
-  CREATE_INVOICE: `${BASE_PREFIX}/invoice`,
-  UPDATE_INVOICE: `${BASE_PREFIX}/invoice`,
-  DELETE_INVOICE: `${BASE_PREFIX}/invoice`,
-  GET_INVOICE_DETAIL: `${BASE_PREFIX}/invoice`,
+  FETCH_LIST_TRANSACTION: `${BASE_PREFIX}/transaction`,
+  CREATE_TRANSACTION: `${BASE_PREFIX}/transaction`,
+  UPDATE_TRANSACTION: `${BASE_PREFIX}/transaction`,
+  DELETE_TRANSACTION: `${BASE_PREFIX}/transaction`,
+  GET_TRANSACTION: `${BASE_PREFIX}/transaction`,
 };
 
 export default ApiConstants;
@@ -61,4 +61,3 @@ export {
 
 export const API_URL: string = `http://${debuggerHost}:5000/api`;
 
-console.log('API_URL:', API_URL);

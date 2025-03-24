@@ -9,10 +9,6 @@ const TransactionSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.Number,
         ref: 'Store'
     },
-    userId : {
-        type: mongoose.Schema.Types.Number,
-        ref: 'User'
-    },
     customerId: {
         type: mongoose.Schema.Types.Number,
         ref: 'Customer'
@@ -24,11 +20,14 @@ const TransactionSchema = new mongoose.Schema({
                 ref: 'Product'
             },
             quantity : Number,
-            price : Number
         }
     ],
     totalPrice : Number,
-    status : String,
+    status: {
+        type: String,
+        enum: ["pending", "completed", "canceled"],
+        default: "pending"
+    },
     createdAt : {
         type: Date,
         default: Date.now

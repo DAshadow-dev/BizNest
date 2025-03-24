@@ -60,28 +60,6 @@ const seedData = async () => {
     await resetCounter('category_seq', 1);
     await resetCounter('product_seq', 100);
 
-    // === CREATE ROLES ===
-    // console.log("\nCreating roles...");
-    // const roles = [
-    //   {
-    //     name: "admin",
-    //     permissions: ["manage_users", "manage_stores", "manage_products", "manage_categories", "manage_all"]
-    //   },
-    //   {
-    //     name: "business_owner",
-    //     permissions: ["manage_store", "manage_products", "manage_staff", "manage_customers"]
-    //   },
-    //   {
-    //     name: "staff",
-    //     permissions: ["view_products", "sell_products", "manage_customers"]
-    //   }
-    // ];
-
-    // for (const role of roles) {
-    //   await Role.create(role);
-    // }
-    // console.log("Roles created successfully!");
-
     // === CREATE CATEGORIES (THỜI TRANG) ===
     console.log("\nCreating fashion categories...");
     const categories = [
@@ -107,9 +85,9 @@ const seedData = async () => {
     // Admin user
     const adminUser = await User.create({
       username: "admin",
-      password: await bcrypt.hash('Admin@123', 10),
+      password: await bcrypt.hash('12345678', 10),
       verified: true,
-      email: "admin@biznest.com",
+      email: "a1@email.com",
       phone: "0900000000",
       role: "admin",
       status: "active",
@@ -121,29 +99,28 @@ const seedData = async () => {
     const businessOwners = [
       {
         username: "fashion_owner",
-        password: await bcrypt.hash('Owner@123', 10),
+        password: await bcrypt.hash('12345678', 10),
         verified: true,
-        email: "fashion@biznest.com",
-        phone: "0901111111",
+        email: "b1@email.com",
         role: "business owner",
         status: "active",
         pendingApproval: false
       },
       {
         username: "sport_owner",
-        password: await bcrypt.hash('Owner@123', 10),
+        password: await bcrypt.hash('12345678', 10),
         verified: true,
-        email: "sport@biznest.com",
+        email: "b2@email.com",
         phone: "0902222222",
         role: "business owner",
         status: "active",
         pendingApproval: false
       },
       {
-        username: "Pending 1",
+        username: "Women King Clothes Shop",
         password: await bcrypt.hash('12345678', 10),
         verified: true,
-        email: "bus5@gmail.com",
+        email: "b3@emai.com",
         phone: "0903333333",
         role: "business owner",
         gender: true,
@@ -152,10 +129,10 @@ const seedData = async () => {
         date_of_birth: new Date("2000-01-01")
       },
       {
-        username: "Pending 2",
+        username: "1998 Shoes Shop",
         password: await bcrypt.hash('12345678', 10),
         verified: true,
-        email: "bus6@gmail.com",
+        email: "b4@emai.com",
         phone: "0904444444",
         role: "business owner",
         gender: true,
@@ -387,90 +364,6 @@ const seedData = async () => {
         image: "https://res.cloudinary.com/duerrjcxj/image/upload/v1710780000/product_images/polo_navy_h29fjs.jpg",
         brand: "Coolmate",
         storeId: fashionStore._id
-      },
-      {
-        name: "Quần jean nam slim fit",
-        categoryId: quanCategory._id,
-        color: "Xanh đậm",
-        size: "32",
-        price: 450000,
-        quantity: 30,
-        description: "Quần jean nam form slim fit, chất vải jean co giãn, đường may chắc chắn, phong cách trẻ trung năng động",
-        image: "https://res.cloudinary.com/duerrjcxj/image/upload/v1710780000/product_images/jeans_blue_kfdjal.jpg",
-        brand: "Routine",
-        storeId: fashionStore._id
-      },
-      {
-        name: "Quần kaki nam trơn",
-        categoryId: quanCategory._id,
-        color: "Be",
-        size: "31",
-        price: 350000,
-        quantity: 40,
-        description: "Quần kaki nam trơn basic, form regular fit, chất vải kaki cao cấp, không nhăn, không xù, dễ phối đồ",
-        image: "https://res.cloudinary.com/duerrjcxj/image/upload/v1710780000/product_images/khaki_beige_kdf8a2.jpg",
-        brand: "Owen",
-        storeId: fashionStore._id
-      },
-      {
-        name: "Quần short nam thể thao",
-        categoryId: quanCategory._id,
-        color: "Đen",
-        size: "M",
-        price: 180000,
-        quantity: 60,
-        description: "Quần short nam thể thao, chất liệu thun nỉ mềm mại, có túi khóa kéo an toàn, thích hợp cho các hoạt động thể thao và đi chơi",
-        image: "https://res.cloudinary.com/duerrjcxj/image/upload/v1710780000/product_images/shorts_black_fj21cs.jpg",
-        brand: "Local Brand",
-        storeId: fashionStore._id
-      },
-      {
-        name: "Giày thể thao nam",
-        categoryId: giayCategory._id,
-        color: "Đen",
-        size: "42",
-        price: 850000,
-        quantity: 20,
-        description: "Giày thể thao nam đế cao su bền bỉ, thiết kế hiện đại, êm chân, phù hợp chạy bộ và tập luyện",
-        image: "https://res.cloudinary.com/duerrjcxj/image/upload/v1710780000/product_images/shoes_black_ksjdfa.jpg",
-        brand: "Nike",
-        storeId: fashionStore._id
-      },
-      {
-        name: "Giày lười nam da thật",
-        categoryId: giayCategory._id,
-        color: "Nâu",
-        size: "43",
-        price: 750000,
-        quantity: 25,
-        description: "Giày lười nam chất liệu da bò thật 100%, đế cao su chống trơn trượt, thiết kế lịch lãm phù hợp đi làm và đi chơi",
-        image: "https://res.cloudinary.com/duerrjcxj/image/upload/v1710780000/product_images/loafers_brown_akd8js.jpg",
-        brand: "Lacoste",
-        storeId: fashionStore._id
-      },
-      {
-        name: "Ví da nam ngang",
-        categoryId: pkCategory._id,
-        color: "Đen",
-        size: "Standard",
-        price: 450000,
-        quantity: 15,
-        description: "Ví da nam ngang chất liệu da bò thật, nhiều ngăn đựng thẻ, thiết kế sang trọng lịch lãm",
-        image: "https://res.cloudinary.com/duerrjcxj/image/upload/v1710780000/product_images/wallet_black_fkjad9.jpg",
-        brand: "Pierre Cardin",
-        storeId: fashionStore._id
-      },
-      {
-        name: "Thắt lưng nam da thật",
-        categoryId: pkCategory._id,
-        color: "Đen",
-        size: "105cm",
-        price: 550000,
-        quantity: 20,
-        description: "Thắt lưng nam làm từ da bò nguyên miếng, mặt khóa hợp kim cao cấp chống gỉ, kiểu dáng đơn giản thanh lịch",
-        image: "https://res.cloudinary.com/duerrjcxj/image/upload/v1710780000/product_images/belt_black_fk39ds.jpg",
-        brand: "Bovini",
-        storeId: fashionStore._id
       }
     ];
 
@@ -504,42 +397,6 @@ const seedData = async () => {
         description: "Quần jogger thể thao chất liệu thun nỉ, co giãn tốt, thiết kế gọn gàng thoải mái, phù hợp cho tập gym và các hoạt động ngoài trời",
         image: "https://res.cloudinary.com/duerrjcxj/image/upload/v1710780000/product_images/jogger_gray_kf83hd.jpg",
         brand: "Nike",
-        storeId: sportStore._id
-      },
-      {
-        name: "Giày chạy bộ nam",
-        categoryId: thethaoCategory._id,
-        color: "Đỏ đen",
-        size: "41",
-        price: 1200000,
-        quantity: 15,
-        description: "Giày chạy bộ nam công nghệ đệm Air, nhẹ, êm, bám đường tốt, thiết kế thời trang phù hợp cho chạy bộ và tập luyện",
-        image: "https://res.cloudinary.com/duerrjcxj/image/upload/v1710780000/product_images/running_shoes_red_fjk832.jpg",
-        brand: "Nike",
-        storeId: sportStore._id
-      },
-      {
-        name: "Áo khoác gió thể thao",
-        categoryId: dongCategory._id,
-        color: "Đen",
-        size: "XL",
-        price: 450000,
-        quantity: 20,
-        description: "Áo khoác gió thể thao chống nước, chống gió, nhẹ và có thể gấp gọn, phù hợp cho các hoạt động ngoài trời và du lịch",
-        image: "https://res.cloudinary.com/duerrjcxj/image/upload/v1710780000/product_images/wind_jacket_black_fk38ds.jpg",
-        brand: "Under Armour",
-        storeId: sportStore._id
-      },
-      {
-        name: "Áo len nam cổ tròn",
-        categoryId: dongCategory._id,
-        color: "Xám",
-        size: "L",
-        price: 380000,
-        quantity: 30,
-        description: "Áo len nam cổ tròn chất liệu len mềm mại, giữ ấm tốt, thiết kế basic dễ phối đồ, phù hợp mùa thu đông",
-        image: "https://res.cloudinary.com/duerrjcxj/image/upload/v1710780000/product_images/sweater_gray_fk92js.jpg",
-        brand: "Uniqlo",
         storeId: sportStore._id
       }
     ];

@@ -1,10 +1,15 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Button } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LineChart } from "react-native-chart-kit";
 import * as Routes from "@utils/Routes";
 import { navigate, useNavigationRoot } from "@components/navigate/RootNavigation";
+import ProductActions from "@redux/product/actions";
+import { useAppSelector } from "@redux/store";
+import { useDispatch } from "react-redux";
+import { RootState } from "@redux/root-reducer";
+import CustomerActions from "@redux/customer/actions";
 
 const HomePage = () => {
   const navigation = useNavigationRoot();
@@ -16,6 +21,26 @@ const HomePage = () => {
     { id: "5", name: "Invoice", icon: "account-balance-wallet", route: Routes.InvoiceListScreen },
   ];
 
+  const dispatch = useDispatch();
+  const Auth = useAppSelector((state: RootState) => state.User.Auth);
+
+  useEffect(() => {
+    dispatch({ 
+      type: ProductActions.FETCH_PRODUCTS, 
+      payload: { storeId: Auth?.storeId } 
+    });
+    dispatch({
+      type: CustomerActions.FETCH_LIST_CUSTOMER,
+      payload: {
+        onError: (error: any) => {
+          console.log(error);
+        },
+        onFailed: (MsgNo: string) => {
+          console.log(MsgNo);
+        },
+      },
+    });
+  },[])
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>

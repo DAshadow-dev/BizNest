@@ -15,6 +15,8 @@ const staffRoutes = require('./src/routes/staffRoutes');
 const customerRoute = require('./src/routes/customerRoute');
 const adminRoute = require('./src/routes/admin/adminRouter');
 const invoiceRouter = require('./src/routes/invoiceRouter');
+const transactionRouter = require('./src/routes/transaction/transactionRoutes');
+
 const port = process.env.PORT || 5000;
 
 const app = express();
@@ -52,6 +54,9 @@ app.use('/api/user', userRoute)
 app.use('/api/customer', customerRoute)
 //invoice
 app.use('/api/invoice', invoiceRouter);
+
+//transaction
+app.use('/api/transaction', transactionRouter);
 
 //connect socket.io
 io.on("connection", (socket) => {

@@ -1,75 +1,154 @@
-import React, { useEffect } from "react";
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchInvoices } from "@redux/invoice/actions";
-import { RootState } from "@redux/rootReducer";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigationRoot } from "@components/navigate/RootNavigation";
+import * as Routes from "@utils/Routes";
+import { useDispatch } from "react-redux";
+import TransactionActions from "@redux/transaction/actions";
+import { useAppSelector } from "@redux/store";
+import { RootState } from "@redux/root-reducer";
+import {
+  moderateScale,
+  scale,
+  verticalScale,
+} from "@libs/reactResizeMatter/scalingUtils";
+import { format, parseISO } from "date-fns";
 
-const InvoiceListScreen = ({ navigation }: { navigation: any }) => {
+const InvoiceListScreen = () => {
+  const navigation = useNavigationRoot();
   const dispatch = useDispatch();
-  const { invoices = [], loading, error } = useSelector((state: RootState) => {
-    const invoiceData = state.Invoice || { invoices: [], loading: false, error: null };
-    console.log("Raw API Response:", invoiceData); // Debugging API response
-    return {
-      ...invoiceData,
-      invoices: invoiceData.invoices || [],
-    };
-  });
+  const [search, setSearch] = useState<string>("");
+  const [filteredtransactions, setFilteredtransactions] = useState<any[]>([]);
 
-  useEffect(() => {
-    dispatch(fetchInvoices());
-  }, [dispatch]);
-
-  const handleInvoicePress = (item: any) => {
-    navigation.navigate("InvoiceDetail", item);
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "paid": return "#28A745";
-      case "pending": return "#FFC107";
-      case "overdue": return "#FF5733";
-      default: return "#777";
-    }
-  };
-
-  const renderItem = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.item} onPress={() => handleInvoicePress(item)}>
-      <Text style={styles.itemTitle}>Invoice #{item.invoiceNumber}</Text>
-      <Text style={styles.itemSubtitle}>Customer: {item.customerName} ({item.customerEmail})</Text>
-      <Text style={styles.itemTotal}>Total: ${item.totalAmount}</Text>
-      <Text style={[styles.itemStatus, { color: getStatusColor(item.status) }]}>Status: {item.status}</Text>
-      <Text style={styles.itemDate}>Due Date: {new Date(item.dueDate).toLocaleDateString()}</Text>
-    </TouchableOpacity>
+  const transactions = useAppSelector(
+    (state: RootState) => state.Transaction.ListTransaction
   );
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#007AFF" />
-      </View>
-    );
-  }
+  useEffect(() => {
+    dispatch({
+      type: TransactionActions.FETCH_LIST_TRANSACTION,
+      payload: {
+        onError: (error: any) => {
+          console.log(error);
+        },
+        onFailed: (MsgNo: string) => {
+          console.log(MsgNo);
+        },
+      },
+    });
+  }, []);
 
-  if (error) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>Error: {error?.message || "An unexpected error occurred."}</Text>
-      </View>
-    );
-  }
+  useEffect(() => {
+    if (search == "") {
+      setFilteredtransactions(transactions);
+    } else {
+      const filtered = transactions.filter(
+        (item: any) =>
+          item.customerId.fullname.toLowerCase().includes(search.toLowerCase()) ||
+        item._id == search
+      );
+      setFilteredtransactions(filtered);
+    }
+  }, [search, transactions]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Invoices</Text>
-      {Array.isArray(invoices) && invoices.length > 0 ? (
+      <View style={styles.header}>
+        <View style={styles.headerTop}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate(Routes.HomeScreen)}
+          >
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>List Transaction</Text>
+          <TouchableOpacity>
+            <Ionicons name="options-outline" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchBar}
+            placeholder="Search transaction by Id or Name"
+            value={search}
+            onChangeText={(value: string) => setSearch(value)}
+          />
+          <TouchableOpacity style={styles.searchIcon}>
+            <Ionicons name="search-outline" size={20} color="#333" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={{ margin: 16, position: "relative", flex: 1 }}>
         <FlatList
-          data={invoices}
-          renderItem={renderItem}
-          keyExtractor={(item) => item._id?.toString() || Math.random().toString()}
+          data={filteredtransactions}
+          keyExtractor={(item: any) => item._id.toString()}
+          renderItem={({ item }) => {
+            // Tính tổng số lượng sản phẩm
+            const totalQuantity =
+              item.products?.reduce(
+                (sum: number, product: any) => sum + product.quantity,
+                0
+              ) || 0;
+
+            return (
+              <TouchableOpacity
+                style={styles.orderItem}
+                onPress={() =>
+                  navigation.navigate(Routes.InvoiceScreen, { id: item._id })
+                }
+              >
+                <View style={styles.orderInfo}>
+                  <Text style={styles.orderText}>Mã đơn hàng: {item._id}</Text>
+                  <Text style={styles.orderText}>
+                    Khách hàng: {item.customerId.fullname}
+                  </Text>
+                  <Text style={styles.orderText}>
+                    Số lượng sản phẩm: {totalQuantity}
+                  </Text>
+                  <Text style={styles.orderText}>
+                    Tổng giá trị: {item.totalPrice.toLocaleString()} đ
+                  </Text>
+                  <Text style={styles.orderText}>
+                    Trạng thái: {item.status}
+                  </Text>
+                  <Text style={styles.orderDate}>
+                    Ngày tạo:{" "}
+                    {item.createdAt
+                      ? format(
+                          parseISO(item.createdAt.toString()),
+                          "HH:mm:ss dd/MM/yyyy"
+                        )
+                      : "N/A"}
+                  </Text>
+                </View>
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={20}
+                  color="#555"
+                />
+              </TouchableOpacity>
+            );
+          }}
+          contentContainerStyle={{ paddingBottom: 20 }}
         />
-      ) : (
-        <Text style={styles.noInvoices}>No invoices available.</Text>
-      )}
+        <TouchableOpacity
+          style={styles.floatingButton}
+          onPress={() =>
+            navigation.navigate(Routes.CreateInvoiceScreen, { idUpdate: -1 })
+          }
+        >
+          <Ionicons name="add" size={24} color="#fff" />
+          <Text style={styles.buttonText}>New</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -77,65 +156,112 @@ const InvoiceListScreen = ({ navigation }: { navigation: any }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#f0f4f8",
+    backgroundColor: "#f2f2f2",
   },
-  title: {
-    fontSize: 24,
+  header: {
+    backgroundColor: "#4a90e2",
+    paddingTop: 50,
+    paddingBottom: 20,
+    alignItems: "center",
+  },
+  headerTop: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    marginBottom: 20,
+  },
+  headerTitle: {
+    fontSize: 20,
+    color: "white",
     fontWeight: "bold",
-    marginBottom: 15,
     textAlign: "center",
-    color: "#007AFF",
   },
-  item: {
-    padding: 20,
+  searchContainer: {
+    width: "80%",
+    position: "relative",
+  },
+  searchBar: {
     backgroundColor: "#ffffff",
-    borderRadius: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 5,
-    marginBottom: 15,
-    borderLeftWidth: 5,
-    borderLeftColor: "#007AFF",
+    borderRadius: 20,
+    paddingVertical: 10,
+    fontSize: 16,
+    paddingLeft: 16,
+    paddingRight: 40,
   },
-  itemTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
+  searchIcon: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+  },
+  customerItem: {
+    height: 80,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#ffffff",
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+  },
+  customerText: {
+    fontSize: 16,
     color: "#333",
   },
-  itemSubtitle: {
+  floatingButton: {
+    position: "absolute",
+    right: 10,
+    bottom: 10,
+    backgroundColor: "#3478f6",
+    borderRadius: 50,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  buttonText: {
+    color: "#fff",
+    marginLeft: 5,
+    fontWeight: "500",
+  },
+  orderItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#ffffff",
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+  },
+  orderInfo: {
+    flexDirection: "column",
+    flex: 1,
+  },
+  orderText: {
     fontSize: 14,
-    color: "#555",
-    marginTop: 5,
+    color: "#333",
   },
-  itemTotal: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#007AFF",
-    marginTop: 8,
+  orderDate: {
+    fontSize: 12,
+    color: "#615e5e",
   },
-  itemStatus: {
-    fontSize: 14,
-    marginTop: 5,
-  },
-  itemDate: {
-    fontSize: 14,
-    color: "#777",
-    marginTop: 5,
-  },
-  errorText: {
-    fontSize: 16,
-    color: "red",
-    textAlign: "center",
-  },
-  noInvoices: {
-    fontSize: 16,
-    textAlign: "center",
-    color: "#777",
-    marginTop: 20,
-  },
+  
 });
 
 export default InvoiceListScreen;

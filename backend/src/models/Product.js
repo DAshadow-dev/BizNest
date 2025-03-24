@@ -59,6 +59,5 @@ const ProductSchema = new mongoose.Schema({
 ProductSchema.plugin(AutoIncrement, { 
   id: 'product_seq', 
   inc_field: '_id',
-  start_seq: 100 // Bắt đầu từ 100 để tránh xung đột với các ID đã tồn tại
 });
 module.exports = mongoose.model("Product", ProductSchema);

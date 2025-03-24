@@ -24,8 +24,8 @@ import {
 const LoginScreen: React.FC = () => {
   const dispatch = useDispatch();
   const navigation = useNavigationRoot();
-  const [email, setEmail] = useState("admin@biznest.com");
-  const [password, setPassword] = useState("Admin@123");
+  const [email, setEmail] = useState("b1@email.com");
+  const [password, setPassword] = useState("12345678");
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");

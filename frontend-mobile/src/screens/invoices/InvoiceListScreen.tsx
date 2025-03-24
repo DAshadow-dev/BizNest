@@ -14,11 +14,7 @@ import { useDispatch } from "react-redux";
 import TransactionActions from "@redux/transaction/actions";
 import { useAppSelector } from "@redux/store";
 import { RootState } from "@redux/root-reducer";
-import {
-  moderateScale,
-  scale,
-  verticalScale,
-} from "@libs/reactResizeMatter/scalingUtils";
+
 import { format, parseISO } from "date-fns";
 
 const InvoiceListScreen = () => {
@@ -30,7 +26,7 @@ const InvoiceListScreen = () => {
   const transactions = useAppSelector(
     (state: RootState) => state.Transaction.ListTransaction
   );
-
+  console.log('filteredtransactions: ', filteredtransactions)
   useEffect(() => {
     dispatch({
       type: TransactionActions.FETCH_LIST_TRANSACTION,
@@ -46,16 +42,8 @@ const InvoiceListScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (search == "") {
+
       setFilteredtransactions(transactions);
-    } else {
-      const filtered = transactions.filter(
-        (item: any) =>
-          item.customerId.fullname.toLowerCase().includes(search.toLowerCase()) ||
-        item._id == search
-      );
-      setFilteredtransactions(filtered);
-    }
   }, [search, transactions]);
 
   return (
@@ -89,7 +77,7 @@ const InvoiceListScreen = () => {
       <View style={{ margin: 16, position: "relative", flex: 1 }}>
         <FlatList
           data={filteredtransactions}
-          keyExtractor={(item: any) => item._id.toString()}
+          keyExtractor={(item: any, index: number) => index.toString()}
           renderItem={({ item }) => {
             // Tính tổng số lượng sản phẩm
             const totalQuantity =
@@ -114,7 +102,7 @@ const InvoiceListScreen = () => {
                     Số lượng sản phẩm: {totalQuantity}
                   </Text>
                   <Text style={styles.orderText}>
-                    Tổng giá trị: {item.totalPrice.toLocaleString()} đ
+                    Tổng giá trị: {item.totalPrice} đ
                   </Text>
                   <Text style={styles.orderText}>
                     Trạng thái: {item.status}

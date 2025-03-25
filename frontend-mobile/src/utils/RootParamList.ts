@@ -112,5 +112,6 @@ export type RootParamList = {
   CHAT_SCREEN :undefined,
   HOME_ADMIN: undefined,
   STATUS_SCREEN: {status: string},
+  ReviewScreen: undefined,
   PendingDetailScreen: {id: string}
 };

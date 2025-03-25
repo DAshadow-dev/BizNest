@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendVerificationEmail = async (email, token) => {
-  const url = `http://localhost:5000/api/auth/verify-email?token=${token}`; // URL chứa token trong query string
+  const url = `http://localhost:5000/api/auth/verify-email?token=${token}`; 
 
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
@@ -22,7 +22,7 @@ const sendVerificationEmail = async (email, token) => {
   });
 };
 const sendResetPasswordEmail = async (email, token) => {
-  const url = "http://localhost:5000/api/auth/reset-password"; // URL không chứa token
+  const url = "http://localhost:5000/api/auth/reset-password"; 
 
   await transporter.sendMail({
     from: process.env.EMAIL_USER,

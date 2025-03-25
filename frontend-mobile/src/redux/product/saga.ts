@@ -11,10 +11,8 @@ export function* fetchProducts() {
     try {
       console.log('Calling API to get products...');
       const response = yield call(Factories.getAllProducts);
-      console.log('API response:', response);
       
       if (response?.status === 200) {
-        console.log('Products fetched successfully:', response.data.Data);
         onSuccess(response.data.Data);
         yield put({ type: ProductActions.FETCH_PRODUCTS_SUCCESS, payload: response.data.Data });
       } else {

@@ -103,7 +103,15 @@ const PendingAccountScreen: React.FC = () => {
         <View style={styles.accountInfo}>
           <Text style={styles.accountName}>{item.username}</Text>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
+          <TouchableOpacity
+              style={styles.detailButton}
+              onPress={() => {
+                navigation.navigate(Routes.PendingDetailScreen, {accountId: item._id});
+              }}
+            >
+              <Text style={styles.buttonText}>View Detail</Text>
+            </TouchableOpacity>
+            {/* <TouchableOpacity
               style={styles.approveButton}
               onPress={() => handleApprove(item)}
             >
@@ -114,7 +122,7 @@ const PendingAccountScreen: React.FC = () => {
               onPress={() => handleReject(item)}
             >
               <Text style={styles.buttonText}>Reject</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
       </View>
@@ -225,6 +233,12 @@ const styles = StyleSheet.create({
   backButtonText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  detailButton: {
+    backgroundColor: "#9F7434",
+    padding: 10,
+    borderRadius: 5,
+    marginRight: 10,
   },
 });
 

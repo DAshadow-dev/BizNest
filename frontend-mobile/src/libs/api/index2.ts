@@ -20,22 +20,18 @@ api.interceptors.request.use(
     try {
       // Lấy token từ AsyncStorage
       const token = await getToken();
-      console.log('[API Interceptor] Token retrieved:', token ? 'Yes' : 'No');
       
       // Chỉ thêm Authorization header nếu có token
       if (token) {
         config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${token}`;
-        console.log('[API Interceptor] Added auth token to request');
       }
       return config;
     } catch (error) {
-      console.error('[API Interceptor] Error retrieving token:', error);
       return config;
     }
   },
   (error) => {
-    console.error('[API Interceptor] Request error:', error);
     return Promise.reject(error);
   }
 );

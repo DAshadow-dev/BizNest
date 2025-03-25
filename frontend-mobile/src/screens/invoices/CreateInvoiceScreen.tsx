@@ -264,7 +264,7 @@ const CreateTransactionScreen = () => {
                       onPress={() => handleSelectProduct(item)}
                     >
                       <Text style={styles.productName}>{item.name}</Text>
-                      <Text style={styles.productPrice}>${item.price}</Text>
+                      <Text style={styles.productPrice}>${item.price.toLocaleString()}</Text>
                     </TouchableOpacity>
                   )}
                   style={{ maxHeight: verticalScale(150) }}

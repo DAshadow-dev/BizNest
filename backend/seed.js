@@ -102,6 +102,7 @@ const seedData = async () => {
         password: await bcrypt.hash('12345678', 10),
         verified: true,
         email: "b1@email.com",
+        phone: "0934726073",
         role: "business owner",
         status: "active",
         pendingApproval: false
@@ -383,7 +384,7 @@ const seedData = async () => {
         price: 250000,
         quantity: 30,
         description: "Áo thun thể thao nam chất liệu polyester cao cấp, thấm hút mồ hôi tốt, thoáng khí, co giãn 4 chiều",
-        image: "https://res.cloudinary.com/duerrjcxj/image/upload/v1710780000/product_images/sport_tshirt_blue_akd932.jpg",
+        image: "https://bizweb.dktcdn.net/100/415/697/products/ap001.png?v=1701403328933",
         brand: "Adidas",
         storeId: sportStore._id
       },
@@ -395,7 +396,7 @@ const seedData = async () => {
         price: 320000,
         quantity: 25,
         description: "Quần jogger thể thao chất liệu thun nỉ, co giãn tốt, thiết kế gọn gàng thoải mái, phù hợp cho tập gym và các hoạt động ngoài trời",
-        image: "https://res.cloudinary.com/duerrjcxj/image/upload/v1710780000/product_images/jogger_gray_kf83hd.jpg",
+        image: "https://chodole.com/cdn/shop/products/CDL5_1_1024x1024.jpg?v=1586758906",
         brand: "Nike",
         storeId: sportStore._id
       }

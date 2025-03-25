@@ -26,7 +26,6 @@ const InvoiceListScreen = () => {
   const transactions = useAppSelector(
     (state: RootState) => state.Transaction.ListTransaction
   );
-  console.log('filteredtransactions: ', filteredtransactions)
   useEffect(() => {
     dispatch({
       type: TransactionActions.FETCH_LIST_TRANSACTION,
@@ -75,58 +74,59 @@ const InvoiceListScreen = () => {
       </View>
 
       <View style={{ margin: 16, position: "relative", flex: 1 }}>
+        { transactions.length != 0 &&
         <FlatList
-          data={filteredtransactions}
-          keyExtractor={(item: any, index: number) => index.toString()}
-          renderItem={({ item }) => {
-            // Tính tổng số lượng sản phẩm
-            const totalQuantity =
-              item.products?.reduce(
-                (sum: number, product: any) => sum + product.quantity,
-                0
-              ) || 0;
+        data={filteredtransactions}
+        keyExtractor={(item: any, index: number) => index.toString()}
+        renderItem={({ item }) => {
+          // Tính tổng số lượng sản phẩm
+          const totalQuantity =
+            item.products?.reduce(
+              (sum: number, product: any) => sum + product.quantity,
+              0
+            ) || 0;
 
-            return (
-              <TouchableOpacity
-                style={styles.orderItem}
-                onPress={() =>
-                  navigation.navigate(Routes.InvoiceScreen, { id: item._id })
-                }
-              >
-                <View style={styles.orderInfo}>
-                  <Text style={styles.orderText}>Mã đơn hàng: {item._id}</Text>
-                  <Text style={styles.orderText}>
-                    Khách hàng: {item.customerId.fullname}
-                  </Text>
-                  <Text style={styles.orderText}>
-                    Số lượng sản phẩm: {totalQuantity}
-                  </Text>
-                  <Text style={styles.orderText}>
-                    Tổng giá trị: {item.totalPrice} đ
-                  </Text>
-                  <Text style={styles.orderText}>
-                    Trạng thái: {item.status}
-                  </Text>
-                  <Text style={styles.orderDate}>
-                    Ngày tạo:{" "}
-                    {item.createdAt
-                      ? format(
-                          parseISO(item.createdAt.toString()),
-                          "HH:mm:ss dd/MM/yyyy"
-                        )
-                      : "N/A"}
-                  </Text>
-                </View>
-                <Ionicons
-                  name="chevron-forward-outline"
-                  size={20}
-                  color="#555"
-                />
-              </TouchableOpacity>
-            );
-          }}
-          contentContainerStyle={{ paddingBottom: 20 }}
-        />
+          return (
+            <TouchableOpacity
+              style={styles.orderItem}
+              onPress={() =>
+                navigation.navigate(Routes.InvoiceScreen, { id: item._id })
+              }
+            >
+              <View style={styles.orderInfo}>
+                <Text style={styles.orderText}>Mã đơn hàng: {item._id}</Text>
+                <Text style={styles.orderText}>
+                  Khách hàng: {item.customerId.fullname}
+                </Text>
+                <Text style={styles.orderText}>
+                  Số lượng sản phẩm: {totalQuantity}
+                </Text>
+                <Text style={styles.orderText}>
+                  Tổng giá trị: {new Intl.NumberFormat('vi-VN').format(item.totalPrice)} đ
+                </Text>
+                <Text style={styles.orderText}>
+                  Trạng thái: {item.status}
+                </Text>
+                <Text style={styles.orderDate}>
+                  Ngày tạo:{" "}
+                  {item.createdAt
+                    ? format(
+                        parseISO(item.createdAt.toString()),
+                        "HH:mm:ss dd/MM/yyyy"
+                      )
+                    : "N/A"}
+                </Text>
+              </View>
+              <Ionicons
+                name="chevron-forward-outline"
+                size={20}
+                color="#555"
+              />
+            </TouchableOpacity>
+          );
+        }}
+        contentContainerStyle={{ paddingBottom: 20 }}
+      />}
         <TouchableOpacity
           style={styles.floatingButton}
           onPress={() =>

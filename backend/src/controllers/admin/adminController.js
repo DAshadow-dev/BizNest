@@ -12,6 +12,7 @@ exports.approveUser = async (req, res) => {
         .json({ message: "This action is only for business owners" });
     }
 
+
     //Update status
     user.status = "active";
     user.pendingApproval = false;
@@ -37,7 +38,7 @@ exports.rejectUser = async (req, res) => {
 
 exports.getBusinessOwners = async (req, res) => {
   try {
-    const businessOwners = await User.find({ role: "business owner" });
+    const businessOwners = await User.find({ role: "business owner" }).populate('storeId');
     res.status(200).json({Data: businessOwners});
   } catch (error) {
     res.status(500).json({ message: error.message });

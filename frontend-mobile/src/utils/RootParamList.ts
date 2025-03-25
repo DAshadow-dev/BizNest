@@ -113,4 +113,5 @@ export type RootParamList = {
   HOME_ADMIN: undefined,
   STATUS_SCREEN: {status: string},
   ReviewScreen: undefined,
+  PendingDetailScreen: {id: string}
 };

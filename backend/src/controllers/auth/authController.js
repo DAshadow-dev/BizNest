@@ -36,6 +36,10 @@ exports.register = async (req, res) => {
     });
     await store.save();
 
+    console.log(store._id);
+    user.storeId= store._id;
+    await user.save();
+
     // Generate Token and verify email
     const token = generateToken(user);
     await sendVerificationEmail(email, token);

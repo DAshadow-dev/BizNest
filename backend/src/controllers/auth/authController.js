@@ -9,45 +9,53 @@ const {
 } = require("../../config/mailer");
 
 exports.register = async (req, res) => {
-  const {
-    username,
-    password,
-    email,
-    phone,
-    storeName,
-    storeAddress,
-    storePhone,
-  } = req.body;
+  try {
+    const {
+      username,
+      password,
+      email,
+      phone,  
+      storeName,
+      storeAddress,
+      storePhone,
+    } = req.body;
 
-  // Hash Password
-  const hashedPassword = await bcrypt.hash(password, 10);
+    // Hash Password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  // Save user
-  const user = new User({ username, password: hashedPassword, email, phone });
-  await user.save();
+    // Save user
+    const user = new User({ username, password: hashedPassword, email, phone });
+    await user.save();
 
-  // Save store with owner attribute
-  const store = new Store({
-    owner: user._id,
-    name: storeName,
-    address: storeAddress,
-    phone: storePhone,
-  });
-  await store.save();
+    // Save store with owner attribute
+    const store = new Store({
+      owner: user._id,
+      name: storeName,
+      address: storeAddress,
+      phone: storePhone,
+    });
+    await store.save();
 
-  // Generate Token and verify email
-  const token = generateToken(email);
-  await sendVerificationEmail(email, token);
+    console.log(store._id);
+    user.storeId= store._id;
+    await user.save();
 
-  res.status(200).json({
-    message:
-      "User and store registered successfully. Please verify your email.",
-    token: token,
-  });
+    // Generate Token and verify email
+    const token = generateToken(user);
+    await sendVerificationEmail(email, token);
+    res.status(200).json({Data:{
+      message:
+        "User and store registered successfully. Please verify your email.",
+      token: token,
+    }});
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message || "Internal Server Error" });
+  }
 };
 
 exports.verifyEmail = async (req, res) => {
-  const token = req.query.token; // Lấy token từ query string
+  const token = req.query.token; 
 
   if (!token) {
     return res.status(401).json({ message: "Authorization token is required" });
@@ -58,18 +66,19 @@ exports.verifyEmail = async (req, res) => {
     console.log("Decoded Token:", decodedToken);
 
     const user = await User.findOneAndUpdate(
-      { email: decodedToken.email },
+      { email: decodedToken.user.email },
       { $set: { verified: true } },
       { new: true }
     );
-
+    console.log("User:", user);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json({
-      message: "Email verified successfully. You can now login.",
-    });
+    res.status(200).json({Data:{
+      token: token,
+      message: "Email verified successfully"
+    }});
   } catch (error) {
     console.error("Error verifying email:", error);
     res.status(400).json({ message: "Invalid or expired token." });
@@ -87,8 +96,11 @@ exports.login = async (req, res) => {
     return res.status(403).json({ message: "Email not verified" });
   }
 
-  const token = generateToken(email);
-  res.json({ token });
+  const token = generateToken(user);
+  res.json({Data:{
+    token: token,
+    user: user
+  } });
 };
 
 exports.forgotPassword = async (req, res) => {
@@ -99,7 +111,7 @@ exports.forgotPassword = async (req, res) => {
     return res.status(404).json({ message: "User not found" });
   }
 
-  const token = generateToken(email);
+  const token = generateToken(user);
   await sendResetPasswordEmail(email, token);
 
   res.status(200).json({

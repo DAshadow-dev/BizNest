@@ -1,134 +1,299 @@
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+  Image,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigationRoot } from "@components/navigate/RootNavigation";
-import React from "react";
 import * as Routes from "@utils/Routes";
-import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
+import { useAppSelector } from "@redux/store";
+import { RootState } from "@redux/root-reducer";
+import { format, parseISO } from "date-fns";
+import { useDispatch } from "react-redux";
+import TransactionActions from "@redux/transaction/actions";
 
-const InvoiceScreen = (props: {
-  route: {
-    params: {
-      invoiceId: string;
-      amount: string;
-      date: string;
-      customer: string;
-      address: string;
-      createdBy: string;
-      createdDate: string;
-    };
-  };
-}) => {
-  //   const { invoiceId, amount, date, customer, address, createdBy, createdDate } =
-  //     props.route.params;
+const OrderDetailScreen = (props: any) => {
+  const { id } = props.route.params;
   const navigation = useNavigationRoot();
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Invoice Details</Text>
-      <View style={styles.detailBox}>
-        {/* <Text style={styles.label}>Invoice ID: {invoiceId}</Text>
-                <Text style={styles.label}>Amount: {amount}</Text>
-                <Text style={styles.label}>Date: {date}</Text>
-                <Text style={styles.label}>Customer: {customer}</Text>
-                <Text style={styles.label}>Address: {address}</Text>
-                <Text style={styles.label}>Created By: {createdBy}</Text>
-                <Text style={styles.label}>Created Date: {createdDate}</Text> */}
-
-        <Text style={styles.label}>Invoice ID: 10003</Text>
-        <Text style={styles.label}>Amount: 30.000.000 VNĐ</Text>
-        <Text style={styles.label}>Date: 22/09/2025</Text>
-        <Text style={styles.label}>Customer: Truong</Text>
-        <Text style={styles.label}>Address: 29.SonLa Str</Text>
-        <Text style={styles.label}>Created By: Admin</Text>
-        <Text style={styles.label}>Created Date: 22/09/2019</Text>
-      </View>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate(Routes.PaymentScreen)}
-      >
-        <Text style={styles.buttonText}>Pay this invoice</Text>
-      </TouchableOpacity>
-      <Button title="Go back" onPress={() => navigation.goBack()} />
-    </View>
+  const orders = useAppSelector(
+    (state: RootState) => state.Transaction.ListTransaction
   );
-};
 
-const DemoScreen = ({ navigation }: any) => {
+  const [order, setOrder] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const findOrder = orders.find((e: any) => e._id === id);
+    setOrder(findOrder);
+    setLoading(false);
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#4a90e2" />
+      </View>
+    );
+  }
+
+  if (!order) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>Order not found</Text>
+      </View>
+    );
+  }
+
+  const dispatch= useDispatch();
+
+  const handleDeleteCustomer= () => {
+    dispatch({
+      type: TransactionActions.DELETE_TRANSACTION,
+      payload: {
+        data: {id: id},
+        onSuccess:() => {
+          console.log('1');
+          navigation.navigate(Routes.InvoiceListScreen);
+          console.log('2');
+        },
+        onError: (error: any) => {
+          console.log(error);
+        },
+        onFailed: (MsgNo: string) => {
+          console.log("Delete unsuccess")
+        },
+      },
+    });
+  }
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Demo Screen</Text>
-      <Button
-        title="Go to Invoice"
-        onPress={() =>
-          navigation.navigate("InvoiceScreen", {
-            invoiceId: "INV12345",
-            amount: "$250.00",
-            date: "2025-02-14",
-            customer: "John Doe",
-            address: "123 Main St, City, Country",
-            createdBy: "Admin",
-            createdDate: "2025-02-01",
-          })
-        }
-      />
+      <View style={styles.header}>
+        <View style={styles.headerTop}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate(Routes.InvoiceListScreen)}
+          >
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Detail Transaction</Text>
+          <TouchableOpacity onPress={handleDeleteCustomer}>
+            <Ionicons name="trash" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <ScrollView style={{ padding: 16 }}>
+        {/* Thông tin khách hàng */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Thông tin khách hàng</Text>
+          <Text style={styles.label}>
+            Tên: <Text style={styles.value}>{order.customerId.fullname}</Text>
+          </Text>
+          <Text style={styles.label}>
+            Email: <Text style={styles.value}>{order.customerId.email}</Text>
+          </Text>
+          <Text style={styles.label}>
+            Số điện thoại:{" "}
+            <Text style={styles.value}>{order.customerId.phone}</Text>
+          </Text>
+          <Text style={styles.label}>
+            Ngày sinh:
+            <Text style={styles.value}>
+              {order.customerId.date_of_birth
+                ? format(new Date(order.customerId.date_of_birth), "dd/MM/yyyy")
+                : "N/A"}
+            </Text>
+          </Text>
+        </View>
+
+        {/* Danh sách sản phẩm */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Danh sách sản phẩm</Text>
+          {order.products.map((product: any, index: number) => (
+            <View key={index} style={styles.productRow}>
+              <Image
+                source={{ uri: product.productId.image }}
+                style={styles.productImage}
+              />
+              <View style={{ flex: 1, marginLeft: 10 }}>
+                <Text style={styles.productName}>{product.productId.name}</Text>
+                <Text style={styles.productDetail}>
+                  Màu sắc: {product.productId.color}
+                </Text>
+                <Text style={styles.productDetail}>
+                  Size: {product.productId.size}
+                </Text>
+                <Text style={styles.productDetail}>
+                  Đơn giá: {product.productId.price.toLocaleString()}đ
+                </Text>
+                <Text style={styles.productDetail}>
+                  Số lượng: {product.quantity}
+                </Text>
+                <Text style={styles.productTotal}>
+                  Thành tiền:{" "}
+                  {(
+                    product.productId.price * product.quantity
+                  ).toLocaleString()}
+                  đ
+                </Text>
+              </View>
+            </View>
+          ))}
+        </View>
+
+        {/* Tổng cộng */}
+        <View
+          style={{
+            ...styles.card,
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text style={{ ...styles.totalText }}>Tổng cộng:</Text>
+          <Text style={styles.totalText}>
+            {" "}
+            {order.totalPrice.toLocaleString()}đ
+          </Text>
+        </View>
+
+        {/* Trạng thái đơn hàng */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Trạng thái đơn hàng</Text>
+          <View style={{ justifyContent: "center", alignItems: "center" }}>
+            <Text
+              style={{
+                ...styles.statusText,
+                borderColor: "gray",
+                borderWidth: 1,
+                padding: 12,
+                borderRadius: 16,
+                backgroundColor: "#4a90e2",
+              }}
+            >
+              {order.status}
+            </Text>
+          </View>
+          <TouchableOpacity style={styles.changeStatusButton}>
+            <Text style={styles.changeStatusText}>Thay đổi trạng thái</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  headerTop: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    marginBottom: 20,
+  },
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#f2f2f2",
   },
-  title: {
-    fontSize: 22,
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  header: {
+    backgroundColor: "#4a90e2",
+    paddingTop: 20,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  headerTitle: {
+    fontSize: 20,
+    color: "white",
     fontWeight: "bold",
-    marginBottom: 10,
+    marginLeft: 16,
   },
-  detailBox: {
-    padding: 20,
-    backgroundColor: "#ffffff",
-    borderRadius: 20,
+  card: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 16,
+    marginBottom: 12,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     elevation: 3,
-    width: "100%",
-    marginBottom: 15,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#1e4cff",
   },
   label: {
     fontSize: 16,
-    marginBottom: 5,
     color: "#333",
+    marginBottom: 6,
   },
-  button: {
-    backgroundColor: "#4A90E2",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
+  value: {
+    fontWeight: "bold",
+  },
+  productRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  productImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 5,
+  },
+  productName: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  productDetail: {
+    fontSize: 14,
+    color: "#555",
+  },
+  productTotal: {
+    fontSize: 14,
+    color: "#ff5733",
+    fontWeight: "bold",
+  },
+  totalText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#ff5733",
+    textAlign: "right",
+  },
+  statusText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "white",
+  },
+  changeStatusButton: {
+    backgroundColor: "#ff5733",
+    padding: 10,
+    borderRadius: 5,
     marginTop: 10,
     alignItems: "center",
   },
-  buttonText: {
-    color: "#FFF",
-    fontSize: 16,
+  changeStatusText: {
+    color: "white",
     fontWeight: "bold",
   },
-  buttonSecondary: {
-    backgroundColor: "#E3F2FD",
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    marginVertical: 10,
-    minWidth: 180,
-    alignItems: "center",
-  },
-  buttonTextSecondary: {
-    color: "#4A90E2",
-    fontSize: 16,
-    fontWeight: "bold",
+  errorText: {
+    textAlign: "center",
+    fontSize: 18,
+    color: "red",
   },
 });
 
-export default InvoiceScreen;
-export { DemoScreen };
+export default OrderDetailScreen;

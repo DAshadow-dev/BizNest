@@ -14,7 +14,7 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigationRoot } from "@components/navigate/RootNavigation";
 import * as Routes from "@utils/Routes";
 import { useDispatch } from "react-redux";
-import AuthActions from "@redux/auth/actions";
+import UserActions from "@redux/user/actions";
 
 const BusinessCategoryScreen = (props: {
   route: { params: { email: string; fullName: string; mobile: string, password: string } };
@@ -38,7 +38,7 @@ const BusinessCategoryScreen = (props: {
     setIsLoading(true); // Bắt đầu hiển thị loading spinner
 
     dispatch({
-      type: AuthActions.REGISTER,
+      type: UserActions.REGISTER,
       payload: {
         data: {
           email,
@@ -60,6 +60,7 @@ const BusinessCategoryScreen = (props: {
         },
         onError: (error: any) => {
           setIsLoading(false); // Dừng hiển thị loading spinner
+          console.log(error);
           Alert.alert("Error", "There are any errors happening during the registration process");
         },
       },

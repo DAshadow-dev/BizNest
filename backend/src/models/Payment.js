@@ -1,12 +1,16 @@
 const mongoose = require("mongoose");
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const PaymentSchema = new mongoose.Schema({
+  _id: {
+    type: Number
+  },
   storeId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.Number,
     ref: "Store",
   },
   adminId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.Number,
     ref: "User",
     required: true,
   },
@@ -25,4 +29,5 @@ const PaymentSchema = new mongoose.Schema({
   },
 });
 
+PaymentSchema.plugin(AutoIncrement, { id: 'payment_seq', inc_field: '_id'});
 module.exports = mongoose.model("Payment", PaymentSchema);

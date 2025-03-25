@@ -1,63 +1,175 @@
-import React from "react";
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useEffect } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
-import { moderateScale, scale, verticalScale } from "@libs/reactResizeMatter/scalingUtils";
+import {
+  moderateScale,
+  scale,
+  verticalScale,
+} from "@libs/reactResizeMatter/scalingUtils";
 import IconBack from "@assets/svg/header/ic_back.svg";
 import { FontAwesome } from "@expo/vector-icons";
 import { CommonColors, Fonts } from "@utils/CommonStyles";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@redux/store";
+import { RootState } from "@redux/root-reducer";
+import CustomerActions from "@redux/customer/actions";
+import TransactionActions from "@redux/transaction/actions";
 
 const BusinessDashBoardScreen = () => {
   const screenWidth = Dimensions.get("window").width - 40;
+  const dispatch = useDispatch();
+  const customers = useAppSelector(
+    (state: RootState) => state.Customer.ListCustomer
+  );
+  const transactions = useAppSelector(
+    (state: RootState) => state.Transaction.ListTransaction
+  );
+  const revenueCalculating = (transactions : any) => {
+    let total = 0;
+    transactions.forEach((transaction : any) => total += transaction.totalPrice);
+    return total;
+  }
+
+  useEffect(() => {
+    dispatch({
+      type: CustomerActions.FETCH_LIST_CUSTOMER,
+      payload: {
+        onError: (error: any) => {
+          console.log(error);
+        },
+        onFailed: (MsgNo: string) => {
+          console.log(MsgNo);
+        },
+      },
+    });
+  }, [customers]);
+
+  useEffect(() => {
+    dispatch({
+      type: TransactionActions.FETCH_LIST_TRANSACTION,
+      payload: {
+        onError: (error: any) => {
+          console.log(error);
+        },
+        onFailed: (MsgNo: string) => {
+          console.log(MsgNo);
+        },
+      },
+    });
+  }, []);
+
+  const monthlyRevenue = Array(12).fill(0);
+  transactions.forEach((transaction : any) => {
+    const month = new Date(transaction.createdAt).getMonth();
+    monthlyRevenue[month] += transaction.totalPrice;
+  });
+
+  // console.log(monthlyRevenue)
 
   const revenueData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "July", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    labels: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "July",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
     datasets: [
       {
-        data: [5000, 7000, 8000, 12000, 15000, 18000, 0, 10000, 20000, 15000, 2000, 12300],
+        data: monthlyRevenue,
         strokeWidth: 2,
       },
     ],
   };
-
   return (
     <ScrollView style={styles.container}>
-      <View style={{height: verticalScale(60), width: scale(393), backgroundColor: '#3750B2', flexDirection: 'row', alignItems: "flex-end"}}>
-          <View style={{width: scale(50), height: verticalScale(50), justifyContent: "center", alignItems: "center"}}>
-              <TouchableOpacity
-                  onPress={()=>{
-                  }}
-              >
-                  <IconBack/>
-              </TouchableOpacity>
-          </View>
-          <View style={{width: scale(293), height: verticalScale(50), justifyContent: "center", alignItems: "center"}}>
-              <Text style={{fontSize: moderateScale(22), color: CommonColors.white, ...Fonts.defaultRegular}}>Dash Board</Text>
-          </View>
-          <View style={{width: scale(50), height: verticalScale(50),flexDirection: 'row', justifyContent: "center", alignItems: "center"}}>
-              <TouchableOpacity
-                  onPress={()=>{
-                  }}
-                  style={{marginRight: scale(10)}}
-              >   
-                  <FontAwesome name="filter" size={moderateScale(20)} color={CommonColors.white} />
-              </TouchableOpacity>
-              
-          </View>
+      <View
+        style={{
+          height: verticalScale(60),
+          width: scale(393),
+          backgroundColor: "#3750B2",
+          flexDirection: "row",
+          alignItems: "flex-end",
+        }}
+      >
+        <View
+          style={{
+            width: scale(50),
+            height: verticalScale(50),
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <TouchableOpacity onPress={() => {}}>
+            <IconBack />
+          </TouchableOpacity>
+        </View>
+        <View
+          style={{
+            width: scale(293),
+            height: verticalScale(50),
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: moderateScale(22),
+              color: CommonColors.white,
+              ...Fonts.defaultRegular,
+            }}
+          >
+            Dash Board
+          </Text>
+        </View>
+        <View
+          style={{
+            width: scale(50),
+            height: verticalScale(50),
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {}}
+            style={{ marginRight: scale(10) }}
+          >
+            <FontAwesome
+              name="filter"
+              size={moderateScale(20)}
+              color={CommonColors.white}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
       {/* Tổng quan */}
       <View style={styles.overviewContainer}>
         <View style={styles.card}>
-          <Text style={styles.title}>Tổng Doanh Thu</Text>
-          <Text style={styles.value}>$50,000</Text>
+          <Text style={styles.title}>Revenue: </Text>
+          <Text style={styles.value}>${revenueCalculating(transactions)}</Text>
         </View>
         <View style={styles.card}>
-          <Text style={styles.title}>Tổng Đơn Hàng</Text>
-          <Text style={styles.value}>1,200</Text>
+          <Text style={styles.title}>Number of transactions: </Text>
+          <Text style={styles.value}>{transactions.length}</Text>
         </View>
         <View style={styles.card}>
-          <Text style={styles.title}>Tổng Khách Hàng</Text>
-          <Text style={styles.value}>850</Text>
+          <Text style={styles.title}>Customers</Text>
+          <Text style={styles.value}>{customers.length}</Text>
         </View>
       </View>
 
@@ -93,7 +205,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(20),
   },
   card: {
-    justifyContent: 'center',
+    justifyContent: "center",
     flex: 1,
     width: scale(200),
     height: verticalScale(150),

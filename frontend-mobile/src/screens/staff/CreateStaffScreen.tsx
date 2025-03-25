@@ -8,154 +8,616 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
-  Button
+  Button,
+  ActivityIndicator,
+  Modal
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Import Ionicons
+import { Ionicons, FontAwesome } from '@expo/vector-icons'; // Import Ionicons and FontAwesome
 import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
+import staffActions from '../../redux/staff/actions';
+import * as Routes from '@utils/Routes';
+import { moderateScale, scale, verticalScale } from '@libs/reactResizeMatter/scalingUtils';
+import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
+import { useNavigationRoot } from '@components/navigate/RootNavigation';
+import { useAppSelector } from '@redux/store';
+import { RootState } from '@redux/root-reducer';
+
+// Hàm kiểm tra email hợp lệ
+const validateEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
 
 const CreateStaffScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigationRoot();
+  const dispatch = useDispatch();
+  
+  // Lấy storeId từ Redux store
+  const auth = useAppSelector((state: RootState) => state.User.Auth);
+  const storeId = auth?.storeId;
 
   // State của form
-  const [fullname, setFullname] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [role, setRole] = useState('');
-  const [image, setImage] = useState('');
-  const [imageUrl, setImageUrl] = useState(''); // State cho URL ảnh từ mạng
+  const [password, setPassword] = useState('');
+  const [status, setStatus] = useState('active');
+  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [errorTitle, setErrorTitle] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  // Chọn ảnh từ thư viện
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri); // Lưu ảnh đã chọn vào state
-    }
-  };
-
-  // Xử lý lưu nhân viên
-  const handleSave = () => {
-    if (!fullname || !email || !phone || !role || !image) {
-      Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin và chọn ảnh!');
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      // Hiển thị Modal lỗi thay vì Toast
+      setErrorTitle('Permission Denied');
+      setErrorMessage('You need to grant permission to access the photo library');
+      setErrorModalVisible(true);
       return;
     }
 
-    const newStaff = {
-      fullname,
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets && result.assets[0]?.uri) {
+      setImageUri(result.assets[0].uri);
+    }
+  };
+
+  const validateInputs = () => {
+    if (!firstName.trim()) {
+      // Hiển thị Modal lỗi thay vì Toast
+      setErrorTitle('Validation Error');
+      setErrorMessage('First name is required');
+      setErrorModalVisible(true);
+      return false;
+    }
+
+    if (!lastName.trim()) {
+      // Hiển thị Modal lỗi thay vì Toast
+      setErrorTitle('Validation Error');
+      setErrorMessage('Last name is required');
+      setErrorModalVisible(true);
+      return false;
+    }
+
+    if (!email.trim()) {
+      // Hiển thị Modal lỗi thay vì Toast
+      setErrorTitle('Validation Error');
+      setErrorMessage('Email is required');
+      setErrorModalVisible(true);
+      return false;
+    }
+
+    // Simple email validation
+    if (!validateEmail(email)) {
+      // Hiển thị Modal lỗi thay vì Toast
+      setErrorTitle('Validation Error');
+      setErrorMessage('Please enter a valid email address');
+      setErrorModalVisible(true);
+      return false;
+    }
+
+    if (!phone.trim()) {
+      // Hiển thị Modal lỗi thay vì Toast
+      setErrorTitle('Validation Error');
+      setErrorMessage('Phone number is required');
+      setErrorModalVisible(true);
+      return false;
+    }
+
+    if (!password.trim()) {
+      // Hiển thị Modal lỗi thay vì Toast
+      setErrorTitle('Validation Error');
+      setErrorMessage('Password is required');
+      setErrorModalVisible(true);
+      return false;
+    }
+
+    // Kiểm tra độ dài mật khẩu
+    if (password.length < 6) {
+      // Hiển thị Modal lỗi thay vì Toast
+      setErrorTitle('Validation Error');
+      setErrorMessage('Password must be at least 6 characters');
+      setErrorModalVisible(true);
+      return false;
+    }
+
+    return true;
+  };
+
+  const onSubmit = () => {
+    if (!validateInputs()) return;
+
+    if (!storeId) {
+      setErrorMessage('No store assigned to your account. Cannot create staff.');
+      setErrorModalVisible(true);
+      return;
+    }
+
+    setLoading(true);
+
+    const staffData = {
+      firstName,
+      lastName,
       email,
       phone,
-      role,
-      image: image || imageUrl, // Chấp nhận ảnh từ thư viện hoặc URL
+      password,
+      status,
+      image: imageUri,
+      storeId: storeId
     };
 
-    console.log('Nhân viên mới:', newStaff);
-
-    Alert.alert('Thành công', 'Nhân viên đã được thêm!', [
-      { text: 'OK', onPress: () => navigation.goBack() },
-    ]);
+    dispatch({
+      type: staffActions.CREATE_STAFF,
+      payload: {
+        staff: staffData,
+        onSuccess: () => {
+          setLoading(false);
+          
+          // Hiển thị Modal thành công
+          setSuccessMessage('Staff created successfully');
+          setSuccessModalVisible(true);
+          
+          // Tăng thời gian chờ để đảm bảo người dùng thấy thông báo
+          setTimeout(() => {
+            setSuccessModalVisible(false);
+            dispatch({ type: staffActions.FETCH_STAFFS });
+            navigation.navigate(Routes.StaffListScreen, { refresh: true });
+          }, 2000);
+        },
+        onFailed: (error: string) => {
+          setLoading(false);
+          // Hiển thị Modal lỗi thay vì Toast
+          setErrorTitle('Failed');
+          setErrorMessage(error || 'Failed to create staff');
+          setErrorModalVisible(true);
+        },
+        onError: (error: any) => {
+          setLoading(false);
+          // Hiển thị Modal lỗi thay vì Toast
+          setErrorTitle('Error');
+          setErrorMessage(error?.message || 'An error occurred');
+          setErrorModalVisible(true);
+        }
+      }
+    });
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={20} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Thêm Nhân Viên Mới</Text>
-      </View>
-
-      <TextInput style={styles.input} placeholder="Họ tên" value={fullname} onChangeText={setFullname} />
-      <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={setEmail} />
-      <TextInput style={styles.input} placeholder="Số điện thoại" value={phone} onChangeText={setPhone} />
-      <TextInput style={styles.input} placeholder="Vai trò" value={role} onChangeText={setRole} />
-
-      <View style={styles.imageContainer}>
-        {/* Nhập URL ảnh từ mạng */}
-        <TextInput
-          style={styles.input}
-          placeholder="Hoặc nhập URL ảnh"
-          value={imageUrl}
-          onChangeText={(text) => {
-            setImageUrl(text);
-            setImage(''); // Xóa ảnh từ thư viện nếu nhập URL
-          }}
-        />
-
-        {/* Hiển thị ảnh nếu nhập URL */}
-        {imageUrl ? (
-          <Image source={{ uri: imageUrl }} style={styles.image} />
-        ) : null}
-
-        {/* Chọn ảnh nhân viên từ thư viện */}
-        <View style={styles.imageButton}>
-          <Button title="Chọn ảnh" onPress={pickImage} />
+    <View style={styles.mainContainer}>
+      {/* Đặt Toast ở đầu View chính để đảm bảo nó hiển thị trên cùng (giữ lại cho các trường hợp khác) */}
+      <Toast config={toastConfig} />
+      
+      {/* Modal thông báo thành công */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={successModalVisible}
+        onRequestClose={() => {
+          setSuccessModalVisible(false);
+        }}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.successIconContainer}>
+              <Ionicons name="checkmark-circle" size={50} color="green" />
+            </View>
+            <Text style={styles.modalTitle}>Success</Text>
+            <Text style={styles.modalMessage}>{successMessage}</Text>
+          </View>
+        </View>
+      </Modal>
+      
+      {/* Modal thông báo lỗi */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={errorModalVisible}
+        onRequestClose={() => {
+          setErrorModalVisible(false);
+        }}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.errorIconContainer}>
+              <Ionicons name="alert-circle" size={50} color="red" />
+            </View>
+            <Text style={styles.errorModalTitle}>{errorTitle}</Text>
+            <Text style={styles.errorModalMessage}>{errorMessage}</Text>
+            <TouchableOpacity 
+              style={styles.errorModalButton}
+              onPress={() => setErrorModalVisible(false)}
+            >
+              <Text style={styles.errorModalButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      
+      <ScrollView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Create New Staff</Text>
+          <View style={{ width: 24 }} />
         </View>
 
-        {/* Hiển thị ảnh đã chọn từ thư viện */}
-        {image && <Image source={{ uri: image }} style={styles.image} />}
-      </View>
+        <View style={styles.formContainer}>
+          {/* Image Picker */}
+          <View style={styles.imagePickerContainer}>
+            <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
+              {imageUri ? (
+                <Image source={{ uri: imageUri }} style={styles.imagePreview} />
+              ) : (
+                <View style={styles.imagePickerPlaceholder}>
+                  <FontAwesome name="camera" size={24} color="#6B7280" />
+                  <Text style={styles.imagePickerText}>Add Photo</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
 
-      {/* Nút lưu nhân viên */}
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>Lưu Nhân Viên</Text>
-      </TouchableOpacity>
-    </ScrollView>
+          {/* Form Fields */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>First Name</Text>
+            <TextInput
+              style={styles.input}
+              value={firstName}
+              onChangeText={setFirstName}
+              placeholder="Enter first name"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Last Name</Text>
+            <TextInput
+              style={styles.input}
+              value={lastName}
+              onChangeText={setLastName}
+              placeholder="Enter last name"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Enter email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Phone</Text>
+            <TextInput
+              style={styles.input}
+              value={phone}
+              onChangeText={setPhone}
+              placeholder="Enter phone number"
+              keyboardType="phone-pad"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Password</Text>
+            <TextInput
+              style={styles.input}
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Enter password"
+              secureTextEntry={true}
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Status</Text>
+            <View style={styles.statusContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.statusOption,
+                  status === 'active' && styles.statusOptionActive
+                ]}
+                onPress={() => setStatus('active')}
+              >
+                <Text
+                  style={[
+                    styles.statusText,
+                    status === 'active' && styles.statusTextActive
+                  ]}
+                >
+                  Active
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.statusOption,
+                  status === 'inactive' && styles.statusOptionActive
+                ]}
+                onPress={() => setStatus('inactive')}
+              >
+                <Text
+                  style={[
+                    styles.statusText,
+                    status === 'inactive' && styles.statusTextActive
+                  ]}
+                >
+                  Inactive
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={onSubmit}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={styles.submitButtonText}>Create Staff</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
 /** 📌 Styles */
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: '#F3F4F6',
+  },
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#F3F4F6',
   },
-  title: {
-    fontSize: 22,
+  header: {
+    backgroundColor: '#3B82F6',
+    padding: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    color: 'white',
+    fontSize: 20,
     fontWeight: 'bold',
+  },
+  formContainer: {
+    padding: 16,
+  },
+  imagePickerContainer: {
+    alignItems: 'center',
     marginBottom: 20,
-    textAlign: 'center',
+  },
+  imagePicker: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    overflow: 'hidden',
+  },
+  imagePreview: {
+    width: '100%',
+    height: '100%',
+  },
+  imagePickerPlaceholder: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#E5E7EB',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imagePickerText: {
+    marginTop: 8,
+    color: '#6B7280',
+    fontSize: 12,
+  },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#374151',
   },
   input: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
+    backgroundColor: 'white',
     borderRadius: 8,
-    paddingHorizontal: 15,
-    marginBottom: 10,
-  },
-  imageContainer: {
-    marginBottom: 20,
-  },
-  image: {
-    width: '100%',
-    height: 150,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  imageButton: {
-    width: '40%',
+    padding: 12,
     fontSize: 16,
-    marginBottom: 10,
-    marginHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
   },
-  saveButton: {
-    backgroundColor: '#007bff',
-    paddingVertical: 15,
+  statusContainer: {
+    flexDirection: 'row',
     borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 30,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
   },
-  saveButtonText: {
+  statusOption: {
+    flex: 1,
+    padding: 12,
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+  statusOptionActive: {
+    backgroundColor: '#3B82F6',
+  },
+  statusText: {
+    fontSize: 16,
+    color: '#374151',
+  },
+  statusTextActive: {
     color: 'white',
-    fontSize: 18,
     fontWeight: 'bold',
   },
+  submitButton: {
+    backgroundColor: '#3B82F6',
+    borderRadius: 8,
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  submitButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    elevation: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    width: '80%',
+  },
+  successIconContainer: {
+    marginBottom: 15,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'green',
+    marginBottom: 10,
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#333',
+    textAlign: 'center',
+  },
+  errorIconContainer: {
+    marginBottom: 15,
+  },
+  errorModalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'red',
+    marginBottom: 10,
+  },
+  errorModalMessage: {
+    fontSize: 16,
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  errorModalButton: {
+    backgroundColor: '#3B82F6',
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    borderRadius: 5,
+  },
+  errorModalButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
 });
+
+const toastConfig = {
+  success: (props: any) => (
+    <BaseToast
+      {...props}
+      style={{
+        borderLeftColor: "green",
+        backgroundColor: "white",
+        marginTop: verticalScale(50),
+        zIndex: 9999,
+        elevation: 20,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+      }}
+      contentContainerStyle={{
+        paddingHorizontal: verticalScale(15),
+      }}
+      text1Style={{
+        fontSize: moderateScale(16),
+        fontWeight: "bold",
+        color: "green",
+      }}
+      text2Style={{
+        fontSize: moderateScale(14),
+        color: "#333",
+      }}
+    />
+  ),
+  error: (props: any) => (
+    <ErrorToast
+      {...props}
+      style={{
+        borderLeftColor: "red",
+        backgroundColor: "white",
+        marginTop: verticalScale(50),
+        zIndex: 9999,
+        elevation: 20,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+      }}
+      contentContainerStyle={{
+        paddingHorizontal: verticalScale(15),
+      }}
+      text1Style={{
+        fontSize: moderateScale(16),
+        fontWeight: "bold",
+        color: "red",
+      }}
+      text2Style={{
+        fontSize: moderateScale(14),
+        color: "#333",
+      }}
+    />
+  ),
+};
 
 export default CreateStaffScreen;

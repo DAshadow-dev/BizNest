@@ -1,11 +1,12 @@
+
 export type RootParamList = {
   HomeScreen: undefined,
   AdminDashboardScreen : undefined,
   AccountListScreen : undefined,
   PendingAccountsScreen : undefined,
-  AccountDetailScreen : {  id: string;
-    name: string;
-    status: 'Active' | 'Blocked'},
+  AccountDetailScreen : {  
+    id: string
+  },
   InvoiceListScreen : undefined,
   CreateInvoiceScreen : {
       invoiceId?: string;
@@ -33,7 +34,8 @@ export type RootParamList = {
                           color: string;
                           brand: string;
                           image: string;
-                          category: string;} };
+                          categoryId: string;
+                          quantity: string;} };
   CreateProductScreen: undefined,
   EditProductScreen: {  product: {name: string;
                         price: number;
@@ -41,18 +43,61 @@ export type RootParamList = {
                         color: string;
                         brand: string;
                         image: string;
-                        category: string;} };
+                        categoryId: string;
+                        quantity: string;}}; 
+  //new Product screen
+  WareHouse: { refresh?: boolean };
+  ProductCreateScreen: undefined
+  ProductDetailScreens: {
+    product: {name: string;
+      price: number;
+      size: string;
+      color: string;
+      brand: string;
+      image: string;
+      category: string;}
+  };
+  EditProductScreens: {
+    product: {name: string;
+    price: number;
+    size: string;
+    color: string;
+    brand: string;
+    quantity: number;
+    image: string | null;
+    description: string;
+    _id: string;
+    category: string;}
+  };
     //staff
-    StaffListScreen: undefined;
-    StaffDetailScreen: { staff: { fullname: string; email: string; phone: string; role: string; } };
+    StaffListScreen: { refresh?: boolean };
+    StaffDetailScreen: { staff: { 
+      username: string; 
+      email: string; 
+      phone: string; 
+      role: string; 
+      status: string;
+      image: string | null;
+      _id: string;
+    } };
     CreateStaffScreen: undefined;
-    EditStaffScreen: { staff: { fullname: string; email: string; phone: string; role: string; } };
+    EditStaffScreen: { staff: { 
+      firstName: string; 
+      lastName: string; 
+      email: string; 
+      phone: string; 
+      role: string;
+      status: string;
+      image: string | null;
+      _id: string;
+      username?: string;
+    } };
   PROFILE_SCREEN: undefined,
   PASSWORD_SCREEN: undefined,
   PROFILE: undefined,
-  CUSTOMER_LIST: undefined,
+  CUSTOMER_LIST: {showToast?: boolean, message?: string},
   CREATE_CUSTOMER: {idUpdate: number};
-  CUSTOMER_DETAIL: undefined;
+  CUSTOMER_DETAIL: {id: number};
   BUSINESS_DASHBOARD: undefined,
   LOGIN_SCREEN: undefined,
   ONBOARDING_SCREEN : undefined,
@@ -65,4 +110,8 @@ export type RootParamList = {
   },
   // HOME_SCREEN: undefined,
   CHAT_SCREEN :undefined,
+  HOME_ADMIN: undefined,
+  STATUS_SCREEN: {status: string},
+  ReviewScreen: undefined,
+  PendingDetailScreen: {id: string}
 };

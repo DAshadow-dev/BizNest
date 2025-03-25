@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const ChatSchema = new mongoose.Schema({
+    _id: {
+        type: Number
+    },
     senderId : {
         type: String,
         // type: mongoose.Schema.Types.ObjectId,
@@ -29,4 +33,5 @@ const ChatSchema = new mongoose.Schema({
     }
 });
 
+ChatSchema.plugin(AutoIncrement, { id: 'chat_seq', inc_field: '_id'});
 module.exports = mongoose.model('Chat', ChatSchema);

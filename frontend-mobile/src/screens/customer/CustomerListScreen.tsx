@@ -1,96 +1,251 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import IconBack from "@assets/svg/header/ic_back.svg";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigationRoot } from "@components/navigate/RootNavigation";
+import * as Routes from "@utils/Routes";
+import { useDispatch } from "react-redux";
+import CustomerActions from "@redux/customer/actions";
+import { useAppSelector } from "@redux/store";
+import { RootState } from "@redux/root-reducer";
+import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 import { moderateScale, scale, verticalScale } from "@libs/reactResizeMatter/scalingUtils";
-import { CommonColors, Fonts } from "@utils/CommonStyles";
-import { FlatList } from "react-native-gesture-handler";
-import { FontAwesome } from "@expo/vector-icons";
-import { useNavigationRoot } from '@components/navigate/RootNavigation';
-import * as Routes from '@utils/Routes';
 
-const CustomerListScreen= () =>{
-    const list=[1];
-    const navigation= useNavigationRoot();
+const CustomerListScreen = (props: any) => {
+  const navigation = useNavigationRoot();
+  const dispatch = useDispatch();
+  const [search, setSearch] = useState<string>('');
+  const [filteredCustomers, setFilteredCustomers] = useState<any[]>([]);
 
-    return(
-        <View style={{flex: 1}}>
-            <View style={{height: verticalScale(60), width: scale(393), backgroundColor: '#3750B2', flexDirection: 'row', alignItems: "flex-end"}}>
-                <View style={{width: scale(50), height: verticalScale(50), justifyContent: "center", alignItems: "center"}}>
-                    <TouchableOpacity
-                        onPress={()=>{
-                        }}
-                    >
-                        <IconBack/>
-                    </TouchableOpacity>
-                </View>
-                <View style={{width: scale(293), height: verticalScale(50), justifyContent: "center", alignItems: "center"}}>
-                    <Text style={{fontSize: moderateScale(22), color: CommonColors.white, ...Fonts.defaultRegular}}>List Customer</Text>
-                </View>
-                <View style={{width: scale(50), height: verticalScale(50),flexDirection: 'row', justifyContent: "center", alignItems: "center"}}>
-                    <TouchableOpacity
-                        onPress={()=>{
-                        }}
-                        style={{marginRight: scale(10)}}
-                    >   
-                        <FontAwesome name="filter" size={moderateScale(20)} color={CommonColors.white} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={()=>{
-                            navigation.navigate(Routes.CREATE_CUSTOMER, { idUpdate: -1 });
-                        }}
-                        style={{marginRight: scale(10)}}
-                    >   
-                        <FontAwesome name="plus" size={moderateScale(20)} color={CommonColors.white} />
-                    </TouchableOpacity>
-                    
-                </View>
-            </View>
-            <View style={{flex: 1, paddingHorizontal: scale(20), paddingBottom: verticalScale(20)}}>
-                <FlatList
-                    data={list} 
-                    keyExtractor={(item) => item.toString()}
-                    showsVerticalScrollIndicator={false} // Ẩn thanh cuộn dọc
-                    renderItem={({ item }) => ( 
-                        <TouchableOpacity
-                            onPress={() => {navigation.navigate(Routes.CUSTOMER_DETAIL)}}
-                        >
-                            <View style={style.containerCustomer}>
-                                <View style={{width: scale(100), height: verticalScale(100), justifyContent: "center", alignItems: "center"}}>
-                                    <Image 
-                                        source={require('@assets/images/avatar.jpg')}
-                                        style={{width: scale(70), height: verticalScale(70), borderRadius: 100}}
-                                    />
-                                </View>
-                                <View style={{width: scale(253), height: verticalScale(90), paddingVertical: verticalScale(10), flexDirection: 'column', justifyContent: "space-between"}}>
-                                    <Text style={{fontSize: moderateScale(17), ...Fonts.defaultBold}}>ID: 1504922</Text>
-                                    <Text style={{fontSize: moderateScale(15), ...Fonts.defaultMedium}}>
-                                        <FontAwesome name="user" size={moderateScale(22)} color={CommonColors.black} />
-                                        : Lê Kim Hoàng Nguyên
-                                    </Text>
-                                    <Text style={{fontSize: moderateScale(15), ...Fonts.defaultMedium}}>
-                                        <FontAwesome name="phone" size={moderateScale(22)} color={CommonColors.black} />
-                                        : 0934726073
-                                    </Text>
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-                    )}
-                />
-            </View>
-        </View>
-    );
-}
+  const customers = useAppSelector((state: RootState) => state.Customer.ListCustomer);
 
-const style= StyleSheet.create({
-    containerCustomer:{
-        flexDirection: 'row',
-        marginTop: verticalScale(20),
-        width: scale(353), 
-        height: verticalScale(100), 
-        backgroundColor: CommonColors.white, 
-        borderRadius: 16, 
-        borderColor: CommonColors.black, 
-        borderWidth: 1,
-        alignItems: 'center'
+  useEffect(() => {
+    if (props.route.params?.showToast) {
+      Toast.show({
+        type: "success",
+        text1: "Success!",
+        text2: props.route.params?.message,
+        position: "top",
+        visibilityTime: 2000,
+      });
+
+      // Xóa param sau khi hiển thị toast để tránh hiển thị lại khi re-render
+      navigation.setParams({ showToast: undefined });
     }
-})
+  }, [props.route.params]);
+
+  useEffect(() => {
+    dispatch({
+      type: CustomerActions.FETCH_LIST_CUSTOMER,
+      payload: {
+        onError: (error: any) => {
+          console.log(error);
+        },
+        onFailed: (MsgNo: string) => {
+          console.log(MsgNo);
+        },
+      },
+    });
+  }, []);
+
+  useEffect(() => {
+    if (search === '') {
+      setFilteredCustomers(customers);
+    } else {
+      const filtered = customers.filter((customer: any) =>
+        customer.phone.includes(search) || customer.fullname.toLowerCase().includes(search.toLowerCase())
+      );
+      setFilteredCustomers(filtered);
+    }
+  }, [search, customers]);
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <View style={styles.headerTop}>
+          <TouchableOpacity onPress={() => navigation.navigate(Routes.HomeScreen)}>
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>List Customer</Text>
+          <TouchableOpacity>
+            <Ionicons name="options-outline" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchBar}
+            placeholder="Search customer by phone or name..."
+            value={search}
+            onChangeText={(value: string) => setSearch(value)}
+          />
+          <TouchableOpacity style={styles.searchIcon}>
+            <Ionicons name="search-outline" size={20} color="#333" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={{ margin: 16, position: "relative", flex: 1 }}>
+        <FlatList
+          data={filteredCustomers}
+          keyExtractor={(item: any) => item._id.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.customerItem}
+              onPress={() => navigation.navigate(Routes.CUSTOMER_DETAIL, { id: item._id })}
+            >
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                <View style={{ flexDirection: "row", alignItems: "center", width: "80%" }}>
+                  <View>
+                    <Text style={styles.customerText}>Name: {item.fullname}</Text>
+                    <Text style={{ color: "#615e5e", fontSize: 14 }}>SĐT: {item.phone}</Text>
+                  </View>
+                </View>
+                <Ionicons name="chevron-forward-outline" size={20} color="#555" />
+              </View>
+            </TouchableOpacity>
+          )}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        />
+        <TouchableOpacity
+          style={styles.floatingButton}
+          onPress={() => navigation.navigate(Routes.CREATE_CUSTOMER, { idUpdate: -1 })}
+        >
+          <Ionicons name="add" size={24} color="#fff" />
+          <Text style={styles.buttonText}>New</Text>
+        </TouchableOpacity>
+      </View>
+      <Toast config={toastConfig}/>
+      
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#f2f2f2",
+  },
+  header: {
+    backgroundColor: "#4a90e2",
+    paddingTop: 50,
+    paddingBottom: 20,
+    alignItems: "center",
+  },
+  headerTop: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    marginBottom: 20,
+  },
+  headerTitle: {
+    fontSize: 20,
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  searchContainer: {
+    width: "80%",
+    position: "relative",
+  },
+  searchBar: {
+    backgroundColor: "#ffffff",
+    borderRadius: 20,
+    paddingVertical: 10,
+    fontSize: 16,
+    paddingLeft: 16,
+    paddingRight: 40,
+  },
+  searchIcon: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+  },
+  customerItem: {
+    height: 80,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#ffffff",
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+  },
+  customerText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  floatingButton: {
+    position: "absolute",
+    right: 10,
+    bottom: 10,
+    backgroundColor: "#3478f6",
+    borderRadius: 50,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  buttonText: {
+    color: "#fff",
+    marginLeft: 5,
+    fontWeight: "500",
+  },
+});
+
+
+// 🎨 Tuỳ chỉnh giao diện Toast
+const toastConfig = {
+  success: (props: any) => (
+      <BaseToast
+          {...props}
+          style={{ borderLeftColor: "green", backgroundColor: "white", marginTop: scale(0)}}
+          contentContainerStyle={{ paddingHorizontal: verticalScale(15) }}
+          text1Style={{
+              fontSize: moderateScale(16),
+              fontWeight: "bold",
+              color: "green",
+          }}
+          text2Style={{
+              fontSize: moderateScale(14),
+              color: "#333",
+          }}
+      />
+  ),
+  error: (props: any) => (
+      <ErrorToast
+          {...props}
+          style={{ borderLeftColor: "red", backgroundColor: "white", marginTop: scale(0)}}
+          contentContainerStyle={{ paddingHorizontal: verticalScale(15)}}
+          text1Style={{
+              fontSize: moderateScale(16),
+              fontWeight: "bold",
+              color: "red",
+          }}
+          text2Style={{
+              fontSize: moderateScale(14),
+              color: "#333",
+          }}
+      />
+  ),
+};
+ 
 export default CustomerListScreen;

@@ -1,129 +1,255 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
+  TextInput,
   TouchableOpacity,
   FlatList,
   StyleSheet,
 } from "react-native";
-import * as Routes from "@utils/Routes";
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigationRoot } from "@components/navigate/RootNavigation";
+import * as Routes from "@utils/Routes";
+import { useDispatch } from "react-redux";
+import TransactionActions from "@redux/transaction/actions";
+import { useAppSelector } from "@redux/store";
+import { RootState } from "@redux/root-reducer";
 
-const invoices = Array.from({ length: 10 }, (_, index) => ({
-  id: index + 1,
-  number: `${1000 + index}`,
-  amount: (Math.random() * 500).toFixed(2),
-  date: new Date().toISOString().split("T")[0],
-}));
+import { format, parseISO } from "date-fns";
 
 const InvoiceListScreen = () => {
   const navigation = useNavigationRoot();
+  const dispatch = useDispatch();
+  const [search, setSearch] = useState<string>("");
+  const [filteredtransactions, setFilteredtransactions] = useState<any[]>([]);
 
-  const renderItem = ({ item }) => (
-    <View style={styles.invoiceItem}>
-      <Text style={styles.invoiceText}>Invoice ID: #{item.number}</Text>
-      <Text style={styles.invoiceText}>Amount: ${item.amount}</Text>
-      <Text style={styles.invoiceText}>Date: {item.date}</Text>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          //   navigation.navigate(Routes.InvoiceScreen, { invoice: item })
-          navigation.navigate(Routes.InvoiceScreen)
-        }
-      >
-        <Text style={styles.buttonText}>More detail</Text>
-      </TouchableOpacity>
-    </View>
+  const transactions = useAppSelector(
+    (state: RootState) => state.Transaction.ListTransaction
   );
+  console.log('filteredtransactions: ', filteredtransactions)
+  useEffect(() => {
+    dispatch({
+      type: TransactionActions.FETCH_LIST_TRANSACTION,
+      payload: {
+        onError: (error: any) => {
+          console.log(error);
+        },
+        onFailed: (MsgNo: string) => {
+          console.log(MsgNo);
+        },
+      },
+    });
+  }, []);
+
+  useEffect(() => {
+
+      setFilteredtransactions(transactions);
+  }, [search, transactions]);
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.navigate(Routes.HomeScreen)}>
-        <Text style={styles.buttonTextSecondary}>Home</Text>
-      </TouchableOpacity>
-      <Text style={styles.title}>Invoice List</Text>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          navigation.navigate(Routes.CreateInvoiceScreen)
-        }
-      >
-        <Text style={styles.buttonText}>Create new invoice</Text>
-      </TouchableOpacity>
-      <FlatList
-        data={invoices}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItem}
-      />
+      <View style={styles.header}>
+        <View style={styles.headerTop}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate(Routes.HomeScreen)}
+          >
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>List Transaction</Text>
+          <TouchableOpacity>
+            <Ionicons name="options-outline" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
 
-      {/* Navigate to Home */}
-      <TouchableOpacity
-        style={styles.buttonSecondary}
-        onPress={() => navigation.navigate(Routes.HomeScreen)}
-      >
-        <Text style={styles.buttonTextSecondary}>Home</Text>
-      </TouchableOpacity>
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchBar}
+            placeholder="Search transaction by Id or Name"
+            value={search}
+            onChangeText={(value: string) => setSearch(value)}
+          />
+          <TouchableOpacity style={styles.searchIcon}>
+            <Ionicons name="search-outline" size={20} color="#333" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={{ margin: 16, position: "relative", flex: 1 }}>
+        <FlatList
+          data={filteredtransactions}
+          keyExtractor={(item: any, index: number) => index.toString()}
+          renderItem={({ item }) => {
+            // Tính tổng số lượng sản phẩm
+            const totalQuantity =
+              item.products?.reduce(
+                (sum: number, product: any) => sum + product.quantity,
+                0
+              ) || 0;
+
+            return (
+              <TouchableOpacity
+                style={styles.orderItem}
+                onPress={() =>
+                  navigation.navigate(Routes.InvoiceScreen, { id: item._id })
+                }
+              >
+                <View style={styles.orderInfo}>
+                  <Text style={styles.orderText}>Mã đơn hàng: {item._id}</Text>
+                  <Text style={styles.orderText}>
+                    Khách hàng: {item.customerId.fullname}
+                  </Text>
+                  <Text style={styles.orderText}>
+                    Số lượng sản phẩm: {totalQuantity}
+                  </Text>
+                  <Text style={styles.orderText}>
+                    Tổng giá trị: {item.totalPrice} đ
+                  </Text>
+                  <Text style={styles.orderText}>
+                    Trạng thái: {item.status}
+                  </Text>
+                  <Text style={styles.orderDate}>
+                    Ngày tạo:{" "}
+                    {item.createdAt
+                      ? format(
+                          parseISO(item.createdAt.toString()),
+                          "HH:mm:ss dd/MM/yyyy"
+                        )
+                      : "N/A"}
+                  </Text>
+                </View>
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={20}
+                  color="#555"
+                />
+              </TouchableOpacity>
+            );
+          }}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        />
+        <TouchableOpacity
+          style={styles.floatingButton}
+          onPress={() =>
+            navigation.navigate(Routes.CreateInvoiceScreen, { idUpdate: -1 })
+          }
+        >
+          <Ionicons name="add" size={24} color="#fff" />
+          <Text style={styles.buttonText}>New</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "center",
-    backgroundColor: "#E9E9E9",
-    padding: 16,
+    flex: 1,
+    backgroundColor: "#f2f2f2",
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#333",
+  header: {
+    backgroundColor: "#4a90e2",
+    paddingTop: 50,
+    paddingBottom: 20,
+    alignItems: "center",
   },
-  invoiceItem: {
-    display: "flex",
-    flexDirection: "column",
-    backgroundColor: "#FFF",
-    padding: 15,
-    borderRadius: 20,
-    marginVertical: 10,
+  headerTop: {
     width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    marginBottom: 20,
+  },
+  headerTitle: {
+    fontSize: 20,
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  searchContainer: {
+    width: "80%",
+    position: "relative",
+  },
+  searchBar: {
+    backgroundColor: "#ffffff",
+    borderRadius: 20,
+    paddingVertical: 10,
+    fontSize: 16,
+    paddingLeft: 16,
+    paddingRight: 40,
+  },
+  searchIcon: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+  },
+  customerItem: {
+    height: 80,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#ffffff",
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
     shadowColor: "#000",
-    shadowOffset: { width: 100, height: 2 },
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
     elevation: 2,
   },
-  invoiceText: {
+  customerText: {
     fontSize: 16,
     color: "#333",
-    marginBottom: 5,
   },
-  button: {
-    backgroundColor: "#4A90E2",
+  floatingButton: {
+    position: "absolute",
+    right: 10,
+    bottom: 10,
+    backgroundColor: "#3478f6",
+    borderRadius: 50,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 20,
-    marginTop: 10,
+    flexDirection: "row",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 4,
   },
   buttonText: {
-    color: "#FFF",
-    fontSize: 16,
-    fontWeight: "bold",
+    color: "#fff",
+    marginLeft: 5,
+    fontWeight: "500",
   },
-  buttonSecondary: {
-    backgroundColor: "#E3F2FD",
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    marginVertical: 10,
-    minWidth: 180,
+  orderItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
+    backgroundColor: "#ffffff",
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
   },
-  buttonTextSecondary: {
-    color: "#4A90E2",
-    fontSize: 16,
-    fontWeight: "bold",
+  orderInfo: {
+    flexDirection: "column",
+    flex: 1,
   },
+  orderText: {
+    fontSize: 14,
+    color: "#333",
+  },
+  orderDate: {
+    fontSize: 12,
+    color: "#615e5e",
+  },
+  
 });
 
 export default InvoiceListScreen;

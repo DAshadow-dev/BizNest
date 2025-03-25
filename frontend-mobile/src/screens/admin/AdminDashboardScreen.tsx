@@ -10,10 +10,41 @@ import {
 } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import * as Routes from "@utils/Routes";
+import { useEffect, useState } from "react";
+import AdminActions from "@redux/admin/actions";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@redux/store";
+import { RootState } from "@redux/root-reducer";
 
 const AdminDashboardScreen = () => {
   const navigation = useNavigationRoot();
-
+  const dispatch = useDispatch();
+  const bussinessOnwers: any = useAppSelector((state: RootState) => state.Admin.ListBussinessOnwer);
+  const [activeAccount, setActiveAccount] = useState<any[]>([]);
+  const [pendingAccount, setPendingAccount] = useState<any[]>([]);
+  useEffect(() => {
+      dispatch({
+        type: AdminActions.FETCH_LIST_BUSSINESS_OWNER,
+        payload: {
+          onError: (error: any) => {
+            console.log(error);
+          },
+          onFailed: (MsgNo: string) => {
+            console.log(MsgNo);
+          },
+        },
+      });
+    },[bussinessOnwers]);
+    
+    useEffect(() => {
+      getAccounts();
+    }, [bussinessOnwers]);
+    const getAccounts = () => {
+      let activeAccountsList = bussinessOnwers.filter((u: any) => u.status =="active");
+      let pendingAccounts = bussinessOnwers.filter((u: any) => u.status === "pending");
+      setActiveAccount(activeAccountsList);
+      setPendingAccount(pendingAccounts);
+    };
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <ScrollView style={styles.container}>
@@ -33,14 +64,14 @@ const AdminDashboardScreen = () => {
             onPress={() => navigation.navigate(Routes.AccountListScreen)}
           >
             <Text style={styles.cardTitle}>Active Accounts</Text>
-            <Text style={styles.cardValue}>23</Text>
+            <Text style={styles.cardValue}>{activeAccount.length}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.card, { backgroundColor: "#FFC107" }]}
             onPress={() => navigation.navigate(Routes.PendingAccountsScreen)}
           >
             <Text style={styles.cardTitle}>Pending Accounts</Text>
-            <Text style={styles.cardValue}>5</Text>
+            <Text style={styles.cardValue}>{pendingAccount.length}</Text>
           </TouchableOpacity>
           <View style={[styles.card, { backgroundColor: "#F44336" }]}>
             <Text style={styles.cardTitle}>Transactions</Text>

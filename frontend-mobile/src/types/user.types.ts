@@ -10,14 +10,26 @@ export interface User {
   createAt?: Date,
   lastLogin?: Date,
   isAuthenticated?: boolean,
+  storeId?: string,
 }
 
-
+export interface Customer {
+  _id?: number,
+  fullname?: string,
+  email?: string,
+  phone?: boolean,
+  gender?: boolean,
+  date_of_birth?: Date,
+  createdAt?: Date,
+}
 
 export interface UserReducer {
   Auth: User,
 }
 
+export interface CustomerReducer {
+  ListCustomer: Array<Customer>;
+}
 export interface ChangePassword {
   oldPassword: string;
   newPassword: string;

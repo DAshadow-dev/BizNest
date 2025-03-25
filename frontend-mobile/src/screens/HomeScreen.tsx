@@ -1,70 +1,62 @@
-// import React from "react";
-// import { View, Text, Button } from "react-native";
-// import * as Routes from "@utils/Routes";
-// import {
-//   navigate,
-//   useNavigationRoot,
-// } from "@components/navigate/RootNavigation";
 
-// const HomeScreen = () => {
-//   const navigation = useNavigationRoot();
-
-//   return (
-//     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-//       <Text>Home Screen</Text>
-//       <Button
-//         title="Admin Dashboard"
-//         onPress={() => navigation.navigate(Routes.AdminDashboardScreen)}
-//       />
-//       <Button
-//         title="Go to InvoiceListScreen"
-//         onPress={() => navigation.navigate(Routes.InvoiceListScreen)}
-//       />
-//       <Button
-//         title="Go to ProductListScreen"
-//         onPress={() => navigation.navigate(Routes.ProductListScreen)}
-//       />
-//       <Button
-//         title="Go to StaffListScreen"
-//         onPress={() => navigation.navigate(Routes.StaffListScreen)}
-//       />
-//       <Button
-//         title="Go to CustomerListScreen"
-//         onPress={() => navigation.navigate(Routes.CUSTOMER_LIST)}
-//       />
-//       <Button
-//         title="Go to BusinessDashboard"
-//         onPress={() => navigation.navigate(Routes.BUSINESS_DASHBOARD)}
-//       />
-//     </View>
-//   );
-// };
-// export default HomeScreen;
-
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Button } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LineChart } from "react-native-chart-kit";
 import * as Routes from "@utils/Routes";
 import { navigate, useNavigationRoot } from "@components/navigate/RootNavigation";
+import ProductActions from "@redux/product/actions";
+import { useAppSelector } from "@redux/store";
+import { useDispatch } from "react-redux";
+import { RootState } from "@redux/root-reducer";
+import CustomerActions from "@redux/customer/actions";
 
 const HomePage = () => {
   const navigation = useNavigationRoot();
   const categories = [
-    { id: "1", name: "Product", icon: "storefront", route: Routes.ProductListScreen },
+    { id: "1", name: "Product", icon: "storefront", route: Routes.WareHouse },
     { id: "2", name: "Staff", icon: "receipt", route: Routes.StaffListScreen },
     { id: "3", name: "Customer", icon: "people", route: Routes.CUSTOMER_LIST },
     { id: "4", name: "Business dashboard", icon: "bar-chart", route: Routes.BUSINESS_DASHBOARD },
     { id: "5", name: "Invoice", icon: "account-balance-wallet", route: Routes.InvoiceListScreen },
+    { id : "6", name: "Review", icon: "rate-review",route: Routes.REVIEW_SCREEN}
   ];
 
+  const dispatch = useDispatch();
+  const Auth = useAppSelector((state: RootState) => state.User.Auth);
+
+  useEffect(() => {
+    dispatch({ 
+      type: ProductActions.FETCH_PRODUCTS, 
+      payload: { storeId: Auth?.storeId } 
+    });
+    dispatch({
+      type: CustomerActions.FETCH_LIST_CUSTOMER,
+      payload: {
+        onError: (error: any) => {
+          console.log(error);
+        },
+        onFailed: (MsgNo: string) => {
+          console.log(MsgNo);
+        },
+      },
+    });
+  },[])
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.headerText}>Dashboard</Text>
-          <Ionicons name="notifications-outline" size={24} color="white" />
-        </View>
+          <View style={{flexDirection: 'row'}}>
+            <Ionicons name="notifications-outline" size={24} color="white" />
+            <View style={{width: 10}}/>
+            <TouchableOpacity
+              onPress={() => navigation.navigate(Routes.LOGIN_SCREEN)}
+            >
+              <Ionicons name="log-out-outline" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
+      </View>
 
         <View style={styles.chartContainer}>
           <Text style={styles.chartTitle}>Doanh thu gần đây</Text>
@@ -95,19 +87,25 @@ const HomePage = () => {
           ))}
         </View>
       </ScrollView>
-
+{/* 
       <TouchableOpacity style={styles.chatButton} onPress={() => navigation.navigate("CHAT_SCREEN")}>
         <Ionicons name="chatbubble" size={28} color="white" />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate(Routes.AdminDashboardScreen)}>
-          <Ionicons name="home" size={28} color="white" />
+        <TouchableOpacity onPress={() => navigation.navigate(Routes.CUSTOMER_LIST,{showToast: false, message: ""})}>
+          <MaterialIcons name="people" size={28} color="white" />
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate(Routes.WareHouse, {refresh: false});
+          }}
+        >
           <Ionicons name="cart" size={28} color="white" />
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate(Routes.BUSINESS_DASHBOARD)}
+        >
           <Ionicons name="stats-chart" size={28} color="white" />
         </TouchableOpacity>
         <TouchableOpacity

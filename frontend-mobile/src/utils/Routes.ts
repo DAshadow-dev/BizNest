@@ -1,3 +1,4 @@
+
 const HomeScreen= 'HomeScreen';
 const AdminDashboardScreen= 'AdminDashboardScreen';
 const AccountListScreen = 'AccountListScreen';
@@ -12,6 +13,11 @@ const ProductListScreen= 'ProductListScreen';
 const ProductDetailScreen= 'ProductDetailScreen';
 const CreateProductScreen= 'CreateProductScreen';
 const EditProductScreen= 'EditProductScreen';
+//new
+const WareHouse= 'WareHouse';
+const ProductCreateScreen= 'ProductCreateScreen';
+// const EditProductScreens= 'EditProductScreens';
+// const ProductDetailScreens= 'ProductDetailScreens';
 //staff screen
 const StaffListScreen = 'StaffListScreen';
 const StaffDetailScreen = 'StaffDetailScreen';
@@ -31,8 +37,10 @@ const REGISTER_SCREEN ='REGISTER_SCREEN';
 const BUSINESSCATEGORY_SCREEN ='BUSINESSCATEGORY_SCREEN';
 // const HOME_SCREEN ='HOME_CREEN';
 const CHAT_SCREEN ='CHAT_SCREEN';
-
-
+const HOME_ADMIN= 'HOME_ADMIN';
+const STATUS_SCREEN= 'STATUS_SCREEN';
+const ReviewScreen= 'ReviewScreen';
+const PendingDetailScreen= 'PendingDetailScreen';
 export {
   HomeScreen,
   AdminDashboardScreen,
@@ -43,10 +51,14 @@ export {
   InvoiceScreen,
   CreateInvoiceScreen,
   PaymentScreen,
+  //product
   ProductListScreen,
   ProductDetailScreen,
-  CreateProductScreen,
   EditProductScreen,
+  WareHouse,
+  ProductCreateScreen,
+  
+
   //staff
   StaffListScreen,
   StaffDetailScreen,
@@ -66,4 +78,8 @@ export {
   BUSINESSCATEGORY_SCREEN,
   // HOME_SCREEN,
   CHAT_SCREEN,
+  HOME_ADMIN,
+  STATUS_SCREEN,
+  ReviewScreen,
+  PendingDetailScreen
 }

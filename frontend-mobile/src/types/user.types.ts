@@ -24,7 +24,7 @@ export interface Customer {
 }
 
 export interface UserReducer {
-  Auth: User;
+  Auth: User,
 }
 
 export interface CustomerReducer {

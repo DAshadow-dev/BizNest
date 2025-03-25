@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -9,36 +9,71 @@ import {
   Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
+import { io } from "socket.io-client";
+import ChatActions from "@redux/chat/actions";
+import { RootState } from "@redux/root-reducer";
 
-const ChatBox = ({ navigation }) => {
-  const [messages, setMessages] = useState([
-    { id: "1", text: "Hello! How can I assist you?", sender: "bot" },
-  ]);
+const socket = io("http://localhost:5000");
+
+const ChatBox = ({ navigation, route }: { navigation: any; route: any }) => {
+  // Lấy dữ liệu từ Redux
+  const dispatch = useDispatch();
+  const messages = useSelector((state: RootState) => state.Chat.messages);
+  // Nhận userId, receiverId từ route (nếu có)
+  const userId = route.params?.userId || "123";
+  const receiverId = route.params?.receiverId || "456";
+
   const [inputText, setInputText] = useState("");
-  const flatListRef = useRef(null);
+  const flatListRef = useRef<FlatList<any> | null>(null);
 
+  // 🟢 Lấy danh sách tin nhắn khi mở màn hình qua Redux Saga
+  useEffect(() => {
+    dispatch({
+      type: ChatActions.FETCH_MESSAGES,
+      payload: { data: { senderId: userId, receiverId } },
+    });
+  }, [dispatch, userId, receiverId,messages]);
+
+  // 🟢 Kết nối socket để nhận tin nhắn theo thời gian thực
+  useEffect(() => {
+    socket.emit("userOnline", userId);
+
+    // Khi có tin nhắn mới từ server
+    socket.on("receiveMessage", (newMessage) => {
+      // Gửi action để reducer cập nhật messages
+      dispatch({
+        type: ChatActions.RECEIVE_MESSAGE,
+        payload: { data: newMessage },
+      });
+    });
+
+    return () => {
+      socket.off("receiveMessage");
+    };
+  }, [dispatch, userId]);
+
+  // 🔵 Gửi tin nhắn
   const sendMessage = () => {
     if (inputText.trim() === "") return;
 
     const newMessage = {
-      id: Date.now().toString(),
-      text: inputText,
-      sender: "user",
+      senderId: userId,
+      receiverId,
+      message: inputText,
     };
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
-    setInputText("");
 
-    // Simulate bot response
-    setTimeout(() => {
-      const botReply = {
-        id: Date.now().toString(),
-        text: "I received your message!",
-        sender: "bot",
-      };
-      setMessages((prevMessages) => [...prevMessages, botReply]);
-    }, 1000);
+    // Dispatch action cho Redux Saga gọi API
+    dispatch({
+      type: ChatActions.SEND_MESSAGE,
+      payload: { data: newMessage },
+    });
+
+    // Xóa nội dung input
+    setInputText("");
   };
 
+  // Cuộn FlatList xuống cuối khi có tin nhắn mới
   useEffect(() => {
     flatListRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
@@ -51,31 +86,33 @@ const ChatBox = ({ navigation }) => {
           <Ionicons name="chevron-back" size={24} color="white" />
         </TouchableOpacity>
         <Image
-          source={{ uri: "https://i.pravatar.cc/150?img=10" }} // Bot Avatar
+          source={{ uri: "https://i.pravatar.cc/150?img=10" }}
           style={styles.avatar}
         />
-        <Text style={styles.headerText}>Support Center</Text>
+        <Text style={styles.headerText}>Chat with Support</Text>
       </View>
 
       {/* Chat Messages */}
       <FlatList
         ref={flatListRef}
-        data={messages}
-        keyExtractor={(item) => item.id}
+        data={Array.isArray(messages.messages) ? messages.messages : []}
+        keyExtractor={(item) =>
+          item._id?.toString() || Math.random().toString()
+        }
         renderItem={({ item }) => (
           <View
             style={[
               styles.message,
-              item.sender === "user" ? styles.userMessage : styles.botMessage,
+              item.senderId === userId ? styles.userMessage : styles.botMessage,
             ]}
           >
             <Text
               style={[
                 styles.messageText,
-                item.sender === "bot" ? styles.botText : styles.userText,
+                item.senderId !== userId ? styles.botText : styles.userText,
               ]}
             >
-              {item.text}
+              {item.message || "No message"}
             </Text>
           </View>
         )}

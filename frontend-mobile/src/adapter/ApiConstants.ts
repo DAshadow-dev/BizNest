@@ -18,6 +18,10 @@ const ApiConstants = {
   // User
   CHANGE_PASSWORD: `${BASE_PREFIX}/user/changePassword`,
   UPDATE_INFORMATION: `${BASE_PREFIX}/user/updateInformation`,
+  //Chat
+  GET_MESSAGES : `${BASE_PREFIX}/chat/messages`,
+  SEND_MESSAGE : `${BASE_PREFIX}/chat/send`,
+  RECEIVE_MESSAGE : `${BASE_PREFIX}/chat/receive`,
   // product
   GET_ALL_PRODUCTS: `${BASE_PREFIX}/products`,
   CREATE_PRODUCT: `${BASE_PREFIX}/products`,

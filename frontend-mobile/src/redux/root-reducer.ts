@@ -7,9 +7,11 @@ import CustomerReducer from '@redux/customer/reducer';
 import CategoryReducer from '@redux/category/reducer';
 
 import { combineReducers } from 'redux';
+import ChatReducer from './chat/reducer';
 
 const rootReducer = combineReducers({
   User: UserReducer,
+  Chat: ChatReducer,
   Product: ProductReducer,
   Staff: staffReducer,
   Transaction: TransactionReducer,

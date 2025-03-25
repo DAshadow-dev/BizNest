@@ -1,10 +1,10 @@
-const express = require('express');
-const { sendMessage, getMessages } = require('../controllers/chatController');
+const express = require("express");
+const { sendMessage, getMessages, markAsRead } = require("../controllers/chatController");
 
-const app = express();
-const chatRoute = express.Router();
+const router = express.Router();
 
-chatRoute.post('/send',sendMessage);
-chatRoute.get('/messages',getMessages);
+router.post("/send", sendMessage);
+router.get("/messages", getMessages);
+router.post("/mark-as-read", markAsRead);
 
-module.exports = chatRoute;
+module.exports = router;

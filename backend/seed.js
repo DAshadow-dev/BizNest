@@ -337,7 +337,7 @@ const seedData = async () => {
         price: 350000,
         quantity: 50,
         description: "Áo sơ mi nam dài tay chất liệu cotton cao cấp, thoáng mát, thiết kế hiện đại phù hợp cho công sở và các buổi gặp mặt quan trọng",
-        image: "https://res.cloudinary.com/duerrjcxj/image/upload/v1710780000/product_images/shirt_white_yd8t2z.jpg",
+        image: "https://product.hstatic.net/200000588671/product/dsc07927_39e824282073414092b7a9c98fac9b41.jpg",
         brand: "Local Brand",
         storeId: fashionStore._id
       },
@@ -349,7 +349,7 @@ const seedData = async () => {
         price: 199000,
         quantity: 100,
         description: "Áo thun nam cổ tròn basic, chất liệu cotton 100%, form rộng thoải mái, phù hợp cho mọi hoạt động hàng ngày",
-        image: "https://res.cloudinary.com/duerrjcxj/image/upload/v1710780000/product_images/tshirt_black_fd81h2.jpg",
+        image: "https://chodole.com/cdn/shop/products/CDL5_1_1024x1024.jpg?v=1586758906",
         brand: "Việt Fashion",
         storeId: fashionStore._id
       },
@@ -361,7 +361,7 @@ const seedData = async () => {
         price: 280000,
         quantity: 75,
         description: "Áo polo nam phối viền cổ và tay áo, chất liệu cá sấu co giãn, thấm hút mồ hôi tốt, lịch sự và sang trọng",
-        image: "https://res.cloudinary.com/duerrjcxj/image/upload/v1710780000/product_images/polo_navy_h29fjs.jpg",
+        image: "https://bizweb.dktcdn.net/100/415/697/products/ap001.png?v=1701403328933",
         brand: "Coolmate",
         storeId: fashionStore._id
       }

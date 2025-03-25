@@ -72,7 +72,7 @@ const createTransaction = asyncHandler(async (req, res) => {
             customerId,
             products,
             totalPrice,
-            status: "pending",
+            status: "completed",
         });
 
         console.log('transaction: ', transaction);

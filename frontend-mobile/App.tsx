@@ -48,6 +48,7 @@ import { Provider } from 'react-redux';
 import { store } from '@redux/store';
 import HomeAdminScreen from '@screens/HomeAdminScreen';
 import StatusScreen from '@screens/StatusScreen';
+import PendingDetailScreen from '@screens/admin/PendingDetailScreen';
 
 
 const Stack = createStackNavigator<RootParamList>();
@@ -73,6 +74,8 @@ function MyStack() {
         <Stack.Screen name={Routes.AccountListScreen} component={AccountListScreen}/>
         <Stack.Screen name={Routes.AccountDetailScreen} component={AccountDetailScreen}/>
         <Stack.Screen name={Routes.PendingAccountsScreen} component={PendingAccountScreen} />
+        <Stack.Screen name={Routes.PendingDetailScreen} component={PendingDetailScreen} />
+
         <Stack.Screen name={Routes.InvoiceListScreen} component={InvoiceListScreen} />
         <Stack.Screen name={Routes.InvoiceScreen} component={InvoiceScreen} />
         <Stack.Screen name={Routes.CreateInvoiceScreen} component={CreateInvoiceScreen} />

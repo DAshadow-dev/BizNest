@@ -14,16 +14,20 @@ import AdminActions from "@redux/admin/actions";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@redux/store";
 import { RootState } from "@redux/root-reducer";
-import { useRoute } from '@react-navigation/native';
-import * as Routes from '@utils/Routes';
+import { useRoute } from "@react-navigation/native";
+import * as Routes from "@utils/Routes";
 import { Ionicons } from "@expo/vector-icons";
 
 const PendingAccountScreen: React.FC = () => {
   const navigation = useNavigationRoot();
-  const bussinessOnwers: any = useAppSelector((state: RootState) => state.Admin.ListBussinessOnwer);
-  const [filteredBussinessOnwers, setFilteredBussinessOnwers] = useState<any[]>([]);
+  const bussinessOnwers: any = useAppSelector(
+    (state: RootState) => state.Admin.ListBussinessOnwer
+  );
+  const [filteredBussinessOnwers, setFilteredBussinessOnwers] = useState<any[]>(
+    []
+  );
   const dispatch = useDispatch();
-  const [count, setCount]= useState(0);
+  const [count, setCount] = useState(0);
 
   const handleApprove = (account: any) => {
     dispatch({
@@ -73,42 +77,56 @@ const PendingAccountScreen: React.FC = () => {
     });
   }, [count]);
 
-   useEffect(() => {
-    const filtered = bussinessOnwers.filter((user: any) =>
-      user.status == "pending"
+  useEffect(() => {
+    const filtered = bussinessOnwers.filter(
+      (user: any) => user.status == "pending"
     );
     setFilteredBussinessOnwers(filtered);
   }, [bussinessOnwers]);
 
   const renderItem = ({ item }: { item: any }) => (
-    <View style={styles.accountContainer}>
-      <Image source={{ uri: (item.image != "" ? item.image :  "https://i.pinimg.com/736x/8f/1c/a2/8f1ca2029e2efceebd22fa05cca423d7.jpg") }} style={styles.accountImage} />
-      <View style={styles.accountInfo}>
-        <Text style={styles.accountName}>{item.username}</Text>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.approveButton}
-            onPress={() => handleApprove(item)}
-          >
-            <Text style={styles.buttonText}>Approve</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.rejectButton}
-            onPress={() => handleReject(item)}
-          >
-            <Text style={styles.buttonText}>Reject</Text>
-          </TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => {
+        navigation.navigate(Routes.PendingDetailScreen, {accountId: item._id});
+      }}
+    >
+      <View style={styles.accountContainer}>
+        <Image
+          source={{
+            uri:
+              item.image != ""
+                ? item.image
+                : "https://i.pinimg.com/736x/8f/1c/a2/8f1ca2029e2efceebd22fa05cca423d7.jpg",
+          }}
+          style={styles.accountImage}
+        />
+        <View style={styles.accountInfo}>
+          <Text style={styles.accountName}>{item.username}</Text>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.approveButton}
+              onPress={() => handleApprove(item)}
+            >
+              <Text style={styles.buttonText}>Approve</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.rejectButton}
+              onPress={() => handleReject(item)}
+            >
+              <Text style={styles.buttonText}>Reject</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
-   <View style={{flex: 1}}>
-     <View style={styles.header}>
+    <View style={{ flex: 1 }}>
+      <View style={styles.header}>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate(Routes.HOME_ADMIN)
+            navigation.navigate(Routes.HOME_ADMIN);
           }}
         >
           <Ionicons name="arrow-back" size={24} color="white" />
@@ -116,30 +134,30 @@ const PendingAccountScreen: React.FC = () => {
         <Text style={styles.headerText}>Approve Bussiness Management</Text>
         <Ionicons name="settings-outline" size={24} color="white" />
       </View>
-    <View style={styles.container}>
-      <FlatList
-        data={filteredBussinessOnwers}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-      />
+      <View style={styles.container}>
+        <FlatList
+          data={filteredBussinessOnwers}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+        />
+      </View>
     </View>
-   </View>
   );
 };
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
     padding: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingTop: 35, // Adjust for status bar
   },
   headerText: {
-    color: 'white',
+    color: "white",
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   container: {
     flex: 1,

@@ -39,7 +39,7 @@ const BUSINESSCATEGORY_SCREEN ='BUSINESSCATEGORY_SCREEN';
 const CHAT_SCREEN ='CHAT_SCREEN';
 const HOME_ADMIN= 'HOME_ADMIN';
 const STATUS_SCREEN= 'STATUS_SCREEN';
-
+const PendingDetailScreen= 'PendingDetailScreen';
 export {
   HomeScreen,
   AdminDashboardScreen,
@@ -78,5 +78,6 @@ export {
   // HOME_SCREEN,
   CHAT_SCREEN,
   HOME_ADMIN,
-  STATUS_SCREEN
+  STATUS_SCREEN,
+  PendingDetailScreen
 }

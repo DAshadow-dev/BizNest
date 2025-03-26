@@ -40,7 +40,7 @@ const PendingAccountScreen: React.FC = () => {
         },
       },
     });
-  },[]);
+  },[bussinessOnwers]);
 
   useEffect(() => {
     const filtered = bussinessOnwers.filter(

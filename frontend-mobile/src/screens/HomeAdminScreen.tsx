@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Button,
+  Modal,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LineChart } from "react-native-chart-kit";
@@ -17,6 +17,9 @@ import {
 
 const HomeAdminScreen = () => {
   const navigation = useNavigationRoot();
+  const [activeTab, setActiveTab] = useState("home");
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  
   const categories = [
     {
       id: "1",
@@ -44,20 +47,37 @@ const HomeAdminScreen = () => {
     }
   ];
 
+  const handleLogout = () => {
+    setLogoutModalVisible(true);
+  };
+
+  const confirmLogout = () => {
+    setLogoutModalVisible(false);
+    navigation.navigate(Routes.LOGIN_SCREEN);
+  };
+
+  const handleTabPress = (tabName, route) => {
+    setActiveTab(tabName);
+    navigation.navigate(route);
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.headerText}>Dashboard Admin</Text>
           <View style={{ flexDirection: "row" }}>
-            <Ionicons name="notifications-outline" size={24} color="white" />
+            <TouchableOpacity style={styles.headerButton}>
+              <Ionicons name="notifications-outline" size={24} color="white" />
+            </TouchableOpacity>
             <View style={{ width: 10 }} />
             <TouchableOpacity
-              onPress={() => navigation.navigate(Routes.LOGIN_SCREEN)}
+              style={styles.headerButton}
+              onPress={handleLogout}
             >
               <Ionicons name="log-out-outline" size={24} color="white" />
             </TouchableOpacity>
-          </View>{" "}
+          </View>
         </View>
 
         <View style={styles.chartContainer}>
@@ -93,10 +113,114 @@ const HomeAdminScreen = () => {
           ))}
         </View>
       </ScrollView>
-      {/* 
-      <TouchableOpacity style={styles.chatButton} onPress={() => navigation.navigate("CHAT_SCREEN")}>
-        <Ionicons name="chatbubble" size={28} color="white" />
-      </TouchableOpacity> */}
+
+      {/* Logout Confirmation Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={logoutModalVisible}
+        onRequestClose={() => setLogoutModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Xác nhận đăng xuất</Text>
+            <Text style={styles.modalText}>Bạn có chắc chắn muốn đăng xuất khỏi ứng dụng?</Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.cancelButton]} 
+                onPress={() => setLogoutModalVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Hủy</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.logoutButton]} 
+                onPress={confirmLogout}
+              >
+                <Text style={styles.logoutButtonText}>Đăng xuất</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Enhanced Bottom Navigation */}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity 
+          style={styles.tabItem}
+          onPress={() => handleTabPress('pending', Routes.PendingAccountsScreen)}
+        >
+          <View style={[styles.iconContainer, activeTab === 'pending' && styles.activeIconContainer]}>
+            <MaterialIcons 
+              name="receipt" 
+              size={24} 
+              color={activeTab === 'pending' ? "#007AFF" : "white"} 
+            />
+          </View>
+          <Text style={[styles.tabLabel, activeTab === 'pending' && styles.activeTabLabel]}>
+            Pending
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.tabItem}
+          onPress={() => handleTabPress('accounts', Routes.AccountListScreen)}
+        >
+          <View style={[styles.iconContainer, activeTab === 'accounts' && styles.activeIconContainer]}>
+            <MaterialIcons 
+              name="people" 
+              size={24} 
+              color={activeTab === 'accounts' ? "#007AFF" : "white"} 
+            />
+          </View>
+          <Text style={[styles.tabLabel, activeTab === 'accounts' && styles.activeTabLabel]}>
+            Accounts
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.tabItem}
+          onPress={() => handleTabPress('home', Routes.HOME_ADMIN_SCREEN)}
+        >
+          <View style={styles.homeButton}>
+            <Ionicons name="home" size={28} color="white" />
+          </View>
+          <Text style={[styles.tabLabel, activeTab === 'home' && styles.activeTabLabel]}>
+            Home
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.tabItem}
+          onPress={() => handleTabPress('dashboard', Routes.AdminDashboardScreen)}
+        >
+          <View style={[styles.iconContainer, activeTab === 'dashboard' && styles.activeIconContainer]}>
+            <MaterialIcons 
+              name="bar-chart" 
+              size={24} 
+              color={activeTab === 'dashboard' ? "#007AFF" : "white"} 
+            />
+          </View>
+          <Text style={[styles.tabLabel, activeTab === 'dashboard' && styles.activeTabLabel]}>
+            Dashboard
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.tabItem}
+          onPress={() => handleTabPress('review', Routes.ReviewScreen)}
+        >
+          <View style={[styles.iconContainer, activeTab === 'review' && styles.activeIconContainer]}>
+            <MaterialIcons 
+              name="rate-review" 
+              size={24} 
+              color={activeTab === 'review' ? "#007AFF" : "white"} 
+            />
+          </View>
+          <Text style={[styles.tabLabel, activeTab === 'review' && styles.activeTabLabel]}>
+            Review
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -121,6 +245,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
+  headerButton: {
+    padding: 5,
+  },
   chartContainer: {
     backgroundColor: "white",
     borderRadius: 10,
@@ -141,10 +268,11 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
     padding: 15,
+    paddingBottom: 80, // Add extra padding at bottom to account for nav bar
   },
   categoryItem: {
     backgroundColor: "white",
-    width: "30%",
+    width: "45%", // Changed to 45% to fit better with 4 items
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
@@ -159,18 +287,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontWeight: "bold",
   },
-  chatButton: {
-    position: "absolute",
-    bottom: 80,
-    right: 20,
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 50,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 3,
-  },
+  // Enhanced Bottom Navigation Styles
   bottomNav: {
     position: "absolute",
     bottom: 0,
@@ -179,14 +296,113 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     backgroundColor: "#007AFF",
-    paddingVertical: 10,
-    height: 60,
+    paddingTop: 8,
+    paddingBottom: 5,
+    height: 70,
     alignItems: "center",
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     shadowColor: "#000",
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 10,
+  },
+  tabItem: {
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  activeIconContainer: {
+    backgroundColor: "white",
+  },
+  homeButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#0056b3",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 5,
+  },
+  tabLabel: {
+    color: "white",
+    fontSize: 10, // Smaller font size for admin tabs (more text)
+    marginTop: 2,
+  },
+  activeTabLabel: {
+    color: "#e6f2ff",
+    fontWeight: "bold",
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 20,
+    width: '80%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: '#333',
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#555',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    flex: 1,
+    marginHorizontal: 5,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#f2f2f2',
+  },
+  cancelButtonText: {
+    color: '#555',
+    fontWeight: 'bold',
+  },
+  logoutButton: {
+    backgroundColor: '#ff3b30',
+  },
+  logoutButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });

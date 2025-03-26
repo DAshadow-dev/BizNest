@@ -22,7 +22,7 @@ const HomePage = () => {
     { id: "3", name: "Customer", icon: "people", route: Routes.CUSTOMER_LIST },
     { id: "4", name: "Business dashboard", icon: "bar-chart", route: Routes.BUSINESS_DASHBOARD },
     { id: "5", name: "Invoice", icon: "account-balance-wallet", route: Routes.InvoiceListScreen },
-    { id : "6", name: "Review", icon: "rate-review",route: Routes.REVIEW_SCREEN}
+    { id : "6", name: "Review", icon: "rate-review",route: Routes.ReviewScreen}
   ];
 
   const dispatch = useDispatch();

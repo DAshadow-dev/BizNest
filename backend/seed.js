@@ -8,6 +8,7 @@ const Category = require('./src/models/Category');
 const Product = require('./src/models/Product');
 const Role = require('./src/models/Role');
 const Invoice = require('./src/models/Invoice');
+const Transaction = require('./src/models/Transaction'); // Add Transaction model import
 
 /**
  * Hàm reset sequence counter
@@ -44,6 +45,7 @@ const seedData = async () => {
     await Store.deleteMany({});
     await Customer.deleteMany({});
     await User.deleteMany({});
+    await Transaction.deleteMany({}); // Add this line to delete existing transactions
     // await Role.deleteMany({});
     
     // Xóa tất cả counter cũ
@@ -59,6 +61,7 @@ const seedData = async () => {
     await resetCounter('customer_seq', 1);
     await resetCounter('category_seq', 1);
     await resetCounter('product_seq', 100);
+    await resetCounter('transaction_seq', 1); // Add this line to initialize transaction counter
 
     // === CREATE CATEGORIES (THỜI TRANG) ===
     console.log("\nCreating fashion categories...");
@@ -327,7 +330,7 @@ const seedData = async () => {
     const pkCategory = createdCategories.find(c => c.name === "Phụ kiện");
     const thethaoCategory = createdCategories.find(c => c.name === "Đồ thể thao");
     const dongCategory = createdCategories.find(c => c.name === "Đồ mùa đông");
-
+st
     // Sản phẩm thời trang thông thường
     const fashionProducts = [
       {
@@ -369,8 +372,10 @@ const seedData = async () => {
     ];
 
     // Tạo các sản phẩm thời trang
+    const createdFashionProducts = [];
     for (const product of fashionProducts) {
       const newProduct = await Product.create(product);
+      createdFashionProducts.push(newProduct);
       console.log(`Fashion product "${product.name}" created with ID: ${newProduct._id}`);
     }
 
@@ -403,12 +408,139 @@ const seedData = async () => {
     ];
 
     // Tạo các sản phẩm thể thao
+    const createdSportProducts = [];
     for (const product of sportProducts) {
       const newProduct = await Product.create(product);
+      createdSportProducts.push(newProduct);
       console.log(`Sport product "${product.name}" created with ID: ${newProduct._id}`);
     }
 
     console.log("Products created successfully!");
+
+    // === CREATE TRANSACTIONS ===
+    console.log("\nCreating transactions...");
+    
+    // Danh sách cửa hàng
+    const stores = [fashionStore, sportStore];
+    
+    // Tạo 30 giao dịch cho mỗi cửa hàng
+    for (const store of stores) {
+      console.log(`Creating 30 transactions for store: ${store.name} (ID: ${store._id})`);
+      
+      // Lấy danh sách sản phẩm của cửa hàng
+      const storeProducts = store._id == fashionStore._id 
+        ? createdFashionProducts 
+        : createdSportProducts;
+      
+      // Lấy danh sách khách hàng của cửa hàng
+      const storeCustomers = store.customers.map(custId => 
+        createdCustomers.find(cust => cust._id == custId)
+      ).filter(Boolean);
+      
+      if (storeCustomers.length === 0 || storeProducts.length === 0) {
+        console.log(`Skipping transaction creation for store ${store.name} - no customers or products available`);
+        continue;
+      }
+      
+      // Tạo 30 giao dịch
+      for (let i = 0; i < 30; i++) {
+        // Tạo ngày ngẫu nhiên trong vòng 30 ngày gần đây
+        const randomDaysAgo = Math.floor(Math.random() * 30);
+        const transactionDate = new Date();
+        transactionDate.setDate(transactionDate.getDate() - randomDaysAgo);
+        
+        // Chọn ngẫu nhiên một khách hàng
+        const randomCustomerIndex = Math.floor(Math.random() * storeCustomers.length);
+        const customer = storeCustomers[randomCustomerIndex];
+        
+        // Tạo ngẫu nhiên 1-3 sản phẩm cho giao dịch này
+        const numProducts = Math.floor(Math.random() * 3) + 1;
+        const transactionProducts = [];
+        let totalPrice = 0;
+        
+        // Mảng để theo dõi các sản phẩm đã được chọn
+        const selectedProductIndices = new Set();
+        
+        for (let j = 0; j < numProducts; j++) {
+          // Chọn ngẫu nhiên một sản phẩm (đảm bảo không trùng lặp)
+          let randomProductIndex;
+          do {
+            randomProductIndex = Math.floor(Math.random() * storeProducts.length);
+          } while (selectedProductIndices.has(randomProductIndex) && selectedProductIndices.size < storeProducts.length);
+          
+          // Nếu đã chọn hết tất cả sản phẩm, thoát khỏi vòng lặp
+          if (selectedProductIndices.size >= storeProducts.length) {
+            break;
+          }
+          
+          selectedProductIndices.add(randomProductIndex);
+          const product = storeProducts[randomProductIndex];
+          
+          // Số lượng ngẫu nhiên từ 1-3
+          const quantity = Math.floor(Math.random() * 3) + 1;
+          
+          // Thêm vào danh sách sản phẩm của giao dịch
+          transactionProducts.push({
+            productId: product._id,
+            quantity: quantity
+          });
+          
+          // Cộng vào tổng giá
+          totalPrice += product.price * quantity;
+        }
+        
+        // Trạng thái ngẫu nhiên với tỷ lệ: 20% pending, 70% completed, 10% canceled
+        const statusOptions = ["pending", "completed", "canceled"];
+        const statusWeights = [0.2, 0.7, 0.1];
+        const randomValue = Math.random();
+        let status;
+        
+        if (randomValue < statusWeights[0]) {
+          status = statusOptions[0];
+        } else if (randomValue < statusWeights[0] + statusWeights[1]) {
+          status = statusOptions[1];
+        } else {
+          status = statusOptions[2];
+        }
+        
+        // Tạo giao dịch
+        const transaction = new Transaction({
+          storeId: store._id,
+          customerId: customer._id,
+          products: transactionProducts,
+          totalPrice: totalPrice,
+          status: status,
+          userId: 6,    
+          createdAt: transactionDate
+        });
+        
+        await transaction.save();
+        console.log(`Created transaction #${transaction._id} for store ${store.name}, customer ${customer.fullname}, total: ${totalPrice.toLocaleString('vi-VN')} VND`);
+      }
+    }
+    
+    // Thống kê giao dịch
+    const totalTransactions = await Transaction.countDocuments();
+    console.log(`\nTotal transactions created: ${totalTransactions}`);
+    
+    const transactionsByStatus = await Transaction.aggregate([
+      { $group: { _id: "$status", count: { $sum: 1 } } }
+    ]);
+    console.log('Transactions by status:');
+    transactionsByStatus.forEach(item => {
+      console.log(`${item._id}: ${item.count}`);
+    });
+    
+    const transactionsByStore = await Transaction.aggregate([
+      { $group: { _id: "$storeId", count: { $sum: 1 }, totalRevenue: { $sum: "$totalPrice" } } }
+    ]);
+    console.log('Transactions by store:');
+    for (const item of transactionsByStore) {
+      const storeName = stores.find(s => s._id == item._id)?.name || 'Unknown Store';
+      console.log(`${storeName} (ID: ${item._id}): ${item.count} transactions, Total revenue: ${item.totalRevenue.toLocaleString('vi-VN')} VND`);
+    }
+    
+    console.log("Transactions created successfully!");
 
     console.log("\n=== SEED DATA COMPLETED SUCCESSFULLY ===");
     mongoose.connection.close();

@@ -26,43 +26,8 @@ const PendingAccountScreen: React.FC = () => {
   const [filteredBussinessOnwers, setFilteredBussinessOnwers] = useState<any[]>(
     []
   );
-  const dispatch = useDispatch();
-  const [count, setCount] = useState(0);
-
-  const handleApprove = (account: any) => {
-    dispatch({
-      type: AdminActions.APPROVE_ACCOUNT,
-      payload: {
-        id: account._id,
-        onError: (error: any) => {
-          console.log(error);
-        },
-        onFailed: (MsgNo: string) => {
-          console.log(MsgNo);
-        },
-      },
-    });
-    setCount(count + 1);
-    Alert.alert("Account Approved", `You have approved ${account.username}`);
-  };
-
-  const handleReject = (account: any) => {
-    dispatch({
-      type: AdminActions.REJECT_ACCOUNT,
-      payload: {
-        id: account._id,
-        onError: (error: any) => {
-          console.log(error);
-        },
-        onFailed: (MsgNo: string) => {
-          console.log(MsgNo);
-        },
-      },
-    });
-    setCount(count + 1);
-    Alert.alert("Account Rejected", `You have rejected ${account.username}`);
-  };
-
+  const dispatch = useDispatch();  
+  
   useEffect(() => {
     dispatch({
       type: AdminActions.FETCH_LIST_BUSSINESS_OWNER,
@@ -75,7 +40,7 @@ const PendingAccountScreen: React.FC = () => {
         },
       },
     });
-  }, [count]);
+  },[]);
 
   useEffect(() => {
     const filtered = bussinessOnwers.filter(

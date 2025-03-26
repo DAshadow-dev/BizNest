@@ -21,10 +21,13 @@ import { useAppSelector } from "@redux/store";
 import { RootState } from "@redux/root-reducer";
 import CustomerActions from "@redux/customer/actions";
 import TransactionActions from "@redux/transaction/actions";
+import { useNavigationRoot } from '@components/navigate/RootNavigation';
+import * as Routes from '@utils/Routes';
 
 const BusinessDashBoardScreen = () => {
   const screenWidth = Dimensions.get("window").width - 40;
   const dispatch = useDispatch();
+  const navigation = useNavigationRoot();
   const customers = useAppSelector(
     (state: RootState) => state.Customer.ListCustomer
   );
@@ -114,7 +117,9 @@ const BusinessDashBoardScreen = () => {
             alignItems: "center",
           }}
         >
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={() => {
+            navigation.navigate(Routes.HomeScreen);
+          }}>
             <IconBack />
           </TouchableOpacity>
         </View>

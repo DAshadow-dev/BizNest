@@ -103,7 +103,7 @@ const ProfileScreen: React.FC = () => {
       <View style={styles.header}>
         <TouchableOpacity
             onPress={()=>{
-                navigation.navigate(Routes.HomeScreen)
+                navigation.goBack()
             }}
           style={{position: 'absolute', left: scale(25), top: verticalScale(25)}}
         >

@@ -1,5 +1,6 @@
 
 const HomeScreen= 'HomeScreen';
+const StaffHomeScreen= 'StaffHomeScreen';
 const AdminDashboardScreen= 'AdminDashboardScreen';
 const AccountListScreen = 'AccountListScreen';
 const PendingAccountsScreen= 'PendingAccountsScreen';
@@ -43,6 +44,7 @@ const ReviewScreen= 'ReviewScreen';
 const PendingDetailScreen= 'PendingDetailScreen';
 export {
   HomeScreen,
+  StaffHomeScreen,
   AdminDashboardScreen,
   AccountListScreen,
   PendingAccountsScreen,

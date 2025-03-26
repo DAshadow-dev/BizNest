@@ -146,7 +146,7 @@ const CustomerDetailScreen = (props: any) => {
       <View style={styles.header}>
         <View style={styles.headerTop}>
           <TouchableOpacity
-            onPress={() => navigation.navigate(Routes.CUSTOMER_LIST)}
+            onPress={() => navigation.goBack()}
             style={styles.backButton}
           >
             <Ionicons name="arrow-back" size={24} color="white" />

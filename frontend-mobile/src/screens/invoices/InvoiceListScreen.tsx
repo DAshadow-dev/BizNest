@@ -279,7 +279,7 @@ const InvoiceListScreen = () => {
       <View style={styles.header}>
         <View style={styles.headerTop}>
           <TouchableOpacity
-            onPress={() => navigation.navigate(Routes.HomeScreen)}
+            onPress={() => navigation.goBack()}
           >
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>

@@ -63,6 +63,8 @@ const LoginScreen: React.FC = () => {
         onSuccess: (user: any) => {
           if (user.role == "admin") {
             navigation.navigate(Routes.HOME_ADMIN);
+          } if(user.role == "staff"){
+            navigation.navigate(Routes.StaffHomeScreen)
           } else {
             if (user.status == "inactive" || user.status == "pending") {
               navigation.navigate(Routes.STATUS_SCREEN, {

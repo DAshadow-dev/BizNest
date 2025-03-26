@@ -1,6 +1,7 @@
 // controllers/staffController.js
 const User = require('../models/User');
 const cloudinary = require('../config/cloundinaryConfig');
+const bcrypt = require("bcryptjs");
 
 const createStaff = async (req, res) => {
     try {
@@ -31,17 +32,18 @@ const createStaff = async (req, res) => {
         imageUrl = result.secure_url; // Lấy URL ảnh sau khi upload
         console.log('>>>', imageUrl);
       }
-  
+      const hashedPassword = await bcrypt.hash(password, 10); 
       // Tạo mới nhân viên
       const newStaff = new User({
         username,
-        password,
+        password: hashedPassword,
         email,
         phone,
         role,
         image: imageUrl || '', // Nếu không có ảnh, để rỗng
         status: status || 'active',
         storeId,
+        verified: true
       });
   
       await newStaff.save();

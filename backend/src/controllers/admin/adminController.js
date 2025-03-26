@@ -3,7 +3,7 @@ const User = require("../../models/User");
 
 exports.approveUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
     if (user.role != "business owner") {
@@ -26,9 +26,8 @@ exports.approveUser = async (req, res) => {
 
 exports.rejectUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.userId);
     if (!user) return res.status(404).json({ message: "User not found" });
-
     await Store.findOneAndDelete({ ownerId: user._id });
     await User.findByIdAndDelete(user._id);
   } catch (err) {

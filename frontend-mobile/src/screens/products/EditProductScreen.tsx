@@ -255,7 +255,7 @@ const EditProductScreen = ({ route }: { route: { params: RouteParams } }) => {
             setTimeout(() => {
               setSuccessModalVisible(false);
               dispatch({ type: ProductActions.FETCH_PRODUCTS });
-              navigation.navigate(Routes.WareHouse, { refresh: true });
+              navigation.goBack();
             }, 2000);
             
           } catch (error: any) {

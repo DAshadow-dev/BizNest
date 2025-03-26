@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   detailButton: {
-    backgroundColor: "#9F7434",
+    backgroundColor: "#3478f6",
     padding: 10,
     borderRadius: 5,
     marginRight: 10,

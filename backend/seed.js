@@ -157,9 +157,9 @@ const seedData = async () => {
     const staffUsers = [
       {
         username: "fashion_staff",
-        password: await bcrypt.hash('Staff@123', 10),
+        password: await bcrypt.hash('12345678', 10),
         verified: true,
-        email: "fashion_staff@biznest.com",
+        email: "s1@email.com",
         phone: "0905555555",
         role: "staff",
         status: "active",
@@ -167,9 +167,9 @@ const seedData = async () => {
       },
       {
         username: "sport_staff",
-        password: await bcrypt.hash('Staff@123', 10),
+        password: await bcrypt.hash('12345678', 10),
         verified: true,
-        email: "sport_staff@biznest.com",
+        email: "s2@email.com",
         phone: "0906666666",
         role: "staff",
         status: "active",
@@ -178,9 +178,9 @@ const seedData = async () => {
       // Additional sport store staff
       {
         username: "Nguyen Van Tuan",
-        password: await bcrypt.hash('Staff@123', 10),
+        password: await bcrypt.hash('12345678', 10),
         verified: true,
-        email: "tuan.nguyen@biznest.com",
+        email: "s3@email.com",
         phone: "0907777777",
         role: "staff",
         status: "active",
@@ -188,9 +188,9 @@ const seedData = async () => {
       },
       {
         username: "Tran Thi Mai",
-        password: await bcrypt.hash('Staff@123', 10),
+        password: await bcrypt.hash('12345678', 10),
         verified: true,
-        email: "mai.tran@biznest.com",
+        email: "s4@email.com",
         phone: "0908888888",
         role: "staff",
         status: "active",
@@ -198,9 +198,9 @@ const seedData = async () => {
       },
       {
         username: "Le Van Hung",
-        password: await bcrypt.hash('Staff@123', 10),
+        password: await bcrypt.hash('12345678', 10),
         verified: true,
-        email: "hung.le@biznest.com",
+        email: "s5@email.com",
         phone: "0909999999",
         role: "staff",
         status: "inactive",
@@ -330,7 +330,7 @@ const seedData = async () => {
     const pkCategory = createdCategories.find(c => c.name === "Phụ kiện");
     const thethaoCategory = createdCategories.find(c => c.name === "Đồ thể thao");
     const dongCategory = createdCategories.find(c => c.name === "Đồ mùa đông");
-st
+
     // Sản phẩm thời trang thông thường
     const fashionProducts = [
       {
@@ -443,9 +443,9 @@ st
       }
       
       // Tạo 30 giao dịch
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 84; i++) {
         // Tạo ngày ngẫu nhiên trong vòng 30 ngày gần đây
-        const randomDaysAgo = Math.floor(Math.random() * 30);
+        const randomDaysAgo = Math.floor(Math.random() * 84);
         const transactionDate = new Date();
         transactionDate.setDate(transactionDate.getDate() - randomDaysAgo);
         

@@ -61,11 +61,14 @@ const LoginScreen: React.FC = () => {
       payload: {
         data: { email, password },
         onSuccess: (user: any) => {
+          console.log(user);
           if (user.role == "admin") {
+            console.log('1');
             navigation.navigate(Routes.HOME_ADMIN);
-          } if(user.role == "staff"){
+          } else if(user.role == "staff"){
             navigation.navigate(Routes.StaffHomeScreen)
           } else {
+            console.log('2')
             if (user.status == "inactive" || user.status == "pending") {
               navigation.navigate(Routes.STATUS_SCREEN, {
                 status: user.status,

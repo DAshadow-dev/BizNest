@@ -4,6 +4,7 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
 import HomeScreen from '@screens/HomeScreen';
+import  StaffHomeScreen  from '@screens/StaffHomeScreen';
 import InvoiceListScreen from '@screens/invoices/InvoiceListScreen';
 import InvoiceScreen from '@screens/invoices/InvoiceScreen';
 import PaymentScreen from '@screens/invoices/PaymentScreen';
@@ -66,6 +67,7 @@ function MyStack() {
       }}
       initialRouteName={Routes.LOGIN_SCREEN}>
         <Stack.Screen name={Routes.ONBOARDING_SCREEN} component={OnboardingScreen} />
+        <Stack.Screen name={Routes.StaffHomeScreen} component={StaffHomeScreen} />
         <Stack.Screen name={Routes.LOGIN_SCREEN} component={LoginScreen} />
         <Stack.Screen name={Routes.REGISTER_SCREEN} component={RegisterScreen} />
         <Stack.Screen name={Routes.BUSINESSCATEGORY_SCREEN} component={BusinessCategoryScreen} />

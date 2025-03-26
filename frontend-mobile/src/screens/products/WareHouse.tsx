@@ -182,7 +182,7 @@ const WareHouse = () => {
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate(Routes.HomeScreen)
+            navigation.goBack()
           }}
         >
           <Ionicons name="arrow-back" size={24} color="white" />

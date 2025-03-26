@@ -79,7 +79,7 @@ import AdminActions from './actions';
             const {id, onFailed, onError} = action.payload;
             try {
             const response: CommonResponse<CodeResponse> = yield call(() =>
-                Factories.toggle_account_status(id),
+                Factories.reject_account(id),
             );
             if (response?.status === 200) {
                 yield put({

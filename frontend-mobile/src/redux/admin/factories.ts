@@ -18,13 +18,13 @@ const Factories = {
 
   approve_account: (id: number) => {
     return api.put(
-      `${ApiConstants.TOGGLE_ACCOUNT_STATUS}/${id}`,
+      `${ApiConstants.APPROVE_ACCOUNT}/${id}`,
     ) 
   },
 
   reject_account: (id: number) => {
     return api.put(
-      `${ApiConstants.TOGGLE_ACCOUNT_STATUS}/${id}`,
+      `${ApiConstants.REJECT_ACCOUNT}/${id}`,
     ) 
   },
 }

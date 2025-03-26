@@ -1,247 +1,339 @@
-import React, { useEffect } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
-import { LineChart } from "react-native-chart-kit";
-import { Dimensions } from "react-native";
-import {
-  moderateScale,
-  scale,
-  verticalScale,
-} from "@libs/reactResizeMatter/scalingUtils";
-import IconBack from "@assets/svg/header/ic_back.svg";
-import { FontAwesome } from "@expo/vector-icons";
-import { CommonColors, Fonts } from "@utils/CommonStyles";
-import { useDispatch } from "react-redux";
-import { useAppSelector } from "@redux/store";
-import { RootState } from "@redux/root-reducer";
-import CustomerActions from "@redux/customer/actions";
-import TransactionActions from "@redux/transaction/actions";
 
-const BusinessDashBoardScreen = () => {
-  const screenWidth = Dimensions.get("window").width - 40;
-  const dispatch = useDispatch();
-  const customers = useAppSelector(
-    (state: RootState) => state.Customer.ListCustomer
-  );
+import { useState, useEffect } from "react"
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Dimensions, StatusBar } from "react-native"
+import { LineChart } from "react-native-chart-kit"
+import { Ionicons } from "@expo/vector-icons"
+import { useAppSelector } from "@redux/store"
+import { RootState } from "@redux/root-reducer"
+import { goBack, useNavigationRoot } from "@components/navigate/RootNavigation";
+import * as Routes from "@utils/Routes";
+// Sample data to mimic your web app
+
+
+const months = ["All", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+const BusinessDashboard = () => {
+  const customers = useAppSelector((state: RootState) => state.Customer.ListCustomer);
   const transactions = useAppSelector(
     (state: RootState) => state.Transaction.ListTransaction
   );
-  const revenueCalculating = (transactions : any) => {
-    let total = 0;
-    transactions.forEach((transaction : any) => total += transaction.totalPrice);
-    return total;
+  const sampleData = {
+    customers,
+    transactions
+  }
+  
+  const [selectedMonth, setSelectedMonth] = useState("All")
+  const [filteredTransactions, setFilteredTransactions] = useState(sampleData.transactions)
+  const [isPickerVisible, setIsPickerVisible] = useState(false)
+
+  // Filter transactions when month changes
+  useEffect(() => {
+    if (selectedMonth === "All") {
+      setFilteredTransactions(sampleData.transactions)
+    } else {
+      const monthIndex = months.indexOf(selectedMonth) - 1 // -1 because "All" is at index 0
+      setFilteredTransactions(sampleData.transactions.filter((t) => new Date(t.createdAt).getMonth() === monthIndex))
+    }
+  }, [selectedMonth])
+
+  // Calculate total revenue
+  const calculateRevenue = (transactions) => {
+    return transactions.reduce((total, transaction) => total + transaction.totalPrice, 0)
   }
 
-  useEffect(() => {
-    dispatch({
-      type: CustomerActions.FETCH_LIST_CUSTOMER,
-      payload: {
-        onError: (error: any) => {
-          console.log(error);
-        },
-        onFailed: (MsgNo: string) => {
-          console.log(MsgNo);
-        },
-      },
-    });
-  }, [customers]);
+  // Prepare monthly revenue data
+  const getMonthlyRevenue = () => {
+    const monthlyRevenue = Array(12).fill(0)
+    sampleData.transactions.forEach((transaction) => {
+      const month = new Date(transaction.createdAt).getMonth()
+      monthlyRevenue[month] += transaction.totalPrice
+    })
+    return monthlyRevenue
+  }
 
-  useEffect(() => {
-    dispatch({
-      type: TransactionActions.FETCH_LIST_TRANSACTION,
-      payload: {
-        onError: (error: any) => {
-          console.log(error);
-        },
-        onFailed: (MsgNo: string) => {
-          console.log(MsgNo);
-        },
-      },
-    });
-  }, []);
+  const monthlyRevenue = getMonthlyRevenue()
+  const screenWidth = Dimensions.get("window").width - 40
+  const navigation = useNavigationRoot();
 
-  const monthlyRevenue = Array(12).fill(0);
-  transactions.forEach((transaction : any) => {
-    const month = new Date(transaction.createdAt).getMonth();
-    monthlyRevenue[month] += transaction.totalPrice;
-  });
-
-  // console.log(monthlyRevenue)
-
-  const revenueData = {
-    labels: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "July",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
+  const chartData = {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].slice(0, 6),
     datasets: [
       {
-        data: monthlyRevenue,
+        data: monthlyRevenue.slice(0, 6),
+        color: (opacity = 1) => `rgba(55, 80, 178, ${opacity})`,
         strokeWidth: 2,
       },
     ],
-  };
+    legend: ["Monthly Revenue"],
+  }
+
+  const chartConfig = {
+    backgroundGradientFrom: "#ffffff",
+    backgroundGradientTo: "#ffffff",
+    decimalPlaces: 0,
+    color: (opacity = 1) => `rgba(55, 80, 178, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    style: {
+      borderRadius: 16,
+    },
+    propsForDots: {
+      r: "6",
+      strokeWidth: "2",
+      stroke: "#3750B2",
+    },
+    formatYLabel: (value) => `$${Number.parseInt(value).toLocaleString()}`,
+  }
+
   return (
-    <ScrollView style={styles.container}>
-      <View
-        style={{
-          height: verticalScale(60),
-          width: scale(393),
-          backgroundColor: "#3750B2",
-          flexDirection: "row",
-          alignItems: "flex-end",
-        }}
-      >
-        <View
-          style={{
-            width: scale(50),
-            height: verticalScale(50),
-            justifyContent: "center",
-            alignItems: "center",
+    <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor="#3750B2" barStyle="light-content" />
+
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => {
+            navigation.goBack();
           }}
         >
-          <TouchableOpacity onPress={() => {}}>
-            <IconBack />
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            width: scale(293),
-            height: verticalScale(50),
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Text
-            style={{
-              fontSize: moderateScale(22),
-              color: CommonColors.white,
-              ...Fonts.defaultRegular,
-            }}
-          >
-            Dash Board
-          </Text>
-        </View>
-        <View
-          style={{
-            width: scale(50),
-            height: verticalScale(50),
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => {}}
-            style={{ marginRight: scale(10) }}
-          >
-            <FontAwesome
-              name="filter"
-              size={moderateScale(20)}
-              color={CommonColors.white}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-      {/* Tổng quan */}
-      <View style={styles.overviewContainer}>
-        <View style={styles.card}>
-          <Text style={styles.title}>Revenue: </Text>
-          <Text style={styles.value}>${revenueCalculating(transactions)}</Text>
-        </View>
-        <View style={styles.card}>
-          <Text style={styles.title}>Number of transactions: </Text>
-          <Text style={styles.value}>{transactions.length}</Text>
-        </View>
-        <View style={styles.card}>
-          <Text style={styles.title}>Customers</Text>
-          <Text style={styles.value}>{customers.length}</Text>
-        </View>
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Dashboard</Text>
+        <TouchableOpacity style={styles.filterButton}>
+          <Ionicons name="filter" size={24} color="white" />
+        </TouchableOpacity>
       </View>
 
-      {/* Biểu đồ doanh thu */}
-      <View style={styles.chartContainer}>
-        <Text style={styles.chartTitle}>Doanh Thu Hàng Tháng</Text>
-        <LineChart
-          data={revenueData}
-          width={screenWidth}
-          height={220}
-          chartConfig={{
-            backgroundGradientFrom: "#fff",
-            backgroundGradientTo: "#fff",
-            color: (opacity = 1) => `rgba(0, 122, 255, ${opacity})`,
-            strokeWidth: 2,
-          }}
-          bezier
-          style={{ marginVertical: 10, borderRadius: 10 }}
-        />
-      </View>
-    </ScrollView>
-  );
-};
+      <ScrollView style={styles.scrollView}>
+        {/* Month Filter */}
+        <View style={styles.filterContainer}>
+          <TouchableOpacity style={styles.pickerButton} onPress={() => setIsPickerVisible(!isPickerVisible)}>
+            <Text style={styles.pickerButtonText}>{selectedMonth}</Text>
+            <Ionicons name="chevron-down" size={20} color="#3750B2" />
+          </TouchableOpacity>
+
+          {isPickerVisible && (
+            <View style={styles.pickerContainer}>
+              {months.map((month) => (
+                <TouchableOpacity
+                  key={month}
+                  style={[styles.monthOption, selectedMonth === month && styles.selectedMonthOption]}
+                  onPress={() => {
+                    setSelectedMonth(month)
+                    setIsPickerVisible(false)
+                  }}
+                >
+                  <Text style={[styles.monthOptionText, selectedMonth === month && styles.selectedMonthOptionText]}>
+                    {month}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </View>
+
+        {/* Overview Cards */}
+        <View style={styles.cardsContainer}>
+          <View style={styles.card}>
+            <View style={styles.cardContent}>
+              <View>
+                <Text style={styles.cardLabel}>Revenue</Text>
+                <Text style={styles.cardValue}>${calculateRevenue(filteredTransactions).toLocaleString()}</Text>
+              </View>
+              <View style={styles.iconContainer}>
+                <Ionicons name="cash-outline" size={24} color="#3750B2" />
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.card}>
+            <View style={styles.cardContent}>
+              <View>
+                <Text style={styles.cardLabel}>Transactions</Text>
+                <Text style={styles.cardValue}>{filteredTransactions.length}</Text>
+              </View>
+              <View style={styles.iconContainer}>
+                <Ionicons name="card-outline" size={24} color="#3750B2" />
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.card}>
+            <View style={styles.cardContent}>
+              <View>
+                <Text style={styles.cardLabel}>Customers</Text>
+                <Text style={styles.cardValue}>{sampleData.customers.length}</Text>
+              </View>
+              <View style={styles.iconContainer}>
+                <Ionicons name="people-outline" size={24} color="#3750B2" />
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Revenue Chart */}
+        <View style={styles.chartCard}>
+          <Text style={styles.chartTitle}>Monthly Revenue</Text>
+          <LineChart
+            data={chartData}
+            width={screenWidth}
+            height={280}
+            chartConfig={chartConfig}
+            bezier
+            style={styles.chart}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#f5f5f5",
   },
-  overviewContainer: {
+  header: {
+    backgroundColor: "#3750B2",
+    height: 60,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  backButton: {
+    padding: 8,
+  },
+  headerTitle: {
+    flex: 1,
+    color: "white",
+    fontSize: 18,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  filterButton: {
+    padding: 8,
+  },
+  scrollView: {
+    flex: 1,
+    padding: 20,
+  },
+  filterContainer: {
+    marginBottom: 20,
+    zIndex: 100,
+  },
+  pickerButton: {
+    backgroundColor: "white",
+    borderRadius: 8,
+    padding: 12,
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: verticalScale(20),
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  pickerButtonText: {
+    fontSize: 16,
+    color: "#3750B2",
+    fontWeight: "500",
+  },
+  pickerContainer: {
+    position: "absolute",
+    top: 55,
+    left: 0,
+    right: 0,
+    backgroundColor: "white",
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+    zIndex: 1000,
+    maxHeight: 300,
+  },
+  monthOption: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  selectedMonthOption: {
+    backgroundColor: "#f0f5ff",
+  },
+  monthOptionText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  selectedMonthOptionText: {
+    color: "#3750B2",
+    fontWeight: "600",
+  },
+  cardsContainer: {
+    marginBottom: 20,
   },
   card: {
-    justifyContent: "center",
-    flex: 1,
-    width: scale(200),
-    height: verticalScale(150),
     backgroundColor: "white",
-    padding: 10,
-    borderRadius: 10,
-    marginHorizontal: verticalScale(5),
-    alignItems: "center",
+    borderRadius: 12,
+    marginBottom: 15,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
-  title: {
-    fontSize: moderateScale(16),
-    fontWeight: "bold",
-    color: "#555",
+  cardContent: {
+    padding: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
-  value: {
-    fontSize: moderateScale(20),
-    fontWeight: "bold",
-    color: "#007AFF",
-    marginTop: verticalScale(5),
+  cardLabel: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 5,
   },
-  chartContainer: {
+  cardValue: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#3750B2",
+  },
+  iconContainer: {
+    height: 48,
+    width: 48,
+    borderRadius: 24,
+    backgroundColor: "#EEF1FF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  chartCard: {
     backgroundColor: "white",
-    paddingHorizontal: scale(20),
-    paddingVertical: verticalScale(20),
-    borderRadius: 10,
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   chartTitle: {
-    fontSize: moderateScale(18),
+    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: verticalScale(10),
+    marginBottom: 15,
+    color: "#333",
   },
-});
+  chart: {
+    marginVertical: 8,
+    borderRadius: 16,
+  },
+})
 
-export default BusinessDashBoardScreen;
+export default BusinessDashboard
+

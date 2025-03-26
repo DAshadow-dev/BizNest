@@ -11,7 +11,7 @@ const {
 
 router.get("/businessOwners", isAdmin, getBusinessOwners);
 router.put("/toggleStatus/:id", isAdmin, toggleAccountStatus);
-router.post("/approve/:userId", isAdmin, approveUser);
-router.post("/reject/:userId", isAdmin, rejectUser);
+router.put("/approve/:userId", isAdmin, approveUser);
+router.put("/reject/:userId", isAdmin, rejectUser);
 
 module.exports = router;

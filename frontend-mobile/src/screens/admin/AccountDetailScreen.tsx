@@ -39,10 +39,6 @@ const AccountDetailScreen = (props: any) => {
     setLoading(false)
   },[])
 
-  const transactions = [
-    { date: "21/2/2025", price: "$20" },
-    { date: "21/2/2025", price: "$20" },
-  ];
   const handleLockUnlock = () => {
     Alert.alert(
       "Confirm",
@@ -147,19 +143,6 @@ const AccountDetailScreen = (props: any) => {
             Role: <Text style={styles.value}>{account.role}</Text>
           </Text>
         </View>
-
-        <Text style={styles.sectionTitle}>Transaction history</Text>
-
-        {transactions.map((transaction, index) => (
-          <View key={index} style={styles.card}>
-            <Text style={styles.label}>
-              Date created: <Text style={styles.value}>{transaction.date}</Text>
-            </Text>
-            <Text style={styles.label}>
-              Price: <Text style={styles.value}>{transaction.price}</Text>
-            </Text>
-          </View>
-        ))}
       </ScrollView>
       <Toast config={toastConfig}/>
     </View>

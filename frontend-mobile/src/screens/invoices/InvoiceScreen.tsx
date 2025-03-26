@@ -58,7 +58,7 @@ const OrderDetailScreen = (props: any) => {
         data: {id: id},
         onSuccess:() => {
           console.log('1');
-          navigation.navigate(Routes.InvoiceListScreen);
+          navigation.goBack();
           console.log('2');
         },
         onError: (error: any) => {
@@ -75,7 +75,7 @@ const OrderDetailScreen = (props: any) => {
       <View style={styles.header}>
         <View style={styles.headerTop}>
           <TouchableOpacity
-            onPress={() => navigation.navigate(Routes.InvoiceListScreen)}
+            onPress={() => navigation.goBack()}
           >
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
@@ -114,7 +114,11 @@ const OrderDetailScreen = (props: any) => {
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Danh sách sản phẩm</Text>
           {order.products.map((product: any, index: number) => (
-            <View key={index} style={styles.productRow}>
+            <TouchableOpacity 
+              key={index} 
+              style={styles.productRow}
+              onPress={() => navigation.navigate(Routes.ProductDetailScreen, { product: product.productId })}
+            >
               <Image
                 source={{ uri: product.productId.image }}
                 style={styles.productImage}
@@ -141,7 +145,7 @@ const OrderDetailScreen = (props: any) => {
                   đ
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
 
@@ -163,7 +167,7 @@ const OrderDetailScreen = (props: any) => {
         {/* Trạng thái đơn hàng */}
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Trạng thái đơn hàng</Text>
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
+          <View style={{ justifyContent: "center", alignItems: "center"}}>
             <Text
               style={{
                 ...styles.statusText,
@@ -177,9 +181,9 @@ const OrderDetailScreen = (props: any) => {
               {order.status}
             </Text>
           </View>
-          <TouchableOpacity style={styles.changeStatusButton}>
+          {/* <TouchableOpacity style={styles.changeStatusButton}>
             <Text style={styles.changeStatusText}>Thay đổi trạng thái</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </ScrollView>
     </View>

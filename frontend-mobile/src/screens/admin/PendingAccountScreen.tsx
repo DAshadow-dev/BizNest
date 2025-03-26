@@ -26,43 +26,8 @@ const PendingAccountScreen: React.FC = () => {
   const [filteredBussinessOnwers, setFilteredBussinessOnwers] = useState<any[]>(
     []
   );
-  const dispatch = useDispatch();
-  const [count, setCount] = useState(0);
-
-  const handleApprove = (account: any) => {
-    dispatch({
-      type: AdminActions.APPROVE_ACCOUNT,
-      payload: {
-        id: account._id,
-        onError: (error: any) => {
-          console.log(error);
-        },
-        onFailed: (MsgNo: string) => {
-          console.log(MsgNo);
-        },
-      },
-    });
-    setCount(count + 1);
-    Alert.alert("Account Approved", `You have approved ${account.username}`);
-  };
-
-  const handleReject = (account: any) => {
-    dispatch({
-      type: AdminActions.REJECT_ACCOUNT,
-      payload: {
-        id: account._id,
-        onError: (error: any) => {
-          console.log(error);
-        },
-        onFailed: (MsgNo: string) => {
-          console.log(MsgNo);
-        },
-      },
-    });
-    setCount(count + 1);
-    Alert.alert("Account Rejected", `You have rejected ${account.username}`);
-  };
-
+  const dispatch = useDispatch();  
+  
   useEffect(() => {
     dispatch({
       type: AdminActions.FETCH_LIST_BUSSINESS_OWNER,
@@ -75,7 +40,7 @@ const PendingAccountScreen: React.FC = () => {
         },
       },
     });
-  }, [count]);
+  },[]);
 
   useEffect(() => {
     const filtered = bussinessOnwers.filter(
@@ -103,7 +68,15 @@ const PendingAccountScreen: React.FC = () => {
         <View style={styles.accountInfo}>
           <Text style={styles.accountName}>{item.username}</Text>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
+          <TouchableOpacity
+              style={styles.detailButton}
+              onPress={() => {
+                navigation.navigate(Routes.PendingDetailScreen, {accountId: item._id});
+              }}
+            >
+              <Text style={styles.buttonText}>View Detail</Text>
+            </TouchableOpacity>
+            {/* <TouchableOpacity
               style={styles.approveButton}
               onPress={() => handleApprove(item)}
             >
@@ -114,7 +87,7 @@ const PendingAccountScreen: React.FC = () => {
               onPress={() => handleReject(item)}
             >
               <Text style={styles.buttonText}>Reject</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
       </View>
@@ -225,6 +198,12 @@ const styles = StyleSheet.create({
   backButtonText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  detailButton: {
+    backgroundColor: "#3478f6",
+    padding: 10,
+    borderRadius: 5,
+    marginRight: 10,
   },
 });
 

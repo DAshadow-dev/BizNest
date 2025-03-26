@@ -31,7 +31,15 @@ const TransactionSchema = new mongoose.Schema({
     createdAt : {
         type: Date,
         default: Date.now
-    }
+    },
+    customerId: {
+        type: mongoose.Schema.Types.Number,
+        ref: 'Customer'
+    },
+    userId: {
+        type: mongoose.Schema.Types.Number,
+        ref: 'User'
+    },
 })
 
 TransactionSchema.plugin(AutoIncrement, { id: 'transaction_seq', inc_field: '_id'});

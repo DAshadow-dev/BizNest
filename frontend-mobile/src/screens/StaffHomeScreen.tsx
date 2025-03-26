@@ -1,53 +1,58 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Modal,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Modal, Alert } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LineChart } from "react-native-chart-kit";
 import * as Routes from "@utils/Routes";
-import {
-  navigate,
-  useNavigationRoot,
-} from "@components/navigate/RootNavigation";
-import { RootState } from "@redux/root-reducer";
+import { navigate, useNavigationRoot } from "@components/navigate/RootNavigation";
+import ProductActions from "@redux/product/actions";
 import { useAppSelector } from "@redux/store";
+import { useDispatch } from "react-redux";
+import { RootState } from "@redux/root-reducer";
+import CustomerActions from "@redux/customer/actions";
+import TransactionActions from "@redux/transaction/actions";
 
-const HomeAdminScreen = () => {
+const HomePage = () => {
   const navigation = useNavigationRoot();
-  const Auth = useAppSelector((state: RootState) => state.User.Auth);
   const [activeTab, setActiveTab] = useState("home");
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  
   const categories = [
-    {
-      id: "1",
-      name: "Pending",
-      icon: "receipt",
-      route: Routes.PendingAccountsScreen,
-    },
-    {
-      id: "2",
-      name: "List Onwer",
-      icon: "people",
-      route: Routes.AccountListScreen,
-    },
-    {
-      id: "3",
-      name: "Dashboard",
-      icon: "bar-chart",
-      route: Routes.AdminDashboardScreen,
-    },
-    {
-      id: "4",
-      name: "Review",
-      icon: "rate-review",
-      route: Routes.ReviewScreen,
-    }
+    { id: "1", name: "Product", icon: "storefront", route: Routes.WareHouse },
+    { id: "3", name: "Customer", icon: "people", route: Routes.CUSTOMER_LIST },
+    { id: "5", name: "Invoice", icon: "account-balance-wallet", route: Routes.InvoiceListScreen },
   ];
+
+  const dispatch = useDispatch();
+  const Auth = useAppSelector((state: RootState) => state.User.Auth);
+
+  useEffect(() => {
+    dispatch({ 
+      type: ProductActions.FETCH_PRODUCTS, 
+      payload: { storeId: Auth?.storeId } 
+    });
+    dispatch({
+      type: CustomerActions.FETCH_LIST_CUSTOMER,
+      payload: {
+        onError: (error: any) => {
+          console.log(error);
+        },
+        onFailed: (MsgNo: string) => {
+          console.log(MsgNo);
+        },
+      },
+    });
+    dispatch({
+      type: TransactionActions.FETCH_LIST_TRANSACTION,
+      payload: {
+        onError: (error: any) => {
+          console.log(error);
+        },
+        onFailed: (MsgNo: string) => {
+          console.log(MsgNo);
+        },
+      },
+    });
+  }, []);
 
   const handleLogout = () => {
     setLogoutModalVisible(true);
@@ -58,7 +63,7 @@ const HomeAdminScreen = () => {
     navigation.navigate(Routes.LOGIN_SCREEN);
   };
 
-  const handleTabPress = (tabName, route) => {
+  const handleTabPress = (tabName: string, route: string) => {
     setActiveTab(tabName);
     navigation.navigate(route);
   };
@@ -67,20 +72,12 @@ const HomeAdminScreen = () => {
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.headerText}>Dashboard Admin</Text>
-          <View style={{ flexDirection: "row" }}>
-          <TouchableOpacity
-          onPress={() => {
-            if (Auth._id) {
-              navigation.navigate(Routes.CHAT_LIST, { userId: Auth?._id?.toString(),role: "admin" });
-            } else {
-              console.error("Auth.id is undefined");
-            }
-          }}
-          >
-            <Ionicons name="notifications-outline" size={24} color="white" />
-          </TouchableOpacity>
-            <View style={{ width: 10 }} />
+          <Text style={styles.headerText}>Dashboard</Text>
+          <View style={{flexDirection: 'row'}}>
+            <TouchableOpacity style={styles.headerButton}>
+              <Ionicons name="notifications-outline" size={24} color="white" />
+            </TouchableOpacity>
+            <View style={{width: 10}}/>
             <TouchableOpacity
               style={styles.headerButton}
               onPress={handleLogout}
@@ -91,7 +88,7 @@ const HomeAdminScreen = () => {
         </View>
 
         <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>Revenue</Text>
+          <Text style={styles.chartTitle}>Doanh thu gần đây</Text>
           <LineChart
             data={{
               labels: ["T1", "T2", "T3", "T4", "T5", "T6"],
@@ -112,11 +109,7 @@ const HomeAdminScreen = () => {
 
         <View style={styles.categoryContainer}>
           {categories.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.categoryItem}
-              onPress={() => navigation.navigate(item.route)}
-            >
+            <TouchableOpacity key={item.id} style={styles.categoryItem} onPress={() => navigation.navigate(item.route)}>
               <MaterialIcons name={item.icon} size={32} color="#007AFF" />
               <Text style={styles.categoryText}>{item.name}</Text>
             </TouchableOpacity>
@@ -157,39 +150,39 @@ const HomeAdminScreen = () => {
       <View style={styles.bottomNav}>
         <TouchableOpacity 
           style={styles.tabItem}
-          onPress={() => handleTabPress('pending', Routes.PendingAccountsScreen)}
+          onPress={() => handleTabPress('customers', Routes.CUSTOMER_LIST)}
         >
-          <View style={[styles.iconContainer, activeTab === 'pending' && styles.activeIconContainer]}>
-            <MaterialIcons 
-              name="receipt" 
-              size={24} 
-              color={activeTab === 'pending' ? "#007AFF" : "white"} 
-            />
-          </View>
-          <Text style={[styles.tabLabel, activeTab === 'pending' && styles.activeTabLabel]}>
-            Pending
-          </Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.tabItem}
-          onPress={() => handleTabPress('accounts', Routes.AccountListScreen)}
-        >
-          <View style={[styles.iconContainer, activeTab === 'accounts' && styles.activeIconContainer]}>
+          <View style={[styles.iconContainer, activeTab === 'customers' && styles.activeIconContainer]}>
             <MaterialIcons 
               name="people" 
               size={24} 
-              color={activeTab === 'accounts' ? "#007AFF" : "white"} 
+              color={activeTab === 'customers' ? "#007AFF" : "white"} 
             />
           </View>
-          <Text style={[styles.tabLabel, activeTab === 'accounts' && styles.activeTabLabel]}>
-            Accounts
+          <Text style={[styles.tabLabel, activeTab === 'customers' && styles.activeTabLabel]}>
+            Customer
           </Text>
         </TouchableOpacity>
         
         <TouchableOpacity 
           style={styles.tabItem}
-          onPress={() => handleTabPress('home', Routes.HOME_ADMIN_SCREEN)}
+          onPress={() => handleTabPress('products', Routes.WareHouse)}
+        >
+          <View style={[styles.iconContainer, activeTab === 'products' && styles.activeIconContainer]}>
+            <Ionicons 
+              name="cart" 
+              size={24} 
+              color={activeTab === 'products' ? "#007AFF" : "white"} 
+            />
+          </View>
+          <Text style={[styles.tabLabel, activeTab === 'products' && styles.activeTabLabel]}>
+            Product
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.tabItem}
+          onPress={() => handleTabPress('home', Routes.StaffHomeScreen)}
         >
           <View style={styles.homeButton}>
             <Ionicons name="home" size={28} color="white" />
@@ -201,33 +194,33 @@ const HomeAdminScreen = () => {
         
         <TouchableOpacity 
           style={styles.tabItem}
-          onPress={() => handleTabPress('dashboard', Routes.AdminDashboardScreen)}
+          onPress={() => handleTabPress('stats', Routes.BUSINESS_DASHBOARD)}
         >
-          <View style={[styles.iconContainer, activeTab === 'dashboard' && styles.activeIconContainer]}>
-            <MaterialIcons 
-              name="bar-chart" 
+          <View style={[styles.iconContainer, activeTab === 'stats' && styles.activeIconContainer]}>
+            <Ionicons 
+              name="stats-chart" 
               size={24} 
-              color={activeTab === 'dashboard' ? "#007AFF" : "white"} 
+              color={activeTab === 'stats' ? "#007AFF" : "white"} 
             />
           </View>
-          <Text style={[styles.tabLabel, activeTab === 'dashboard' && styles.activeTabLabel]}>
+          <Text style={[styles.tabLabel, activeTab === 'stats' && styles.activeTabLabel]}>
             Dashboard
           </Text>
         </TouchableOpacity>
         
         <TouchableOpacity 
           style={styles.tabItem}
-          onPress={() => handleTabPress('review', Routes.ReviewScreen)}
+          onPress={() => handleTabPress('profile', Routes.PROFILE)}
         >
-          <View style={[styles.iconContainer, activeTab === 'review' && styles.activeIconContainer]}>
-            <MaterialIcons 
-              name="rate-review" 
+          <View style={[styles.iconContainer, activeTab === 'profile' && styles.activeIconContainer]}>
+            <Ionicons 
+              name="person" 
               size={24} 
-              color={activeTab === 'review' ? "#007AFF" : "white"} 
+              color={activeTab === 'profile' ? "#007AFF" : "white"} 
             />
           </View>
-          <Text style={[styles.tabLabel, activeTab === 'review' && styles.activeTabLabel]}>
-            Review
+          <Text style={[styles.tabLabel, activeTab === 'profile' && styles.activeTabLabel]}>
+            Inforamtion
           </Text>
         </TouchableOpacity>
       </View>
@@ -235,7 +228,7 @@ const HomeAdminScreen = () => {
   );
 };
 
-export default HomeAdminScreen;
+export default HomePage;
 
 const styles = StyleSheet.create({
   container: {
@@ -282,7 +275,7 @@ const styles = StyleSheet.create({
   },
   categoryItem: {
     backgroundColor: "white",
-    width: "45%", // Changed to 45% to fit better with 4 items
+    width: "30%",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
@@ -347,7 +340,7 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     color: "white",
-    fontSize: 10, // Smaller font size for admin tabs (more text)
+    fontSize: 11,
     marginTop: 2,
   },
   activeTabLabel: {

@@ -42,9 +42,15 @@ const AccountListScreen = (props: any) => {
 
   useEffect(() => {
     if (search === '') {
-      setFilteredBussinessOnwers(bussinessOnwers);
+      const filtered = bussinessOnwers.filter(
+        (user: any) => user.status != "pending"
+      );
+      setFilteredBussinessOnwers(filtered);
     } else {
-      const filtered = bussinessOnwers.filter((customer: any) =>
+      const filter = bussinessOnwers.filter(
+        (user: any) => user.status != "pending"
+      );
+      const filtered = filter.filter((customer: any) =>
         customer.phone.includes(search) || customer.username.toLowerCase().includes(search.toLowerCase())
       );
       setFilteredBussinessOnwers(filtered);

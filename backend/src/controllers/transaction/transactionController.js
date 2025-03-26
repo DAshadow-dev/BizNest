@@ -16,6 +16,7 @@ const getTransactionByStoreId = asyncHandler(async (req, res) => {
         }
 
         const transactions = await Transaction.find({ storeId })
+            .populate("userId") // Populate customer (nếu cần)
             .populate("customerId") // Populate customer (nếu cần)
             .populate("products.productId") // Populate sản phẩm
             .sort({ _id: -1 })
@@ -47,6 +48,8 @@ const createTransaction = asyncHandler(async (req, res) => {
     try {
         const{customerId, products } = req.body;
         const storeId= req.user.storeId
+        console.log("User: ", req.user)
+        const userId= req.user._id
         // Kiểm tra sự tồn tại của cửa hàng và khách hàng
         const storeExists = await Store.findById(storeId);
         const customerExists = await Customer.findById(customerId);
@@ -68,6 +71,7 @@ const createTransaction = asyncHandler(async (req, res) => {
 
         // Tạo mới giao dịch
         const transaction = new Transaction({
+            userId,
             storeId,
             customerId,
             products,

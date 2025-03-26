@@ -24,7 +24,7 @@ const resetCounter = async (counterName, startValue) => {
       { $set: { seq: startValue } },
       { upsert: true }
     );
-    console.log(`${counterName} counter set successfully!`);
+    console.log(`${counterNames} counter set successfully!`);
   } catch (error) {
     console.error(`Error setting ${counterName} counter:`, error);
   }

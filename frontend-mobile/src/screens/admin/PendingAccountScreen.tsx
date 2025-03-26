@@ -26,8 +26,8 @@ const PendingAccountScreen: React.FC = () => {
   const [filteredBussinessOnwers, setFilteredBussinessOnwers] = useState<any[]>(
     []
   );
-  const dispatch = useDispatch();  
-  
+  const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch({
       type: AdminActions.FETCH_LIST_BUSSINESS_OWNER,
@@ -40,7 +40,7 @@ const PendingAccountScreen: React.FC = () => {
         },
       },
     });
-  },[bussinessOnwers]);
+  }, [bussinessOnwers]);
 
   useEffect(() => {
     const filtered = bussinessOnwers.filter(
@@ -48,30 +48,42 @@ const PendingAccountScreen: React.FC = () => {
     );
     setFilteredBussinessOnwers(filtered);
   }, [bussinessOnwers]);
-
+  // Hàm lấy chữ cái đầu từ username
+  const getNameInitials = (username: string) => {
+    if (!username) return "";
+    const nameParts = username.split(" ");
+    if (nameParts.length >= 2) {
+      return nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0);
+    }
+    return username.charAt(0);
+  };
   const renderItem = ({ item }: { item: any }) => (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate(Routes.PendingDetailScreen, {accountId: item._id});
+        navigation.navigate(Routes.PendingDetailScreen, {
+          accountId: item._id,
+        });
       }}
     >
       <View style={styles.accountContainer}>
-        <Image
-          source={{
-            uri:
-              item.image != ""
-                ? item.image
-                : "https://i.pinimg.com/736x/8f/1c/a2/8f1ca2029e2efceebd22fa05cca423d7.jpg",
-          }}
-          style={styles.accountImage}
-        />
+        {item.image ? (
+          <Image source={{ uri: item.image }} style={styles.staffImage} />
+        ) : (
+          <View style={styles.staffImagePlaceholder}>
+            <Text style={styles.staffImagePlaceholderText}>
+              {getNameInitials(item.username)}
+            </Text>
+          </View>
+        )}
         <View style={styles.accountInfo}>
           <Text style={styles.accountName}>{item.username}</Text>
           <View style={styles.buttonContainer}>
-          <TouchableOpacity
+            <TouchableOpacity
               style={styles.detailButton}
               onPress={() => {
-                navigation.navigate(Routes.PendingDetailScreen, {accountId: item._id});
+                navigation.navigate(Routes.PendingDetailScreen, {
+                  accountId: item._id,
+                });
               }}
             >
               <Text style={styles.buttonText}>View Detail</Text>
@@ -204,6 +216,26 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginRight: 10,
+  },
+  staffImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 12,
+  },
+  staffImagePlaceholder: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#E5E7EB",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  staffImagePlaceholderText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#6B7280",
   },
 });
 

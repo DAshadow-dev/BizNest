@@ -65,7 +65,7 @@ const PasswordScreen= ()=> {
                 <View style={{width: scale(50), height: verticalScale(50), justifyContent: "center", alignItems: "center"}}>
                     <TouchableOpacity
                         onPress={()=>{
-                            navigation.navigate(Routes.HomeScreen)
+                            navigation.goBack()
                         }}
                     >
                         <IconBack/>

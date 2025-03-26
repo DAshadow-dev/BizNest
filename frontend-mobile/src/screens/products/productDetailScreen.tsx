@@ -188,7 +188,7 @@ const ProductDetailScreen = ({ route }: { route: { params: RouteParams } }) => {
           />
           <Text style={styles.productName}>{product.name || 'N/A'}</Text>
           <View style={styles.priceBadge}>
-            <Text style={styles.priceText}>${product.price || '0.00'}</Text>
+            <Text style={styles.priceText}>${product.price.toLocaleString() || '0.00'}</Text>
           </View>
         </View>
 

@@ -32,19 +32,19 @@ const BusinessDashboard = () => {
       setFilteredTransactions(sampleData.transactions)
     } else {
       const monthIndex = months.indexOf(selectedMonth) - 1 // -1 because "All" is at index 0
-      setFilteredTransactions(sampleData.transactions.filter((t) => new Date(t.createdAt).getMonth() === monthIndex))
+      setFilteredTransactions(sampleData.transactions.filter((t: any) => new Date(t.createdAt).getMonth() === monthIndex))
     }
   }, [selectedMonth])
 
   // Calculate total revenue
-  const calculateRevenue = (transactions) => {
-    return transactions.reduce((total, transaction) => total + transaction.totalPrice, 0)
+  const calculateRevenue = (transactions: any) => {
+    return transactions.reduce((total: any, transaction: any) => total + transaction.totalPrice, 0)
   }
 
   // Prepare monthly revenue data
   const getMonthlyRevenue = () => {
     const monthlyRevenue = Array(12).fill(0)
-    sampleData.transactions.forEach((transaction) => {
+    sampleData.transactions.forEach((transaction: any ) => {
       const month = new Date(transaction.createdAt).getMonth()
       monthlyRevenue[month] += transaction.totalPrice
     })
@@ -81,7 +81,7 @@ const BusinessDashboard = () => {
       strokeWidth: "2",
       stroke: "#3750B2",
     },
-    formatYLabel: (value) => `$${Number.parseInt(value).toLocaleString()}`,
+    formatYLabel: (value: any) => `$${Number.parseInt(value).toLocaleString()}`,
   }
 
   return (

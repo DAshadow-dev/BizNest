@@ -90,26 +90,6 @@ const HomeAdminScreen = () => {
           </View>
         </View>
 
-        <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>Revenue</Text>
-          <LineChart
-            data={{
-              labels: ["T1", "T2", "T3", "T4", "T5", "T6"],
-              datasets: [{ data: [30000, 45000, 32000, 40000, 48000, 50000] }],
-            }}
-            width={350}
-            height={200}
-            chartConfig={{
-              backgroundGradientFrom: "#fff",
-              backgroundGradientTo: "#fff",
-              decimalPlaces: 0,
-              color: (opacity = 1) => `rgba(0, 122, 255, ${opacity})`,
-            }}
-            bezier
-            style={{ borderRadius: 10 }}
-          />
-        </View>
-
         <View style={styles.categoryContainer}>
           {categories.map((item) => (
             <TouchableOpacity
@@ -254,9 +234,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 20,
     fontWeight: "bold",
-  },
-  headerButton: {
-    padding: 5,
   },
   chartContainer: {
     backgroundColor: "white",

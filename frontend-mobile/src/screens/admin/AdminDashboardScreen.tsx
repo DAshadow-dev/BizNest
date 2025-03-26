@@ -42,7 +42,7 @@ const MONTHS = [
 ]
 
 // Short month names for chart labels
-const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
 
 const AdminDashboardScreen = () => {
   const navigation = useNavigationRoot()
@@ -54,7 +54,7 @@ const AdminDashboardScreen = () => {
   const [isFilterVisible, setIsFilterVisible] = useState<boolean>(false)
 
   // Monthly revenue data
-  const monthlyRevenueData = [100000, 120000, 130000, 89000, 90000, 105000, 89000, 120000, 130000, 90000, 105000, 89000]
+  const monthlyRevenueData = [100000, 120000, 130000, 0, 0, 0]
 
   // Calculate filtered data based on selected month
   const filteredData = useMemo(() => {
@@ -75,7 +75,7 @@ const AdminDashboardScreen = () => {
 
       // For single month view, show daily data (simulated here)
       // In a real app, you would fetch daily data for the selected month
-      const daysInMonth = new Date(2023, monthIndex + 1, 0).getDate()
+      const daysInMonth = new Date(2025, monthIndex + 1, 0).getDate()
       const dailyLabels = Array.from({ length: Math.min(7, daysInMonth) }, (_, i) => `${i + 1}`)
 
       // Generate simulated daily data based on the monthly value
@@ -263,7 +263,7 @@ const AdminDashboardScreen = () => {
             <View style={styles.chartLegend}>
               <View style={styles.legendDot} />
               <Text style={styles.legendText}>
-                {selectedMonth === "All" ? "2023 Revenue" : `${selectedMonth} 2023`}
+                {selectedMonth === "All" ? "2025 Revenue" : `${selectedMonth} 2025`}
               </Text>
             </View>
           </View>

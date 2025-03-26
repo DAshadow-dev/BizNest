@@ -212,19 +212,22 @@ const HomePage = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.headerText}>Dashboard</Text>
-          <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity
-          onPress={() => {
-            if (Auth._id) {
-              navigation.navigate(Routes.CHAT_LIST, { userId: Auth?._id?.toString(),role: "business owner" });
-            } else {
-              console.error("Auth.id is undefined");
-            }
-          }}
-          >
-            <Ionicons name="notifications-outline" size={24} color="white" />
-          </TouchableOpacity>
-            <View style={{width: 10}}/>
+          <View style={{ flexDirection: "row" }}>
+            <TouchableOpacity
+              onPress={() => {
+                if (Auth._id) {
+                  navigation.navigate(Routes.CHAT_LIST, {
+                    userId: Auth?._id?.toString(),
+                    role: "business owner",
+                  });
+                } else {
+                  console.error("Auth.id is undefined");
+                }
+              }}
+            >
+              <Ionicons name="notifications-outline" size={24} color="white" />
+            </TouchableOpacity>
+            <View style={{ width: 10 }} />
             <TouchableOpacity
               style={styles.headerButton}
               onPress={handleLogout}
@@ -439,9 +442,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
-  headerButton: {
-    padding: 5,
-  },
+
   chartContainer: {
     backgroundColor: "white",
     borderRadius: 10,

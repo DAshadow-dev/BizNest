@@ -156,7 +156,7 @@ const WareHouse = () => {
           <View style={styles.productDetails}>
             <Text style={styles.productName}>{item.name}</Text>
             <Text style={styles.productCategory}>{categoryName}</Text>
-            <Text style={styles.productPrice}>${item.price || '0.00'}</Text>
+            <Text style={styles.productPrice}>${item.price.toLocaleString() || '0.00'}</Text>
           </View>
         </View>
         <Ionicons name="chevron-forward-outline" size={18} color="#3B82F6" />

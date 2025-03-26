@@ -4,6 +4,7 @@ import { ChatReducer } from '@type/chat.types';
 
 const initState: ChatReducer = {
     messages: [],
+    chatList: [],
     loading: false,
     error: null,
 };
@@ -53,7 +54,12 @@ const Reducer = (state = initState, action: { type: string; payload?: any }) => 
           ...state,
           error: action.payload.error,
       };
-
+      case ChatActions.FETCH_CHAT_LIST:
+      return { ...state, loading: true, error: null };
+    case ChatActions.FETCH_CHAT_LIST_SUCCESS:
+      return { ...state, chatList: action.payload.chatList, loading: false };
+    case ChatActions.FETCH_CHAT_LIST_FAILURE:
+      return { ...state, loading: false, error: action.payload.error };
     default:
       return state;
   }

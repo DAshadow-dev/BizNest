@@ -29,10 +29,8 @@ function* sendMessageSaga(action: any) {
     if (response?.status == 201) {
      
       onSuccess && onSuccess(response.data.Data);
-      console.log('tao pass');
       yield put({ type: ChatActions.SEND_MESSAGE_SUCCESS, payload: { message: response?.data?.Data } });
     } else {
-      console.log("tao co phei")
       onFailure && onFailure(response.data.MsgNo);
       yield put({ type: ChatActions.SEND_MESSAGE_FAILURE });
     }
@@ -40,6 +38,23 @@ function* sendMessageSaga(action: any) {
     console.log(error)
     onError && onError(error);
     yield put({ type: ChatActions.SEND_MESSAGE_FAILURE });
+  }
+}
+
+function* fetchChatListSaga(action: any) {
+  const { data, onSuccess, onFailure, onError } = action.payload;
+  try {
+    const response: CommonResponse<CodeResponse> = yield call(() => Factories.fetchChatList(data.userId));
+    if (response?.status === 200) {
+      onSuccess && onSuccess(response.data.Data);
+      yield put({ type: ChatActions.FETCH_CHAT_LIST_SUCCESS, payload: { chatList: response.data.Data.chatList } });
+    } else {
+      onFailure && onFailure(response.data.MsgNo);
+      yield put({ type: ChatActions.FETCH_CHAT_LIST_FAILURE, payload: { error: response.data.MsgNo } });
+    }
+  } catch (error) {
+    onError && onError(error);
+    yield put({ type: ChatActions.FETCH_CHAT_LIST_FAILURE, payload: { error: error.message } });
   }
 }
 
@@ -64,11 +79,15 @@ export function* watchReceiveMessage() {
   yield takeEvery(ChatActions.RECEIVE_MESSAGE, receiveMessageSaga);
 }
 
+export function* watchFetchChatList() {
+  yield takeEvery(ChatActions.FETCH_CHAT_LIST, fetchChatListSaga);
+}
 // Saga chính
 export default function* chatSaga() {
   yield all([
     fork(watchFetchMessages),
     fork(watchSendMessage),
-    fork(watchReceiveMessage), // Bỏ comment nếu cần
+    fork(watchReceiveMessage), 
+    fork(watchFetchChatList),
   ]);
 }

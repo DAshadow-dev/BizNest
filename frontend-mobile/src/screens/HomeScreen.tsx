@@ -19,12 +19,12 @@ const HomePage = () => {
     { id: "3", name: "Customer", icon: "people", route: Routes.CUSTOMER_LIST },
     { id: "4", name: "Business dashboard", icon: "bar-chart", route: Routes.BUSINESS_DASHBOARD },
     { id: "5", name: "Invoice", icon: "account-balance-wallet", route: Routes.InvoiceListScreen },
-    { id : "6", name: "Review", icon: "rate-review",route: Routes.REVIEW_SCREEN}
+    { id : "6", name: "Review", icon: "rate-review",route: Routes.ReviewScreen}
   ];
 
   const dispatch = useDispatch();
   const Auth = useAppSelector((state: RootState) => state.User.Auth);
-
+  console.log("Auth: ", Auth);
   useEffect(() => {
     dispatch({ 
       type: ProductActions.FETCH_PRODUCTS, 
@@ -48,7 +48,17 @@ const HomePage = () => {
         <View style={styles.header}>
           <Text style={styles.headerText}>Dashboard</Text>
           <View style={{flexDirection: 'row'}}>
+          <TouchableOpacity
+          onPress={() => {
+            if (Auth._id) {
+              navigation.navigate(Routes.CHAT_LIST, { userId: Auth?._id?.toString(),role: "business owner" });
+            } else {
+              console.error("Auth.id is undefined");
+            }
+          }}
+          >
             <Ionicons name="notifications-outline" size={24} color="white" />
+          </TouchableOpacity>
             <View style={{width: 10}}/>
             <TouchableOpacity
               onPress={() => navigation.navigate(Routes.LOGIN_SCREEN)}
@@ -59,7 +69,7 @@ const HomePage = () => {
       </View>
 
         <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>Doanh thu gần đây</Text>
+          <Text style={styles.chartTitle}>Recently Revenue</Text>
           <LineChart
             data={{
               labels: ["T1", "T2", "T3", "T4", "T5", "T6"],

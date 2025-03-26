@@ -13,6 +13,9 @@ const Factories = {
   receiveMessage: (messageData: { senderId: string; receiverId: string; message: string }) => {
     return api.post(ApiConstants.RECEIVE_MESSAGE, { data: messageData });
   },
+  fetchChatList: (userId: string) => {
+    return api.get(`${ApiConstants.GET_CHAT_LIST}/${userId}`);
+  },
 };
 
 export default Factories;

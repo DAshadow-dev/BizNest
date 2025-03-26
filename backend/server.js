@@ -5,7 +5,6 @@ const http = require("http");
 const errorHandler = require("./src/middlewares/errorHandler");
 const connectToDB = require("./src/config/dbConnection");
 const authRoute = require("./src/routes/auth/authRoute");
-const chatRoute = require("./src/routes/chatRoute");
 const userRoute = require("./src/routes/userRoute");
 const Chat = require("./src/models/Chat");
 const { Server } = require("socket.io");
@@ -17,6 +16,7 @@ const customerRoute = require('./src/routes/customerRoute');
 const adminRoute = require('./src/routes/admin/adminRouter');
 const invoiceRouter = require('./src/routes/invoiceRouter');
 const transactionRouter = require('./src/routes/transaction/transactionRoutes');
+const chatRouter = require("./src/routes/chatRoute");
 
 const port = process.env.PORT || 5000;
 
@@ -31,11 +31,6 @@ connectToDB();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 
-// Routes
-app.use('/api', categoryRoutes);
-app.use('/api', storeRoutes);
-app.use('/api', productRoutes);
-app.use('/api', staffRoutes);
 //from errorHandle
 app.use(errorHandler);
 //from cors
@@ -47,11 +42,10 @@ app.use("/api/auth", authRoute);
 global.users = {};
 
 // Kết nối Socket.IO
-=======
 app.use('/api/user', userRoute);
 app.use('/api/admin', adminRoute);
 //chat router
-app.use("api/chat", chatRoute);
+app.use('/api/chat', chatRouter);
 //user router
 app.use('/api/user', userRoute)
 //customer router
@@ -62,6 +56,11 @@ app.use('/api/invoice', invoiceRouter);
 //transaction
 app.use('/api/transaction', transactionRouter);
 
+// Routes
+app.use('/api', categoryRoutes);
+app.use('/api', storeRoutes);
+app.use('/api', productRoutes);
+app.use('/api', staffRoutes);
 //connect socket.io
 io.on("connection", (socket) => {
   console.log("🔵 New client connected:", socket.id);

@@ -17,12 +17,13 @@ import { RootState } from "@redux/root-reducer";
 const socket = io("http://localhost:5000");
 
 const ChatBox = ({ navigation, route }: { navigation: any; route: any }) => {
-  // Lấy dữ liệu từ Redux
+  // console.log("hello")
   const dispatch = useDispatch();
   const messages = useSelector((state: RootState) => state.Chat.messages);
-  // Nhận userId, receiverId từ route (nếu có)
   const userId = route.params?.userId || "123";
-  const receiverId = route.params?.receiverId || "456";
+  const receiverId = route.params?.receiverId || "1";
+  const receiverName = route.params?.receiverName || "Admin"; // Tên của receiver (lấy từ ChatList)
+  const receiverAvatar = route.params?.receiverAvatar || "https://i.pravatar.cc/150?img=10"; // Avatar của receiver
 
   const [inputText, setInputText] = useState("");
   const flatListRef = useRef<FlatList<any> | null>(null);
@@ -77,7 +78,7 @@ const ChatBox = ({ navigation, route }: { navigation: any; route: any }) => {
   useEffect(() => {
     flatListRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
-
+  
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -86,10 +87,10 @@ const ChatBox = ({ navigation, route }: { navigation: any; route: any }) => {
           <Ionicons name="chevron-back" size={24} color="white" />
         </TouchableOpacity>
         <Image
-          source={{ uri: "https://i.pravatar.cc/150?img=10" }}
+          source={{ uri: receiverAvatar }}
           style={styles.avatar}
         />
-        <Text style={styles.headerText}>Chat with Support</Text>
+        <Text style={styles.headerText}>{receiverName}</Text>
       </View>
 
       {/* Chat Messages */}

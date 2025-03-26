@@ -109,9 +109,18 @@ export type RootParamList = {
     password : string,
   },
   // HOME_SCREEN: undefined,
-  CHAT_SCREEN :undefined,
+  CHAT_SCREEN :{
+    userId: string,
+    receiverId: string, 
+    receiverName: string, 
+    receiverAvatar: string,
+  },
+  CHAT_LIST:{
+    userId: string,
+    role : string,
+  },
   HOME_ADMIN: undefined,
   STATUS_SCREEN: {status: string},
   ReviewScreen: undefined,
-  PendingDetailScreen: {id: string}
+  PendingDetailScreen: {id: string},
 };

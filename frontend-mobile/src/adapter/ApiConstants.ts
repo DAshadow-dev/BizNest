@@ -22,6 +22,7 @@ const ApiConstants = {
   GET_MESSAGES : `${BASE_PREFIX}/chat/messages`,
   SEND_MESSAGE : `${BASE_PREFIX}/chat/send`,
   RECEIVE_MESSAGE : `${BASE_PREFIX}/chat/receive`,
+  GET_CHAT_LIST : `${BASE_PREFIX}/chat/chat-list`,
   // product
   GET_ALL_PRODUCTS: `${BASE_PREFIX}/products`,
   CREATE_PRODUCT: `${BASE_PREFIX}/products`,

@@ -4,7 +4,7 @@ import UserActions from './actions';
 
 const initState: UserReducer = {
   Auth: {
-    id: 0,
+    _id: 0,
     username: '',
     email: '',
     phone: '',

@@ -14,12 +14,14 @@ import {
   navigate,
   useNavigationRoot,
 } from "@components/navigate/RootNavigation";
+import { RootState } from "@redux/root-reducer";
+import { useAppSelector } from "@redux/store";
 
 const HomeAdminScreen = () => {
   const navigation = useNavigationRoot();
+  const Auth = useAppSelector((state: RootState) => state.User.Auth);
   const [activeTab, setActiveTab] = useState("home");
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-  
   const categories = [
     {
       id: "1",
@@ -67,9 +69,17 @@ const HomeAdminScreen = () => {
         <View style={styles.header}>
           <Text style={styles.headerText}>Dashboard Admin</Text>
           <View style={{ flexDirection: "row" }}>
-            <TouchableOpacity style={styles.headerButton}>
-              <Ionicons name="notifications-outline" size={24} color="white" />
-            </TouchableOpacity>
+          <TouchableOpacity
+          onPress={() => {
+            if (Auth._id) {
+              navigation.navigate(Routes.CHAT_LIST, { userId: Auth?._id?.toString(),role: "admin" });
+            } else {
+              console.error("Auth.id is undefined");
+            }
+          }}
+          >
+            <Ionicons name="notifications-outline" size={24} color="white" />
+          </TouchableOpacity>
             <View style={{ width: 10 }} />
             <TouchableOpacity
               style={styles.headerButton}

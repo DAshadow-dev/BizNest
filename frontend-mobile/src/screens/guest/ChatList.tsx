@@ -14,10 +14,13 @@ import ChatActions from "@redux/chat/actions";
 import { RootState } from "@redux/root-reducer";
 import { LinearGradient } from "expo-linear-gradient";
 
-const ChatList = ({ navigation }: { navigation: any }) => {
+const ChatList = ({ navigation, route }: { navigation: any; route: any }) => {
   const dispatch = useDispatch();
-  const userId = "123"; 
+  const userId = route.params?.userId || "123";
+  const role = route.params?.role||"admin";
   const chatList = useSelector((state: RootState) => state.Chat.chatList);
+
+  console.log("userId :",chatList);
 
   useEffect(() => {
     dispatch({
@@ -63,7 +66,17 @@ const ChatList = ({ navigation }: { navigation: any }) => {
             </Text>
           </TouchableOpacity>
         )}
-        ListEmptyComponent={<Text style={styles.emptyText}>No chats yet</Text>}
+        // ListEmptyComponent={<Text style={styles.emptyText}>No chats yet</Text>}
+        ListEmptyComponent={role == "admin" ? <Text style={styles.emptyText}>No chats yet</Text> :
+        <TouchableOpacity
+          style={styles.chatItem}
+          onPress={() => goToChat("1", "Admin", "https://i.pravatar.cc/150?img=10")}
+        >
+          <Image source={{ uri: "https://i.pravatar.cc/150?img=10" }} style={styles.avatar} />
+          <View style={styles.chatInfo}>
+            <Text style={styles.chatName}>{"Admin"}</Text>
+          </View>
+        </TouchableOpacity>}
       />
     </View>
   );

@@ -1,5 +1,5 @@
 export interface User {
-  id?: number,
+  _id?: number,
   username?: string,
   password?: string,
   verified?: boolean,
@@ -24,7 +24,7 @@ export interface Customer {
 }
 
 export interface UserReducer {
-  Auth: User;
+  Auth: User,
 }
 
 export interface CustomerReducer {

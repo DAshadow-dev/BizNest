@@ -51,6 +51,7 @@ import HomeAdminScreen from '@screens/HomeAdminScreen';
 import StatusScreen from '@screens/StatusScreen';
 import ReviewScreen from '@screens/admin/ReviewScreen';
 import PendingDetailScreen from '@screens/admin/PendingDetailScreen';
+import ChatList from '@screens/guest/ChatList';
 
 
 const Stack = createStackNavigator<RootParamList>();
@@ -73,6 +74,7 @@ function MyStack() {
         <Stack.Screen name={Routes.HomeScreen} component={HomeScreen} />
         {/* <Stack.Screen name={Routes.HOME_SCREEN} component={HomeScreen} /> */}
         <Stack.Screen name={Routes.CHAT_SCREEN} component={Chatscreen} />
+        <Stack.Screen name={Routes.CHAT_LIST} component={ChatList} />
         <Stack.Screen name={Routes.AdminDashboardScreen} component={AdminDashboardScreen} />
         <Stack.Screen name={Routes.AccountListScreen} component={AccountListScreen}/>
         <Stack.Screen name={Routes.AccountDetailScreen} component={AccountDetailScreen}/>
